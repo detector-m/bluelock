@@ -1,0 +1,427 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		96BD78AB1AAFD0DC00CAF7A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BD78AA1AAFD0DC00CAF7A4 /* main.m */; };
+		96BD78AE1AAFD0DC00CAF7A4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BD78AD1AAFD0DC00CAF7A4 /* AppDelegate.m */; };
+		96BD78B11AAFD0DC00CAF7A4 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BD78B01AAFD0DC00CAF7A4 /* ViewController.m */; };
+		96BD78B41AAFD0DC00CAF7A4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 96BD78B21AAFD0DC00CAF7A4 /* Main.storyboard */; };
+		96BD78B61AAFD0DC00CAF7A4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96BD78B51AAFD0DC00CAF7A4 /* Images.xcassets */; };
+		96BD78B91AAFD0DC00CAF7A4 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96BD78B71AAFD0DC00CAF7A4 /* LaunchScreen.xib */; };
+		96BD78C51AAFD0DD00CAF7A4 /* SmartlockTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BD78C41AAFD0DD00CAF7A4 /* SmartlockTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		96BD78BF1AAFD0DD00CAF7A4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 96BD789D1AAFD0DC00CAF7A4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 96BD78A41AAFD0DC00CAF7A4;
+			remoteInfo = Smartlock;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		96BD78A51AAFD0DC00CAF7A4 /* Smartlock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Smartlock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		96BD78A91AAFD0DC00CAF7A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		96BD78AA1AAFD0DC00CAF7A4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		96BD78AC1AAFD0DC00CAF7A4 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		96BD78AD1AAFD0DC00CAF7A4 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		96BD78AF1AAFD0DC00CAF7A4 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		96BD78B01AAFD0DC00CAF7A4 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		96BD78B31AAFD0DC00CAF7A4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		96BD78B51AAFD0DC00CAF7A4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		96BD78B81AAFD0DC00CAF7A4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		96BD78BE1AAFD0DD00CAF7A4 /* SmartlockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmartlockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		96BD78C31AAFD0DD00CAF7A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		96BD78C41AAFD0DD00CAF7A4 /* SmartlockTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SmartlockTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		96BD78A21AAFD0DC00CAF7A4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96BD78BB1AAFD0DD00CAF7A4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		96BD789C1AAFD0DC00CAF7A4 = {
+			isa = PBXGroup;
+			children = (
+				96BD78A71AAFD0DC00CAF7A4 /* Smartlock */,
+				96BD78C11AAFD0DD00CAF7A4 /* SmartlockTests */,
+				96BD78A61AAFD0DC00CAF7A4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		96BD78A61AAFD0DC00CAF7A4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				96BD78A51AAFD0DC00CAF7A4 /* Smartlock.app */,
+				96BD78BE1AAFD0DD00CAF7A4 /* SmartlockTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		96BD78A71AAFD0DC00CAF7A4 /* Smartlock */ = {
+			isa = PBXGroup;
+			children = (
+				96BD78AC1AAFD0DC00CAF7A4 /* AppDelegate.h */,
+				96BD78AD1AAFD0DC00CAF7A4 /* AppDelegate.m */,
+				96BD78AF1AAFD0DC00CAF7A4 /* ViewController.h */,
+				96BD78B01AAFD0DC00CAF7A4 /* ViewController.m */,
+				96BD78B21AAFD0DC00CAF7A4 /* Main.storyboard */,
+				96BD78B51AAFD0DC00CAF7A4 /* Images.xcassets */,
+				96BD78B71AAFD0DC00CAF7A4 /* LaunchScreen.xib */,
+				96BD78A81AAFD0DC00CAF7A4 /* Supporting Files */,
+			);
+			path = Smartlock;
+			sourceTree = "<group>";
+		};
+		96BD78A81AAFD0DC00CAF7A4 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				96BD78A91AAFD0DC00CAF7A4 /* Info.plist */,
+				96BD78AA1AAFD0DC00CAF7A4 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		96BD78C11AAFD0DD00CAF7A4 /* SmartlockTests */ = {
+			isa = PBXGroup;
+			children = (
+				96BD78C41AAFD0DD00CAF7A4 /* SmartlockTests.m */,
+				96BD78C21AAFD0DD00CAF7A4 /* Supporting Files */,
+			);
+			path = SmartlockTests;
+			sourceTree = "<group>";
+		};
+		96BD78C21AAFD0DD00CAF7A4 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				96BD78C31AAFD0DD00CAF7A4 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		96BD78A41AAFD0DC00CAF7A4 /* Smartlock */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96BD78C81AAFD0DD00CAF7A4 /* Build configuration list for PBXNativeTarget "Smartlock" */;
+			buildPhases = (
+				96BD78A11AAFD0DC00CAF7A4 /* Sources */,
+				96BD78A21AAFD0DC00CAF7A4 /* Frameworks */,
+				96BD78A31AAFD0DC00CAF7A4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Smartlock;
+			productName = Smartlock;
+			productReference = 96BD78A51AAFD0DC00CAF7A4 /* Smartlock.app */;
+			productType = "com.apple.product-type.application";
+		};
+		96BD78BD1AAFD0DD00CAF7A4 /* SmartlockTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96BD78CB1AAFD0DD00CAF7A4 /* Build configuration list for PBXNativeTarget "SmartlockTests" */;
+			buildPhases = (
+				96BD78BA1AAFD0DD00CAF7A4 /* Sources */,
+				96BD78BB1AAFD0DD00CAF7A4 /* Frameworks */,
+				96BD78BC1AAFD0DD00CAF7A4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				96BD78C01AAFD0DD00CAF7A4 /* PBXTargetDependency */,
+			);
+			name = SmartlockTests;
+			productName = SmartlockTests;
+			productReference = 96BD78BE1AAFD0DD00CAF7A4 /* SmartlockTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		96BD789D1AAFD0DC00CAF7A4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = RivenL;
+				TargetAttributes = {
+					96BD78A41AAFD0DC00CAF7A4 = {
+						CreatedOnToolsVersion = 6.1.1;
+					};
+					96BD78BD1AAFD0DD00CAF7A4 = {
+						CreatedOnToolsVersion = 6.1.1;
+						TestTargetID = 96BD78A41AAFD0DC00CAF7A4;
+					};
+				};
+			};
+			buildConfigurationList = 96BD78A01AAFD0DC00CAF7A4 /* Build configuration list for PBXProject "Smartlock" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 96BD789C1AAFD0DC00CAF7A4;
+			productRefGroup = 96BD78A61AAFD0DC00CAF7A4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				96BD78A41AAFD0DC00CAF7A4 /* Smartlock */,
+				96BD78BD1AAFD0DD00CAF7A4 /* SmartlockTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		96BD78A31AAFD0DC00CAF7A4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96BD78B41AAFD0DC00CAF7A4 /* Main.storyboard in Resources */,
+				96BD78B91AAFD0DC00CAF7A4 /* LaunchScreen.xib in Resources */,
+				96BD78B61AAFD0DC00CAF7A4 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96BD78BC1AAFD0DD00CAF7A4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		96BD78A11AAFD0DC00CAF7A4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96BD78B11AAFD0DC00CAF7A4 /* ViewController.m in Sources */,
+				96BD78AE1AAFD0DC00CAF7A4 /* AppDelegate.m in Sources */,
+				96BD78AB1AAFD0DC00CAF7A4 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96BD78BA1AAFD0DD00CAF7A4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96BD78C51AAFD0DD00CAF7A4 /* SmartlockTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		96BD78C01AAFD0DD00CAF7A4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 96BD78A41AAFD0DC00CAF7A4 /* Smartlock */;
+			targetProxy = 96BD78BF1AAFD0DD00CAF7A4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		96BD78B21AAFD0DC00CAF7A4 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				96BD78B31AAFD0DC00CAF7A4 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		96BD78B71AAFD0DC00CAF7A4 /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				96BD78B81AAFD0DC00CAF7A4 /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		96BD78C61AAFD0DD00CAF7A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		96BD78C71AAFD0DD00CAF7A4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		96BD78C91AAFD0DD00CAF7A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = Smartlock/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		96BD78CA1AAFD0DD00CAF7A4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = Smartlock/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		96BD78CC1AAFD0DD00CAF7A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = SmartlockTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Smartlock.app/Smartlock";
+			};
+			name = Debug;
+		};
+		96BD78CD1AAFD0DD00CAF7A4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = SmartlockTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Smartlock.app/Smartlock";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		96BD78A01AAFD0DC00CAF7A4 /* Build configuration list for PBXProject "Smartlock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96BD78C61AAFD0DD00CAF7A4 /* Debug */,
+				96BD78C71AAFD0DD00CAF7A4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		96BD78C81AAFD0DD00CAF7A4 /* Build configuration list for PBXNativeTarget "Smartlock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96BD78C91AAFD0DD00CAF7A4 /* Debug */,
+				96BD78CA1AAFD0DD00CAF7A4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		96BD78CB1AAFD0DD00CAF7A4 /* Build configuration list for PBXNativeTarget "SmartlockTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96BD78CC1AAFD0DD00CAF7A4 /* Debug */,
+				96BD78CD1AAFD0DD00CAF7A4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 96BD789D1AAFD0DC00CAF7A4 /* Project object */;
+}
