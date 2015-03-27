@@ -7,6 +7,14 @@
 //
 
 #import "AppDelegate.h"
+#import "RLBaseNavigationController.h"
+
+#import "MainVC.h"
+
+/************** Test *****************/
+#import "ViewController.h"
+#import "TestViewController.h"
+/*************************************/
 
 @interface AppDelegate ()
 
@@ -16,7 +24,19 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    
+    /************** Test *****************/
+//    ViewController *vc = [ViewController new];
+//    TestViewController *vc = [TestViewController new];
+    /*************************************/
+    MainVC *vc = [MainVC new];
+    RLBaseNavigationController *nav = [RLBaseNavigationController new];
+    [nav pushViewController:vc animated:NO];
+
+    self.window.rootViewController = nav;
+    
+    [self.window makeKeyAndVisible];
     return YES;
 }
 
