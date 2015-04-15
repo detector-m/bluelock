@@ -24,4 +24,6 @@
 #pragma mark -
 + (NSDictionary *)lockListParameters:(NSString *)accessToken;
 + (NSDictionary *)keyListOfAdminParameters:(NSString *)token lockID:(NSUInteger)lockID;
++ (NSDictionary *)lockOrUnlockKeyParameters:(NSUInteger)lockID keyID:(NSUInteger)keyID operation:(NSUInteger)operation token:(NSString *)token;
++ (NSDictionary *)openLockParameters:(NSUInteger)lockID keyID:(NSUInteger)keyID token:(NSString *)token;
 @end

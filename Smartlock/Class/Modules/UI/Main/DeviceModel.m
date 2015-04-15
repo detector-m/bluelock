@@ -21,4 +21,12 @@
     return @{@"accessToken":token, @"bleLockId":[RLTypecast integerToString:lockID]};
 }
 
++ (NSDictionary *)lockOrUnlockKeyParameters:(NSUInteger)lockID keyID:(NSUInteger)keyID operation:(NSUInteger)operation token:(NSString *)token {
+    return @{@"bleLockId":[RLTypecast integerToString:lockID], @"bleKey":[RLTypecast integerToString:keyID], @"flag":[RLTypecast integerToString:operation], @"accessToken":token};
+}
+
++ (NSDictionary *)openLockParameters:(NSUInteger)lockID keyID:(NSUInteger)keyID token:(NSString *)token {
+    return @{@"bleLockId":[RLTypecast integerToString:lockID], @"bleKey":[RLTypecast integerToString:keyID], @"accessToken":token};
+}
+
 @end

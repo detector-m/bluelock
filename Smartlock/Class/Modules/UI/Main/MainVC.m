@@ -125,9 +125,10 @@
 //        
 //    }];
     
-    [DeviceManager keyListOfAdmin:11 token:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
-        DLog(@"");
-    }];
+//    [DeviceManager keyListOfAdmin:11 token:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
+//        DLog(@"");
+//    }];
+    
 }
 
 - (void)clickOpenLockBtn:(UIButton *)button {

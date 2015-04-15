@@ -34,10 +34,14 @@
 }
 
 + (void)lockOrUnlockKey:(NSUInteger)lockID keyID:(NSUInteger)keyID operation:(NSUInteger)operation token:(NSString *)token withBlock:(void (^)(DeviceResponse *, NSError *))block {
-
+    NSDictionary *parameters = [DeviceModel lockOrUnlockKeyParameters:lockID keyID:keyID operation:operation token:token];
+    
+    [self requestWithUrl:@"bleLock/controlMemberLock.jhtml" withParameters:parameters andBlock:block];
 }
 
 + (void)openLock:(NSUInteger)lockID keyID:(NSUInteger)keyID token:(NSString *)token withBlock:(void (^)(DeviceResponse *, NSError *))block {
-
+    NSDictionary *parameters = [DeviceModel openLockParameters:lockID keyID:keyID token:token];
+    
+    [self requestWithUrl:@"bleLock/openLock.jhtml" withParameters:parameters andBlock:block];
 }
 @end
