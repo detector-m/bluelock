@@ -135,7 +135,7 @@
     
     // We got a result. Display information about the result onscreen.
     NSString *formatString = [self barcodeFormatToString:result.barcodeFormat];
-    NSString *display = [NSString stringWithFormat:@"Scanned!Format: %@ Contents:%@", formatString, result.text];
+    __unused NSString *display = [NSString stringWithFormat:@"Scanned!Format: %@ Contents:%@", formatString, result.text];
 //    [self.label performSelectorOnMainThread:@selector(setText:) withObject:display waitUntilDone:YES];
     
     // Vibrate
