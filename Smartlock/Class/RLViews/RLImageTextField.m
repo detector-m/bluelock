@@ -24,8 +24,8 @@
         //self.textField = [UITextField new];
         CGFloat widthOffset = imageView.frame.origin.x+frame.size.height-3;
         UITextField *txtField = [UITextField new];
+        txtField.clearButtonMode = UITextFieldViewModeWhileEditing;
         txtField.frame = CGRectMake(widthOffset, 3, frame.size.width-widthOffset-3, frame.size.height-6);
-        txtField.clearsOnBeginEditing = YES;
         [self addSubview:txtField];
         self.textField = txtField;
         

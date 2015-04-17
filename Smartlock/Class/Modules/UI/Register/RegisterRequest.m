@@ -10,6 +10,7 @@
 
 @implementation RegisterRequest
 + (void)verifyPhone:(NSString *)phone withBlock:(void (^)(id, NSError *))block {
+#if 1
     NSDictionary *parameters = [RegisterModel verifyPhoneParametersWithPhone:phone];
     NSString *urlString = [[kRLHTTPAPIBaseURLString stringByAppendingString:@"/verifty/isMobileUse.jhtml"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 //    urlString = [[urlString stringByAppendingString:[NSString stringWithFormat:@"?%@=%@", [parameters allKeys].firstObject, [parameters objectForKey:[parameters allKeys].firstObject]]] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
@@ -35,7 +36,33 @@
             block(@"2", connectionError);
         }
     }];
-//    [self requestWithUrl:@"verifty/isMobileUse.jhtml"  withParameters:parameters andBlock:block];
+#else
+//    NSDictionary *parameters = [RegisterModel verifyPhoneParametersWithPhone:phone];
+    NSString *urlString = @"http://www.dqcc.com.cn/new_img/fee643eb-1702-40f1-8445-62ade2531584.jpg";
+    //    urlString = [[urlString stringByAppendingString:[NSString stringWithFormat:@"?%@=%@", [parameters allKeys].firstObject, [parameters objectForKey:[parameters allKeys].firstObject]]] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:20.0f];
+//    NSString *bodyString = [NSString stringWithFormat:@"%@=%@", [parameters allKeys].firstObject, [parameters objectForKey:[parameters allKeys].firstObject]];
+//    NSLog(@"%@?%@", urlString, bodyString);
+//    request.HTTPBody = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
+    request.HTTPMethod = @"POST";
+    [request addValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+        if(data.length > 0 && connectionError == nil) {
+            NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            if(dataString.length > 10) {
+                block(@"2", connectionError);
+            }
+            else {
+                block(dataString, connectionError);
+            }
+        }
+        else {
+            block(@"2", connectionError);
+        }
+    }];
+#endif
 }
 + (void)getAuthcode:(NSString *)phone withBlock:(void (^)(id, NSError *))block {
 #if 0

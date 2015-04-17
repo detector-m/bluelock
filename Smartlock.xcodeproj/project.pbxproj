@@ -10,6 +10,7 @@
 		96AB245F1ADE45490021C19C /* btnCheck.png in Resources */ = {isa = PBXBuildFile; fileRef = 96AB245B1ADE45490021C19C /* btnCheck.png */; };
 		96AB24601ADE45490021C19C /* btnCheck@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 96AB245C1ADE45490021C19C /* btnCheck@2x.png */; };
 		96AB24611ADE45490021C19C /* HUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 96AB245E1ADE45490021C19C /* HUD.m */; };
+		96AB24651ADE5A390021C19C /* AWVersionAgent.m in Sources */ = {isa = PBXBuildFile; fileRef = 96AB24641ADE5A390021C19C /* AWVersionAgent.m */; };
 		96BD78AB1AAFD0DC00CAF7A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BD78AA1AAFD0DC00CAF7A4 /* main.m */; };
 		96BD78AE1AAFD0DC00CAF7A4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BD78AD1AAFD0DC00CAF7A4 /* AppDelegate.m */; };
 		96BD78B11AAFD0DC00CAF7A4 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BD78B01AAFD0DC00CAF7A4 /* ViewController.m */; };
@@ -397,6 +398,8 @@
 		96AB245C1ADE45490021C19C /* btnCheck@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "btnCheck@2x.png"; sourceTree = "<group>"; };
 		96AB245D1ADE45490021C19C /* HUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HUD.h; sourceTree = "<group>"; };
 		96AB245E1ADE45490021C19C /* HUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HUD.m; sourceTree = "<group>"; };
+		96AB24631ADE5A390021C19C /* AWVersionAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AWVersionAgent.h; sourceTree = "<group>"; };
+		96AB24641ADE5A390021C19C /* AWVersionAgent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AWVersionAgent.m; sourceTree = "<group>"; };
 		96BD78A51AAFD0DC00CAF7A4 /* Smartlock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Smartlock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		96BD78A91AAFD0DC00CAF7A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		96BD78AA1AAFD0DC00CAF7A4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -1146,6 +1149,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		96AB24621ADE5A390021C19C /* VersionAgent */ = {
+			isa = PBXGroup;
+			children = (
+				96AB24631ADE5A390021C19C /* AWVersionAgent.h */,
+				96AB24641ADE5A390021C19C /* AWVersionAgent.m */,
+			);
+			name = VersionAgent;
+			path = Smartlock/Class/RLTools/VersionAgent;
+			sourceTree = SOURCE_ROOT;
+		};
 		96BD789C1AAFD0DC00CAF7A4 = {
 			isa = PBXGroup;
 			children = (
@@ -1424,6 +1437,7 @@
 		96C7E7551ADCE1E200F27732 /* Notification */ = {
 			isa = PBXGroup;
 			children = (
+				96AB24621ADE5A390021C19C /* VersionAgent */,
 				96C7E7A11ADD287500F27732 /* LocalNotification */,
 				96C7E7A21ADD287500F27732 /* RemoteNotification */,
 				96C7E7A01ADCF3C700F27732 /* Category */,
@@ -2864,6 +2878,7 @@
 				96EED7E71AC13742000E53C0 /* ZXByQuadrantReader.m in Sources */,
 				96EED7CB1AC13742000E53C0 /* ZXPlanarYUVLuminanceSource.m in Sources */,
 				96EED7BE1AC13742000E53C0 /* ZXHybridBinarizer.m in Sources */,
+				96AB24651ADE5A390021C19C /* AWVersionAgent.m in Sources */,
 				96BD78EC1AAFEF7500CAF7A4 /* RLBaseViewController.m in Sources */,
 				96EED7C91AC13742000E53C0 /* ZXInvertedLuminanceSource.m in Sources */,
 				96EED7B51AC13742000E53C0 /* ZXBitSource.m in Sources */,

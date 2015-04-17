@@ -14,10 +14,12 @@
 #import "MainVC.h"
 
 #import "RLLocalNotificationManager.h"
+#import "AWVersionAgent.h"
 
 /************** Test *****************/
 #import "ViewController.h"
 #import "TestViewController.h"
+#import "Register.h"
 /*************************************/
 
 @interface AppDelegate ()
@@ -37,6 +39,9 @@
     /************** Test *****************/
 //    ViewController *vc = [ViewController new];
 //    TestViewController *vc = [TestViewController new];
+//    [Register verifyPhone:@"111" withBlock:^(id response, NSError *error) {
+//
+//    }];
     /*************************************/
     //    MainVC *vc = [MainVC new];
 //    LoginVC *vc = [LoginVC new];
@@ -61,6 +66,13 @@
     
      [[UIApplication sharedApplication] registerForRemoteNotifications];
     
+#pragma mark - Version agent
+    [[AWVersionAgent sharedAgent] setDebug:YES];
+    [AWVersionAgent sharedAgent].actionText = @"test";
+    [[AWVersionAgent sharedAgent] checkNewVersionForApp:@"453718989"];
+    if (launchOptions[UIApplicationLaunchOptionsLocalNotificationKey]) {
+        [self application:application didReceiveLocalNotification:launchOptions[UIApplicationLaunchOptionsLocalNotificationKey]];
+    }
     
     return YES;
 }
@@ -98,6 +110,7 @@
 -(void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
     //收到本地推送消息后调用的方法
     DLog(@"%@",notification);
+    [[AWVersionAgent sharedAgent] upgradeAppWithNotification:notification];
 }
 
 -(void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forLocalNotification:(UILocalNotification *)notification completionHandler:(void (^)())completionHandler {
