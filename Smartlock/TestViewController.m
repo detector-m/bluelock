@@ -7,10 +7,11 @@
 //
 
 #import "TestViewController.h"
-#if 0
+#if 1
 #import "RLCharacteristic.h"
 #import "RLDefines.h"
 #import "RLPeripheral.h"
+#import "BluetoothLockCommand.h"
 
 #import "ServicesViewController.h"
 
@@ -64,6 +65,7 @@
 }
 
 - (void)testPeripheral:(RLPeripheral *)peripheral {
+    __weak __typeof(self)weakSelf = self;
     [peripheral connectWithCompletion:^(NSError *error) {
         if(error) {
             NSLog(@"error = %@", error);
@@ -75,49 +77,24 @@
                 }
                 else {
                     for(RLService *service in services) {
-                        NSLog(@"%@", service);
                         [service discoverCharacteristicsWithCompletion:^(NSArray *characteristics, NSError *error) {
                             if(error) {
                                 NSLog(@"error = %@", error);
                             }
                             else {
-//                                NSLog(@"%@", characteristics);
                                 // We need to count down completed operations for disconnecting
                                 for (RLCharacteristic *charact in characteristics) {
-                                    NSLog(@"%lu", charact.cbCharacteristic.properties);
                                     if(charact.cbCharacteristic.properties == CBCharacteristicPropertyNotify) {
                                         [charact setNotifyValue:YES completion:^(NSError *error) {
-                                            
                                         }];
                                     }
                                     else if(charact.cbCharacteristic.properties == CBCharacteristicPropertyWrite || CBCharacteristicPropertyWriteWithoutResponse == charact.cbCharacteristic.properties) {
                                         if([charact.UUIDString isEqualToString:@"fff2"]) {
-                                            Byte bytes[] = {0xBF, 0xA5, 0x04, 0x04, 0x00, 0x00, 0x00, 0x00, 0x5A};
-                                            [charact writeValue:[NSData dataWithBytes:bytes length:9] completion:nil];
-
+                                            [weakSelf test:charact];
                                         }
                                     }
                                     else {
                                         if([charact.UUIDString isEqualToString:@"2a25"]) {
-                                            
-                                            NSMutableData *data = [NSMutableData data];
-                                            Byte i = 0x7f;
-                                            [data appendBytes:&i length:sizeof(i)];
-                                            i = 0x5a;
-                                            [data appendBytes:&i length:sizeof(i)];
-                                            i = 0x03;
-                                            [data appendBytes:&i length:sizeof(i)];
-                                            i = 0x01;
-                                            [data appendBytes:&i length:sizeof(i)];
-                                            i = 0x21;
-                                            [data appendBytes:&i length:sizeof(i)];
-                                            [data appendData:[@"AAAAAAAA" dataUsingEncoding:NSUTF8StringEncoding]];
-                                            i = 0x5a;
-                                            [data appendBytes:&i length:sizeof(i)];
-                                            
-//                                            [charact writeValue:data completion:^(NSError *error) {
-//                                            
-//                                            }];
                                         }
                                     }
                                 }
@@ -128,6 +105,50 @@
             }];
         }
     }];
+}
+
+- (void)test:(RLCharacteristic *)cb {
+    Byte data[] = {0x3c, 0xbd, 0xec, 0x37, 0xd6, 0xa2, 0x40, 0x4f, 0x96, 0xa0, 0x83, 0xa3, 0xaa, 0x5d, 0x73, 0x82, 0x3c, 0xbd, 0xec, 0x37, 0xd6, 0xa2, 0x40, 0x4f, 0x96, 0xa0, 0x83, 0xa3, 0xaa, 0x5d, 0x73, 0x82};
+    
+    struct BL_cmd cmd = {0};
+    cmd.ST = 0x55;
+    cmd.CRC += cmd.ST;
+    cmd.cmd_code = 0x01;
+    cmd.CRC += cmd.cmd_code;
+    cmd.union_mode.connection = 0x01;
+    cmd.CRC += cmd.union_mode.connection;
+    cmd.result.keep = 0x00;
+    cmd.CRC += cmd.union_mode.keep;
+    cmd.END = 0x66;
+    
+    cmd.data = data;
+    cmd.data_len = sizeof(data);
+    cmd.CRC += cmd.data_len;
+    
+    cmd.CRC +=  CMDDatasCRCCheck(cmd.data, cmd.data_len);
+    
+    cmd.fixation_len = BLcmdFixationLen();
+    NSInteger len = cmd.data_len + cmd.fixation_len;
+    
+    Byte *bytes = calloc(len, sizeof(UInt8));
+    
+    wrappCMDToBytes(&cmd, bytes);
+    
+    int i;
+
+    NSMutableString *str = [NSMutableString stringWithString:@""];
+    NSInteger length = len;//sizeof(bytes);
+    
+    for(i=0; i<length; i++) {
+        [str appendString:[NSString stringWithFormat:@"%02x", bytes[i]]];
+    }
+    for(i=0; i<length; i++) {
+        [cb writeValue:[NSData dataWithBytes:&bytes[i] length:1] completion:nil];
+        [NSThread sleepForTimeInterval:0.1];
+    }
+    
+    NSLog(@"str = %@", str);
+    free((void *)bytes);
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -155,7 +176,7 @@
 }
 
 @end
-#endif
+#else
 #import "RLCycleScrollView.h"
 #import "RLScrollItem.h"
 
@@ -198,3 +219,4 @@
 }
 
 @end
+#endif

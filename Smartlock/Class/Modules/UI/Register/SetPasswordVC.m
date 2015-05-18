@@ -14,6 +14,9 @@
 
 #import "Register.h"
 
+#pragma mark -
+#import "XMPPManager.h" 
+
 #define ButtonBackgroundColor (0xcccccc)
 
 @interface SetPasswordVC ()
@@ -87,6 +90,13 @@
             }
             else {
                 dispatch_async(dispatch_get_main_queue(), ^{
+                    [User saveArchiver];
+                    if(![[XMPPManager sharedXMPPManager] connect]) {
+                        [RLHUD hudAlertWithBody:NSLocalizedString(@"登录失败", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
+                        DLog(@"xmpp connect error");
+                        [self.navigationController popToRootViewControllerAnimated:NO];
+                        return ;
+                    }
                     MainVC *vc = [MainVC new];
                     
                     [self.navigationController popToRootViewControllerAnimated:NO];

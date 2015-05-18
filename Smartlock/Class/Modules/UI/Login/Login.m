@@ -28,4 +28,22 @@
     
     [LoginRequest login:login withBlock:loginBlock];
 }
+
++ (void)logout:(NSString *)token withBlock:(void (^)(LoginResponse *response, NSError *error))block {
+    void (^logoutBlock)(id responseObject, NSError *error) = ^(id responseObject, NSError *error) {
+        if(error) {
+            if(block) {
+                block(nil, error);
+            }
+            return ;
+        }
+        LoginResponse *response = [[LoginResponse alloc] initWithResponseObject:responseObject];
+        
+        if(block) {
+            block(response, nil);
+        }
+    };
+    
+    [LoginRequest logout:token withBlock:logoutBlock];
+}
 @end

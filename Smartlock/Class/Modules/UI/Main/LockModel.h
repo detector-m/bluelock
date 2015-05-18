@@ -10,4 +10,4 @@
 
 @interface LockModel : DeviceModel
 @property (nonatomic, copy) NSString *address;
-@end
+@end 

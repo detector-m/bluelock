@@ -12,4 +12,7 @@
 @property (nonatomic, readonly, weak) UIImageView *backgroundImage;
 
 - (void)setNavigationBar;
+
+- (void)setupBackItem;
+- (void)setupRightItem;
 @end

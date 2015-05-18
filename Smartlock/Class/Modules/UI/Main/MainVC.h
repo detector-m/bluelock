@@ -7,7 +7,13 @@
 //
 
 #import "BaseVC.h"
+#import "LockModel.h"
+#import "RLBluetooth.h"
 
 @interface MainVC : BaseVC
+@property (nonatomic, strong) RLBluetooth *manager;
 
+@property (nonatomic, assign) NSInteger messageBadgeNumber;
+
+- (void)addLock:(LockModel *)lock;
 @end

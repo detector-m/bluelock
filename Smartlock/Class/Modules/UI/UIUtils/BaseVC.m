@@ -18,13 +18,17 @@
     [super viewDidLoad];
     if([UIDevice currentDevice].systemVersion.floatValue >= 7.0) {
         self.edgesForExtendedLayout = UIRectEdgeNone;
+        if(self.navigationController) {
+            CGRect frame = self.view.frame;
+            self.view.frame = CGRectMake(0, 0, frame.size.width, frame.size.height-64);
+        }
     }
     [self setNavigationBar];
     [self setupBackgroundImage];
     self.view.backgroundColor = [UIColor whiteColor];
     
-    self.navigationItem.backBarButtonItem = [UIBarButtonItem new];
-    [self.navigationItem.backBarButtonItem setTitle:NSLocalizedString(@"Back", nil)];
+    [self setupBackItem];
+    [self setupRightItem];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -35,6 +39,15 @@
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:self.view.frame];
     [self.view addSubview:imageView];
     self.backgroundImage = imageView;
+}
+
+- (void)setupBackItem {
+    self.navigationItem.backBarButtonItem = [UIBarButtonItem new];
+    [self.navigationItem.backBarButtonItem setTitle:NSLocalizedString(@"Back", nil)];
+}
+
+- (void)setupRightItem {
+
 }
 
 - (void)setNavigationBar {

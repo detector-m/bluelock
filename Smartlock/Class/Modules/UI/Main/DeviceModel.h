@@ -7,14 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "RLPeripheral.h"
 
 @interface DeviceModel : NSObject
 @property (nonatomic, assign) NSUInteger ID;
+@property (nonatomic, assign) long long pwd;
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, copy) NSString *deviceDescription;
 @property (nonatomic, assign) NSInteger type;
 @property (nonatomic, copy) NSString *ower;
 @property (nonatomic, copy) NSString *date;
+
 
 #pragma mark -
 @property (nonatomic, weak) NSString *token;

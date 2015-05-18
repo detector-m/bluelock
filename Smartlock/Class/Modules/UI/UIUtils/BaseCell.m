@@ -11,7 +11,7 @@ const NSString *kCellIdentifier = @"cellIdentifier";
 
 @implementation BaseCell
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
-    if(self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier]) {
+    if(self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
         [self setDefaultProperties];
     }
     

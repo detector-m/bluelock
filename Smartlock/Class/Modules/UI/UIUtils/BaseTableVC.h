@@ -8,11 +8,15 @@
 
 #import "RLBaseTableViewController.h"
 #import "RLTable.h"
-#import "BaseCell.h"
+//#import "TextAccessoryCell.h"
+#import "ListCell.h"
 
 #define kDefaultRowHeight 50.0f
 
 @interface BaseTableVC : RLBaseTableViewController
 @property (nonatomic, readonly, strong) RLTable *table;
 - (void)setTableViewProperties;
+
+- (void)setupBackItem:(NSString *)title;
+- (void)setupRightItem;
 @end

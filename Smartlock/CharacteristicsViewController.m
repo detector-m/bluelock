@@ -10,6 +10,8 @@
 #import "RLTable.h"
 #import "RLCharacteristic.h"
 
+#import "ExcuteVC.h"
+
 
 @interface CharacteristicsViewController ()
 @property (nonatomic, strong) RLTable *peripheralsTable;
@@ -47,7 +49,10 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-   
+   RLCharacteristic *characteristic = [self.peripheralsTable.datas objectAtIndex:indexPath.row];
+    ExcuteVC *vc = [[ExcuteVC alloc] init];
+    vc.ch = characteristic;
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 @end

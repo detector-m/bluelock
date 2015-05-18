@@ -9,5 +9,5 @@
 #import "RLLogin.h"
 
 @interface LoginModel : RLLogin
-
++ (NSDictionary *)logoutWithToken:(NSString *)token;
 @end

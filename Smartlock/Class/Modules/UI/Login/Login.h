@@ -10,4 +10,6 @@
 
 @interface Login : NSObject
 + (void)login:(id)login withBlock:(void (^)(LoginResponse *response, NSError *error))block;
+
++ (void)logout:(NSString *)token withBlock:(void (^)(LoginResponse *response, NSError *error))block;
 @end

@@ -62,6 +62,7 @@
             block(@"2", connectionError);
         }
     }];
+    
 #endif
 }
 + (void)getAuthcode:(NSString *)phone withBlock:(void (^)(id, NSError *))block {

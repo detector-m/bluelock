@@ -17,6 +17,7 @@
     [parameters setObject:self.name forKey:@"lockName"];
     [parameters setObject:self.address forKey:@"bleAddress"];
     [parameters setObject:self.token forKey:@"accessToken"];
+    [parameters setObject:[RLTypecast longLongToString:self.pwd] forKey:@"lockPwd"];
     
     return parameters;
 }

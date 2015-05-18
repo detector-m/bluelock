@@ -16,6 +16,9 @@
 
 #import "RLHTTPAPIClient.h"
 
+#pragma mark -
+#import "XMPPManager.h"
+
 #define LoginBackgroundColor (0x0F6797)
 #define ButtonBackgroundColor (0x399ACA)
 
@@ -138,6 +141,12 @@
         
         if(response.success) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                [User saveArchiver];
+                if(![[XMPPManager sharedXMPPManager] connect]) {
+                    [RLHUD hudAlertWithBody:NSLocalizedString(@"登录失败", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
+                    DLog(@"xmpp connect error");
+                    return ;
+                }
                 MainVC *vc = [MainVC new];
                 [weakSelf.navigationController pushViewController:vc animated:YES];
             });

@@ -12,6 +12,9 @@
 + (NSString *)integerToString:(NSInteger)aInt {
     return [NSString stringWithFormat:@"%li", (long)aInt];
 }
++ (NSString *)longLongToString:(long long)aInt {
+    return [NSString stringWithFormat:@"%lli", aInt];
+}
 + (NSString *)floatToString:(CGFloat)aFloat {
     return [NSString stringWithFormat:@"%f", aFloat];
 }
@@ -24,6 +27,14 @@
     
     return [aStr integerValue];
 }
+
++ (long long)stringToLongLongInteger:(NSString *)aStr {
+    if(aStr == nil || aStr.length == 0)
+        return 0;
+    
+    return [aStr longLongValue];
+}
+
 + (CGFloat)stringToFloat:(NSString *)aStr {
     if(aStr == nil || aStr.length == 0)
         return 0.0f;
@@ -51,6 +62,47 @@
     
     NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
     return [numberFormatter numberFromString:aStr];
+}
+
+#pragma mark -
+/**
+ *  Decodes an NSString containing hex encoded bytes into an NSData object
+ *
+ *  @param string string
+ *
+ *  @return data
+ */
++ (NSData *)stringToHexData:(NSString *)string
+{
+    int len = [string length] / 2; // Target length
+    unsigned char *buf = malloc(len);
+    unsigned char *wholeByte = buf;
+    char byteChars[3] = {0, 0, 0};
+    
+    
+    int i;
+    for (i=0; i < [string length] / 2; i++) {
+        byteChars[0] = [string characterAtIndex:i*2];
+        byteChars[1] = [string characterAtIndex:i*2+1];
+        *wholeByte = strtol(byteChars, NULL, 16);
+        wholeByte++;
+    }
+    
+    buf[18] = 0;
+    NSData *data = [NSData dataWithBytes:buf length:len];
+    free( buf );
+    return data;
+}
+
++ (NSString *)dataToHexString:(NSData *)data {
+    NSUInteger len = [data length];
+    char * chars = (char *)[data bytes];
+    NSMutableString * hexString = [[NSMutableString alloc] init];
+    
+    for(NSUInteger i = 0; i < len; i++ )
+        [hexString appendString:[NSString stringWithFormat:@"%0.2hhx", chars[i]]];
+    
+    return hexString;
 }
 
 //判断整形

@@ -22,4 +22,10 @@
     [parameters setObject:self.location.city forKey:@"registeredCity"];
     return parameters;
 }
+
++ (NSDictionary *)logoutWithToken:(NSString *)token {
+    NSDictionary *parameters = @{@"accessToken":token};
+    
+    return parameters;
+}
 @end

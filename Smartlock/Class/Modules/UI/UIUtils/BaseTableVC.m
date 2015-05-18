@@ -18,6 +18,14 @@
     self.table = nil;
 }
 
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        [self setupTable];
+    }
+    
+    return self;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -27,7 +35,10 @@
     
     [self setTableViewProperties];
     [self setupTable];
+    [self setupBackItem:@"返回"];
+    [self setupRightItem];
 }
+
 
 - (void)setTableViewProperties {
     if(self.tableView == nil)
@@ -40,7 +51,19 @@
 }
 
 - (void)setupTable {
-    self.table = [RLTable new];
+    if(!self.table) {
+        self.table = [RLTable new];
+    }
+    self.table.tableView = self.tableView;
+}
+    
+- (void)setupBackItem:(NSString *)title {
+    self.navigationItem.backBarButtonItem = [UIBarButtonItem new];
+    [self.navigationItem.backBarButtonItem setTitle:NSLocalizedString(title, nil)];
+}
+
+- (void)setupRightItem {
+
 }
 #pragma mark - Table view data source
 

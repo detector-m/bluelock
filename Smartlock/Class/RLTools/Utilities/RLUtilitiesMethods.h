@@ -21,3 +21,6 @@ extern NSString* RLEncodeURL(NSURL * value);
 extern NSString* RLFlattenHTML(NSString * value, BOOL preserveLineBreaks);
 extern NSString* RLLocalizedStringFormat(NSString* key);
 extern NSString* RLLocalizedString(NSString* key, ...);
+
+//从字符串中取16进制数到byte数组
+extern NSData *hexStringToBytes(NSString *hexString);

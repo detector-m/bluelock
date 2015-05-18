@@ -7,7 +7,11 @@
 //
 
 #import "LockDevicesVC.h"
-#import "ScanningQRCodeVC.h"
+#import "AddDeviceVC.h"
+//#import "ScanningQRCodeVC.h"
+#import "MainVC.h"
+
+#import "LockModel.h"
 
 @implementation LockDevicesVC
 - (void)viewDidLoad {
@@ -15,15 +19,37 @@
     
     self.title = NSLocalizedString(@"My Devices", nil);
  
+//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(clickRightItem)];
+}
+
+- (void)setupRightItem {
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(clickRightItem)];
 }
 
 - (void)clickRightItem {
+#if 0
     ScanningQRCodeVC *vc = [ScanningQRCodeVC new];
     vc.lockDevicesVC = self;
     [self.navigationController pushViewController:vc animated:YES];
+#endif
+    
+    AddDeviceVC *vc = [AddDeviceVC new];
+    vc.lockDevicesVC = self;
+//    vc.manager = self.manager;
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
+#pragma mark -
+- (void)addLockWithPeripheral:(LockModel *)lock {
+    [self.mainVC addLock:lock];
+    [self.table.datas addObject:lock];
+    __weak __typeof(self)weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf.table.tableView reloadData];
+    });
+}
+
+#pragma mark -
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.table.datas.count;
 }
@@ -32,7 +58,8 @@
     [tableView registerClass:[BaseCell class] forCellReuseIdentifier:kCellIdentifier];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:(NSString *)kCellIdentifier forIndexPath:indexPath];
 //     cell.textLabel.text = @"lock";
-    cell.textLabel.text = [self.table.datas objectAtIndex:indexPath.row];
+    LockModel *lock = [self.table.datas objectAtIndex:indexPath.row];
+    cell.textLabel.text = lock.name;
     cell.imageView.image = [UIImage imageNamed:@"LockIcon"];
     
     return cell;
