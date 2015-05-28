@@ -7,6 +7,7 @@
 //
 
 #import "RLBluetooth.h"
+#import "RLHUD.h"
 
 @interface RLBluetooth ()
 @property (nonatomic, readwrite, strong) RLCentralManager *manager;
@@ -39,11 +40,24 @@
     return self;
 }
 
+#pragma mark -
+- (BOOL)bluetoothIsReady {
+    return self.manager.centralReady;
+}
+
+#pragma mark -
 - (void)setupBLCentralManaer {
     self.manager = [RLCentralManager new];
 }
 
 - (void)scanBLPeripheralsWithCompletionBlock:(void (^)(NSArray *peripherals))completionCallback {
+    if(![self bluetoothIsReady]) {
+        if(completionCallback) {
+            completionCallback(nil);
+        }
+        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"蓝牙未开启！", nil)];
+        return;
+    }
     [self disconnectAllPeripherals];
     [self.manager scanForPeripheralsByInterval:1 completion:^(NSArray *peripherals) {
         if(completionCallback) {

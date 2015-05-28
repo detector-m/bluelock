@@ -51,11 +51,11 @@
     
     CGRect frame = self.view.frame;
     self.loginIcon = [UIImageView new];
-    self.loginIcon.frame = CGRectMake(frame.size.width/2-75, 15, 150, 150);
+    self.loginIcon.frame = CGRectMake(frame.size.width/2-75, 5, 130, 130);
     self.loginIcon.image = [UIImage imageNamed:@"LoginIcon.png"];
     [self.view addSubview:self.loginIcon];
     
-    CGFloat heightOffset = self.loginIcon.frame.size.height + self.loginIcon.frame.origin.y + 10;
+    CGFloat heightOffset = self.loginIcon.frame.size.height + self.loginIcon.frame.origin.y + 5;
     CGFloat widthOffset = 20;
     self.account = [[RLImageTextField alloc] initWithFrame:CGRectMake(widthOffset, heightOffset, frame.size.width-widthOffset*2, 35)];
     self.account.textField.keyboardType = UIKeyboardTypeNumberPad;
@@ -72,7 +72,7 @@
     self.password.layer.borderWidth = 0.5f;
     [self.view addSubview:self.password];
     
-    heightOffset += self.password.frame.size.height + 10;
+    heightOffset += self.password.frame.size.height + 5;
     widthOffset = (frame.size.width-100-widthOffset);
     self.forgetPWButton = [UIButton buttonWithType:UIButtonTypeCustom];
     self.forgetPWButton.frame = CGRectMake(widthOffset, heightOffset, 100, 30);
@@ -80,7 +80,7 @@
     [self.forgetPWButton addTarget:self action:@selector(clickedForgetPWButton) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.forgetPWButton];
     
-    heightOffset += self.forgetPWButton.frame.size.height+10;
+    heightOffset += self.forgetPWButton.frame.size.height+3;
     widthOffset = 40;
     self.loginButton = [UIButton buttonWithType:UIButtonTypeCustom];
     self.loginButton.frame = CGRectMake(widthOffset, heightOffset, frame.size.width-widthOffset*2, 35);
@@ -115,13 +115,14 @@
 }
 
 - (void)clickedLoginButton {
+    [self.view endEditing:YES];
     if(![self.account.textField.text isMobile]) {
-        [RLHUD hudAlertWithBody:NSLocalizedString(@"账号输入有误！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
+        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"账号输入有误！", nil)];
         return;
     }
     
     if(self.password.textField.text.length == 0) {
-        [RLHUD hudAlertWithBody:NSLocalizedString(@"密码为空！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
+        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"密码为空！", nil)];
         return;
     }
     
@@ -129,22 +130,26 @@
     login.account = self.account.textField.text;
     login.password = self.password.textField.text;
     login.location = [RLLocationManager sharedLocationManager].curLoction;
+    login.deviceToken = [User sharedUser].deviceToken;
+    if(!login.deviceToken) {
+        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"请查看网络！", nil)];
+        return;
+    }
+    if(!login.location.city || login.location.city.length == 0) {
+        [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"请过5－10s后再试！", nil)];
+
+        return;
+    }
 
     __weak typeof(self)weakSelf = self;
     [Login login:login withBlock:^(LoginResponse *response, NSError *error) {
         [RLHUD hideProgress];
-        if(error) {
-            DLog(@"%@", error);
-            [RLHUD hudAlertWithBody:NSLocalizedString(@"登录失败", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
-            return ;
-        }
-        
         if(response.success) {
+            [User sharedUser].password = login.password;
             dispatch_async(dispatch_get_main_queue(), ^{
                 [User saveArchiver];
                 if(![[XMPPManager sharedXMPPManager] connect]) {
-                    [RLHUD hudAlertWithBody:NSLocalizedString(@"登录失败", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
-                    DLog(@"xmpp connect error");
+                    [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"登录失败", nil)];
                     return ;
                 }
                 MainVC *vc = [MainVC new];
@@ -152,7 +157,10 @@
             });
         }
         else {
-            [RLHUD hudAlertWithBody:NSLocalizedString(@"登录失败", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"用户名或密码错误！", nil)];
+
+            });
         }
     }];
     [RLHUD hudProgressWithBody:NSLocalizedString(@"加载中。。。", nil) onView:self.view timeout:100.0f];

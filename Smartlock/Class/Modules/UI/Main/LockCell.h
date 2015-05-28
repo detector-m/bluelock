@@ -6,8 +6,8 @@
 //  Copyright (c) 2015年 RivenL. All rights reserved.
 //
 
-#import "BaseCell.h"
+#import "DefaultListCell.h"
 
-@interface LockCell : BaseCell
+@interface LockCell : DefaultListCell
 
 @end

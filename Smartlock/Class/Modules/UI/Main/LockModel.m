@@ -10,6 +10,30 @@
 
 @implementation LockModel
 
+- (instancetype)initWithParameters:(NSDictionary *)parameters {
+    if(self = [super init]) {
+        self.pwd = [RLTypecast stringToLongLongInteger:[parameters objectForKey:@"lockPwd"]];
+        self.address = [parameters objectForKey:@"bleAddress"];
+    }
+    
+    return self;
+}
+
+- (instancetype)initWithLockEntity:(LockEntity *)lockEntity {
+    if(self = [super init]) {
+        self.ID = [lockEntity.lockID integerValue];
+        self.pwd = [lockEntity.pwd longLongValue];
+        self.type = [lockEntity.type integerValue];
+        self.status = [lockEntity.status integerValue];
+        self.address = [lockEntity address];
+        self.caption = lockEntity.caption;
+        self.name = lockEntity.name;
+        self.ower = lockEntity.ownUser;
+    }
+    
+    return self;
+}
+
 - (NSDictionary *)toDictionary {
     NSMutableDictionary *parameters = nil;
     parameters = [NSMutableDictionary dictionary];

@@ -41,8 +41,8 @@
     self.password.textField.secureTextEntry = YES;
     [self.password setStyle:kRLTitleTextFieldVertical];
     self.password.title.text = NSLocalizedString(@"请输入密码", nil);
-    self.password.textField.layer.borderColor = [UIColor lightGrayColor].CGColor;
-    self.password.textField.layer.borderWidth = 0.5f;
+//    self.password.textField.layer.borderColor = [UIColor lightGrayColor].CGColor;
+//    self.password.textField.layer.borderWidth = 0.5f;
     [self.view addSubview:self.password];
     
     heightOffset += self.password.frame.size.height;
@@ -50,8 +50,8 @@
     self.pswCheck.textField.secureTextEntry = YES;
     [self.pswCheck setStyle:kRLTitleTextFieldVertical];
     self.pswCheck.title.text = NSLocalizedString(@"确认密码", nil);
-    self.pswCheck.textField.layer.borderColor = [UIColor lightGrayColor].CGColor;
-    self.pswCheck.textField.layer.borderWidth = 0.5f;
+//    self.pswCheck.textField.layer.borderColor = [UIColor lightGrayColor].CGColor;
+//    self.pswCheck.textField.layer.borderWidth = 0.5f;
     [self.view addSubview:self.pswCheck];
     
     heightOffset += self.pswCheck.frame.size.height + 20;
@@ -69,7 +69,7 @@
 
 - (void)clickedCommiteButton {
     if(self.password.textField.text.length == 0 || self.pswCheck.textField.text.length == 0 || ![self.password.textField.text isEqualToString:self.pswCheck.textField.text]) {
-        [RLHUD hudAlertWithBody:NSLocalizedString(@"密码输入有误！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
+        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"密码输入有误！", nil)];
         
         return;
     }
@@ -77,23 +77,25 @@
     [RLHUD hudProgressWithBody:nil onView:self.view timeout:20.0f];
     if(self.type == kRegister) {
         RegisterModel *aRegister = [[RegisterModel alloc] init];
+        if(!aRegister.deviceToken) {
+            [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"请过5－10s后再试！", nil)];
+            return;
+        }
         aRegister.password = self.password.textField.text;
         [Register register:aRegister withBlock:^(RegisterResponse *response, NSError *error) {
             [RLHUD hideProgress];
-            if(error) {
-                [RLHUD hudAlertWithBody:NSLocalizedString(@"请检查网络！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
-            }
             
             if(response.status) {
-                [RLHUD hudAlertWithBody:NSLocalizedString(@"注册失败！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
-                DLog(@"注册失败");
+                
+                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"注册失败！", nil)];
             }
             else {
+                [User sharedUser].password = aRegister.password;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [User saveArchiver];
                     if(![[XMPPManager sharedXMPPManager] connect]) {
-                        [RLHUD hudAlertWithBody:NSLocalizedString(@"登录失败", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
-                        DLog(@"xmpp connect error");
+                        [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"登录失败", nil)];
+                        
                         [self.navigationController popToRootViewControllerAnimated:NO];
                         return ;
                     }
@@ -111,13 +113,9 @@
         __weak __typeof(self)weakSelf = self;
         [Register findPassword:self.findPasswordModel withBlock:^(RegisterResponse *response, NSError *error) {
             [RLHUD hideProgress];
-            if(error) {
-                [RLHUD hudAlertWithBody:NSLocalizedString(@"请检查网络！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
-            }
-            
+        
             if(response.status) {
-                [RLHUD hudAlertWithBody:NSLocalizedString(@"找回密码失败！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
-                DLog(@"注册失败");
+                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"找回密码失败！", nil)];
             }
             else {
                 dispatch_async(dispatch_get_main_queue(), ^{

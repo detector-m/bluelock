@@ -6,14 +6,39 @@
 //  Copyright (c) 2015年 RivenL. All rights reserved.
 //
 
-#import "DeviceModel.h"
+#import "LockModel.h"
 
 typedef NS_ENUM(NSInteger, KeyStatus) {
-    kKeyUnlocked,
-    kKeyLocked
+    kKeyNormal,
+    kKeyFreeze,
+    kKeyExpire,
+    kKeyDelete,
 };
+
+typedef NS_ENUM(NSInteger, UserType) {
+    kUserTypeNone,
+    kUserTypeAdmin = 0,
+    kUserTypeCommon,
+};
+
+typedef NS_ENUM(NSInteger, KeyType) {
+    kKeyTypeForever = 1,
+    kKeyTypeDate,
+    kKeyTypeTimes,
+};
+
+@class KeyEntity;
+
 @interface KeyModel : DeviceModel
 @property (nonatomic, assign) NSUInteger lockID;
 @property (nonatomic, assign) NSUInteger validCount;
+@property (nonatomic, strong) NSString *invalidDate; //截至日期
 @property (nonatomic, assign) KeyStatus keyStatus;
+@property (nonatomic, assign) UserType userType;
+
+#pragma mark -
+@property (nonatomic, strong) LockModel *keyOwner;
+
+- (instancetype)initWithKeyEntity:(KeyEntity *)keyEntity;
+- (BOOL)isValid;
 @end

@@ -9,26 +9,17 @@
 #import "LoginResponse.h"
 
 @interface LoginResponse ()
-@property (nonatomic, readwrite, assign) BOOL success;
+//@property (nonatomic, readwrite, assign) BOOL success;
 @end
 
 @implementation LoginResponse
-@synthesize success;
+//@synthesize success;
 
 - (instancetype)initWithResponseObject:(id)responseObject {
     if(self = [super initWithResponseObject:responseObject]) {
-        [self dealStatus];
+        
     }
     
     return self;
-}
-
-- (void)dealStatus {
-    if(self.status == 0) {
-        self.success = YES;
-        return;
-    }
-    
-    DLog(@"status=%d message = %@", self.status, self.resDescription);
 }
 @end

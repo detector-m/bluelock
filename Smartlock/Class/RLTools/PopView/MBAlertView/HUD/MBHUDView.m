@@ -44,7 +44,7 @@
     alert.hudType = type;
     alert.hudHideDelay = delay;
     alert.itemColor = [UIColor whiteColor];
-    alert.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.9];
+    alert.backgroundColor = [UIColor colorWithWhite:0.0 alpha:1.0];
     
     if(type == MBAlertViewHUDTypeExclamationMark) {
         alert.hudType = MBAlertViewHUDTypeLabelIcon;
@@ -83,7 +83,21 @@
     if(_bodyFont)
         return _bodyFont;
     float size = 0;
+    
+#ifdef __IPHONE_7_0
+//    NSMutableParagraphStyle * paragraphStyle = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
+//    paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
+//    
+//    NSDictionary * attributes = @{NSFontAttributeName:[UIFont boldSystemFontOfSize:26],
+//                                  NSParagraphStyleAttributeName:paragraphStyle};
+//    
+//    CGRect textRect = [self.bodyText boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)                                          options:NSStringDrawingUsesLineFragmentOrigin attributes:attributes context:nil];
+//    int line = ((int)textRect.size.width%(int)(self.contentView.bounds.size.width / 1.3)) + (int)((textRect.size.width/(int)(self.contentView.bounds.size.width / 1.3)));
+//    size = self.contentView.bounds.size.height / line;
+    size = size>6 && size<20 ? :14;
+#else
     [self.bodyText sizeWithFont:[UIFont boldSystemFontOfSize:26] minFontSize:6 actualFontSize:&size forWidth:self.contentView.bounds.size.width / 1.3 lineBreakMode:NSLineBreakByTruncatingTail];
+#endif
     _bodyFont = [UIFont boldSystemFontOfSize:size];
     return _bodyFont;
 }
@@ -94,7 +108,19 @@
     
     UIFont *font = self.bodyFont;
     CGRect bounds = self.contentView.bounds;
-    CGSize size = [self.bodyText sizeWithFont:font];
+    CGSize size;
+#ifdef __IPHONE_7_0
+    NSMutableParagraphStyle * paragraphStyle = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
+    paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
+    
+    NSDictionary * attributes = @{NSFontAttributeName:font,
+                                  NSParagraphStyleAttributeName:paragraphStyle};
+    
+    CGRect textRect = [self.bodyText boundingRectWithSize:CGSizeMake(self.contentView.bounds.size.width / 1.3, CGFLOAT_MAX)                                          options:NSStringDrawingUsesLineFragmentOrigin attributes:attributes context:nil];
+    size = textRect.size;
+#else
+    size = [self.bodyText sizeWithFont:font];
+#endif
     _bodyLabelButton = [[UIButton alloc] initWithFrame:CGRectMake(bounds.origin.x + bounds.size.width/2.0 - size.width/2.0, bounds.size.height/2.0 - size.height/2.0 - 8, size.width, size.height)];
 
     [_bodyLabelButton setTitle:self.bodyText forState:UIControlStateNormal];

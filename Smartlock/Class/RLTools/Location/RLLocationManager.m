@@ -49,6 +49,7 @@
         self.locManager.desiredAccuracy = kCLLocationAccuracyBest;
         self.locManager.distanceFilter = 5.0f;
         self.location = [[RLLocation alloc] init];
+        self.location.city = @"yichun";
 //        [self startUpdatingLocation];
         
         self.geocoder = [[CLGeocoder alloc] init];
@@ -91,19 +92,23 @@
     
     DLog(@"location %f, %f", self.location.latitude, self.location.longitude);
     
-    __weak CLGeocoder *blockGeocoder = self.geocoder;
+//    __weak CLGeocoder *blockGeocoder = self.geocoder;
     __weak RLLocation *blockLocation = self.location;
     __weak __typeof(self)weakSelf = self;
     [self.geocoder reverseGeocodeLocation:newLocation completionHandler:^(NSArray *placemarks, NSError *error) {
         if(error != nil) {
             DLog(@"reverseGeocodeLocation %@", error);
-            [blockGeocoder cancelGeocode];
+//            [blockGeocoder cancelGeocode];
+            [weakSelf stopUpdatingLocation];
+            blockLocation.country = @"中国";
+            blockLocation.city = @"宜春";
             return ;
         }
         
         if(!(placemarks.count > 0)) {
             DLog(@"reverseGeocodeLocation placemarks count == 0");
-            [blockGeocoder cancelGeocode];
+//            [blockGeocoder cancelGeocode];
+            [weakSelf stopUpdatingLocation];
             return;
         }
         

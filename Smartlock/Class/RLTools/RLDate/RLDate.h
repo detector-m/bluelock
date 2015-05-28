@@ -14,5 +14,8 @@ extern NSString *timeStringWithTimestamp(long long timestamp);
 
 #pragma mark - 
 @interface RLDate : NSObject
-
++ (NSDate *)dateFromString:(NSString *)dateString;
+#pragma mark -
++ (NSDateComponents *)dateComponentsWithDate:(NSDate *)date;
++ (NSDateComponents *)dateComponentsNow;
 @end

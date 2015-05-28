@@ -149,8 +149,8 @@
                                 
                                 if(crc == cmdResponse.CRC && cmdResponse.result.result == 0) {
                                     LockModel *lock = [LockModel new];
-                                    lock.name = peripheral.name;
-                                    lock.address = lock.name;
+                                    lock.name = NSLocalizedString(@"我的智能锁", nil);
+                                    lock.address = peripheral.name;
                                     lock.token = [User sharedUser].sessionToken;
                                     lock.pwd = weakSelf.pwd;
                                     
@@ -163,7 +163,8 @@
                                         if(response.status == 0) {
                                             [RLHUD hideProgress];
                                             [[weakSelf lockDevicesVC] addLockWithPeripheral:lock];
-                                            [RLHUD hudAlertWithBody:NSLocalizedString(@"配对成功", nil) type:MBAlertViewHUDTypeDefault hidesAfter:3.0f show:YES];
+                                            
+                                            [RLHUD hudAlertSuccessWithBody:NSLocalizedString(@"配对成功", nil)];
                                         }
                                     }];
                                 }

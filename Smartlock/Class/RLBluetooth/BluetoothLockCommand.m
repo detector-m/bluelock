@@ -119,6 +119,23 @@ BOOL freeBLCMDData(const Byte *data) {
     return YES;
 }
 
+static Byte date[6] = {0};
+extern Byte *dateToBytes(int * const len, NSString * const dateString) {
+    if(!len || !dateString || dateString.length == 0)
+        return NULL;
+    NSDateComponents *dateComponents = [RLDate dateComponentsWithDate:[RLDate dateFromString:dateString]];
+    *len = sizeof(date);
+    int i = 0;
+    date[i++] = dateComponents.year - 2000;
+    date[i++] = dateComponents.month;
+    date[i++] = dateComponents.day;
+    date[i++] = dateComponents.hour;
+    date[i++] = dateComponents.minute;
+    date[i] = dateComponents.second;
+    
+    return date;
+}
+
 //cmd response
 static Byte BL_responseData[240] = {0};
 BL_response responseWithBytes(Byte *bytes, NSInteger length) {

@@ -114,7 +114,14 @@
 #pragma mark - Fetch Records
 - (NSArray *)allObjectsFromTable:(NSString *)tableName wherePredicate:(NSPredicate *)predicate sortDescriptor:(NSSortDescriptor *)descriptor {
     //creating fetch request object for fetching records.
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:tableName];
+//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:tableName];
+#if 1
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:tableName inManagedObjectContext:self.managedObjectContext];
+    [fetchRequest setEntity:entity];
+    [fetchRequest setIncludesSubentities:YES];
+    [fetchRequest setReturnsObjectsAsFaults:NO];
+#endif
     
 #if TARGET_IPHONE_SIMULATOR
     [fetchRequest setReturnsObjectsAsFaults:NO];
@@ -284,5 +291,26 @@
     [self.managedObjectContext deleteObject:object];
     
     return [self save];
+}
+
+#pragma mark -
+- (NSManagedObject *)insertRecordForTable:(NSString *)tableName  {
+    //creating NSManagedObject for inserting records
+    NSManagedObject *object = [NSEntityDescription insertNewObjectForEntityForName:tableName inManagedObjectContext:self.managedObjectContext];
+    
+    return object;
+}
+
+- (NSManagedObject *)insertRecordForTable:(NSString *)tableName attributes:(NSDictionary *)attributes {
+    NSManagedObject *object = [self insertRecordForTable:tableName];
+    
+    NSArray *allKeys = [attributes allKeys];
+    
+    for(NSString *aKey in allKeys) {
+        id value = [attributes objectForKey:aKey];
+        [object setValue:value forKey:aKey];
+    }
+    
+    return object;
 }
 @end

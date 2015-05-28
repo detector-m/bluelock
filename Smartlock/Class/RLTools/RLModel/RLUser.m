@@ -63,6 +63,10 @@
     self.sessionToken = user.sessionToken;
 }
 
+- (void)setWithParameters:(NSDictionary *)parameters {
+
+}
+
 #pragma mark -
 + (BOOL)saveArchiver {
     //获取路径和保存文件

@@ -9,5 +9,7 @@
 #import "RLUser.h"
 
 @interface User : RLUser
-
+@property (nonatomic, copy) NSString *dqID;
+@property (nonatomic, copy) NSString *password;
+@property (nonatomic, copy) NSString *gid;
 @end

@@ -28,6 +28,7 @@ typedef void (^RLperipheralRSSIValueCallback)(NSNumber *RSSI, NSError *error);;
 
 @property (nonatomic, readonly, weak) NSString *UUIDString;
 @property (nonatomic, readonly, weak) NSString *name;
+@property (nonatomic, readonly, weak) NSString *advName;
 
 @property (nonatomic, readonly, assign) BOOL watchDogRaised;
 

@@ -81,7 +81,7 @@
         }
         RegisterResponse *response = [[RegisterResponse alloc] initWithResponseObject:responseObject];
         if(response.status == 0) {
-            User *user = [User sharedUser];
+            [[User sharedUser] setWithParameters:(NSDictionary *)responseObject];
         }
         if(block) {
             block(response, nil);

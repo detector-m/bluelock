@@ -28,6 +28,7 @@
 
     [mutableDic setObject:user.phone forKey:@"memberName"];
     [mutableDic setObject:user.phone forKey:@"mobile"];
+    [mutableDic setObject:user.deviceToken forKey:@"deviceToken"];
     
     return mutableDic;
 }

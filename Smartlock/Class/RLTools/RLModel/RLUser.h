@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, GenderType) {
 @property (nonatomic, unsafe_unretained) RLLocation *location;
 
 @property (nonatomic, copy) NSString *sessionToken;
+@property (nonatomic, strong) NSData *deviceToken;
 
 + (instancetype)sharedUser;
 + (BOOL)saveArchiver;
@@ -32,4 +33,5 @@ typedef NS_ENUM(NSInteger, GenderType) {
 + (void)removeArchiver;
 
 - (void)setWithUser:(id)user;
+- (void)setWithParameters:(NSDictionary *)parameters;
 @end

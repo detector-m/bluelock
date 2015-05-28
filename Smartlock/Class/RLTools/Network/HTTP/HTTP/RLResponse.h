@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface RLResponse : NSObject
-@property (nonatomic, assign) NSUInteger status;
+@property (nonatomic, assign) NSInteger status;
 @property (nonatomic, strong) NSString *resDescription;
 
 @property (nonatomic, assign) NSUInteger errorCode;
@@ -17,4 +17,6 @@
 @property (nonatomic, readonly, assign) BOOL success;
 
 - (instancetype)initWithResponseObject:(id)responseObject;
+
+- (void)checkStatus;
 @end

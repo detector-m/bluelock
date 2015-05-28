@@ -36,8 +36,6 @@
     self.oldPassword.textField.secureTextEntry = YES;
     [self.oldPassword setStyle:kRLTitleTextFieldVertical];
     self.oldPassword.title.text = NSLocalizedString(@"原密码", nil);
-    self.oldPassword.textField.layer.borderColor = [UIColor lightGrayColor].CGColor;
-    self.oldPassword.textField.layer.borderWidth = 0.5f;
     [self.view addSubview:self.oldPassword];
     
     heightOffset += self.oldPassword.frame.size.height;
@@ -45,8 +43,6 @@
     self.password.textField.secureTextEntry = YES;
     [self.password setStyle:kRLTitleTextFieldVertical];
     self.password.title.text = NSLocalizedString(@"请输入新密码", nil);
-    self.password.textField.layer.borderColor = [UIColor lightGrayColor].CGColor;
-    self.password.textField.layer.borderWidth = 0.5f;
     [self.view addSubview:self.password];
     
     heightOffset += self.password.frame.size.height;
@@ -54,8 +50,6 @@
     self.pswCheck.textField.secureTextEntry = YES;
     [self.pswCheck setStyle:kRLTitleTextFieldVertical];
     self.pswCheck.title.text = NSLocalizedString(@"确认密码", nil);
-    self.pswCheck.textField.layer.borderColor = [UIColor lightGrayColor].CGColor;
-    self.pswCheck.textField.layer.borderWidth = 0.5f;
     [self.view addSubview:self.pswCheck];
     
     heightOffset += self.pswCheck.frame.size.height + 20;

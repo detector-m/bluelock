@@ -10,6 +10,17 @@
 #import "XMPPFramework.h"
 #import "RLDate.h"
 
+#pragma mark -
+#import "SoundManager.h"
+
+#pragma mark -
+/**
+ *  Notification fro xmpp
+ */
+extern const NSString *kDidConnected;
+extern const NSString *kDidDisconnected;
+extern const NSString *kReceiveMessage;
+
 @interface XMPPManager : NSObject <XMPPStreamDelegate, XMPPRosterDelegate> {
     XMPPStream *xmppStream;
     XMPPReconnect *xmppReconnect;

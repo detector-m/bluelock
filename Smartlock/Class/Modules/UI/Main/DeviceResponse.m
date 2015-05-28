@@ -10,25 +10,10 @@
 
 @implementation DeviceResponse
 - (instancetype)initWithResponseObject:(id)responseObject {
-    if(self = [super init]) {
-        if([responseObject isKindOfClass:[NSDictionary class]]) {
+    if(self = [super initWithResponseObject:responseObject]) {
+        if(self.status == 0) {
             NSDictionary *resDic = responseObject;
-            self.resDescription = [resDic objectForKey:@"message"];
-            self.status = [[resDic objectForKey:@"status"] integerValue];
-//            DLog(@"%@", resDic);
             [self parserLockList:[resDic objectForKey:@"bleKeys"]];
-        }
-        else if([responseObject isKindOfClass:[NSArray class]] ) {
-            
-        }
-        else if([responseObject isKindOfClass:[NSNumber class]]) {
-            
-        }
-        else if ([responseObject isKindOfClass:[NSString class]]) {
-            self.resDescription = responseObject;
-            if([responseObject integerValue] != 0) {
-                self.status = 1;
-            }
         }
     }
     
@@ -40,14 +25,12 @@
         return;
     }
     self.list = [NSMutableArray new];
-    LockModel *lock = nil;
+    KeyModel *key = nil;
     
-    for(NSDictionary *dicLock in list) {
-        NSDictionary *tempLock = [dicLock objectForKey:@"bleLock"];
-        lock = [[LockModel alloc] init];
-        lock.name = [tempLock objectForKey:@"lockName"];
-        lock.pwd =  [RLTypecast stringToLongLongInteger:[tempLock objectForKey:@"lockPwd"]] ;
-        [self.list addObject:lock];
+//    DLog(@"%@", list);
+    for(NSDictionary *dicKey in list) {
+        key = [[KeyModel alloc] initWithParameters:dicKey];
+        [self.list addObject:key];
     }
 }
 @end

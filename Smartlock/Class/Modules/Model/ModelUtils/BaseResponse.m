@@ -7,27 +7,12 @@
 //
 
 #import "BaseResponse.h"
+#import "RLHUD.h"
 
 @implementation BaseResponse
 - (instancetype)initWithResponseObject:(id)responseObject {
-    if(self = [super init]) {
-        if([responseObject isKindOfClass:[NSDictionary class]]) {
-            NSDictionary *resDic = responseObject;
-            self.resDescription = [resDic objectForKey:@"message"];
-            self.status = [[resDic objectForKey:@"status"] integerValue];
-        }
-        else if([responseObject isKindOfClass:[NSArray class]] ) {
-            
-        }
-        else if([responseObject isKindOfClass:[NSNumber class]]) {
-            
-        }
-        else if ([responseObject isKindOfClass:[NSString class]]) {
-            self.resDescription = responseObject;
-            if([responseObject integerValue] != 0) {
-                self.status = 1;
-            }
-        }
+    if(self = [super initWithResponseObject:responseObject]) {
+    
     }
     
     return self;

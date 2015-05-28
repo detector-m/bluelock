@@ -7,7 +7,7 @@
 //
 
 #import "BaseResponse.h"
-#import "LockModel.h"
+#import "KeyModel.h"
 
 @interface DeviceResponse : BaseResponse
 @property (nonatomic, strong) NSMutableArray *list;

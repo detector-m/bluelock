@@ -12,13 +12,17 @@
 #import "LockDevicesVC.h"
 #import "SendKeyVC.h"
 #import "ProfileVC.h"
+#import "BuyVC.h"
 #import "NotificationMessageVC.h"
 #import "MoreVC.h"
 
-#if 0
-#import "RLCycleScrollView.h"
-#import "RLScrollItem.h"
-#endif
+#pragma mark -
+#import "Message.h"
+#import "RecordManager.h"
+#import "KeyEntity.h"
+
+#pragma mark -
+#import "XMPPManager.h"
 
 #import "RLColor.h"
 #import "SoundManager.h"
@@ -49,6 +53,9 @@
 #pragma mark -
 @property (nonatomic, strong) NSMutableArray *lockList;
 
+#pragma mark -
+@property (assign) BOOL isBannersLoaded;
+@property (assign) BOOL isBannersLoading;
 @end
 
 @implementation MainVC
@@ -58,8 +65,15 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+
+    self.messageBadgeNumber = [[MyCoreDataManager sharedManager] objectsCountWithKey:@"isRead" contains:@NO withTablename:NSStringFromClass([Message class])];
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
     [self.bannersView stopLoading];
     self.bannersView.delegate = nil;
 }
@@ -68,8 +82,6 @@
     [super viewDidLoad];
     
     self.title = NSLocalizedString(@"yongjiakeji", nil);
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(messageComming) name:@"MessageComming" object:nil];
     
     [self setupBLCentralManaer];
 
@@ -82,6 +94,8 @@
     [self setupMainView];
     
     [self setupLockList];
+    
+    [self setupNotification];
 }
 
 - (void)setupBLCentralManaer {
@@ -100,10 +114,45 @@
     [self loadLockList];
 }
 
+- (void)setupNotification {
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applictionWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage) name:(NSString *)kReceiveMessage object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkReachable:) name:AFNetworkingReachabilityDidChangeNotification object:nil];
+}
+
+//- (void)applictionWillEnterForeground:(id)sender {
+//    if(![AFNetworkReachabilityManager sharedManager].isReachable)
+//        return;
+//
+//    [RecordManager updateRecordsWithBlock:^(BOOL success) {
+//        [self loadLockList];
+//    }];
+//}
+
+#pragma mark ----------- network status changed
+- (void)networkReachable:(id)sender {
+    NSNotification *notification = sender;
+    NSDictionary *dic = notification.userInfo;
+    NSInteger status = [[dic objectForKey:AFNetworkingReachabilityNotificationStatusItem] integerValue];
+    if(status > 0) {
+        [self loadBannersRequest];
+        
+        [self loadLockListForNet];
+        [RecordManager updateRecordsWithBlock:^(BOOL success) {
+            [self loadLockListForNet];
+        }];
+    }
+    else {
+        [self.bannersView stopLoading];
+    }
+}
+
 static CGFloat BannerViewHeight = 120.0f;
 static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/advice.jsp";
 - (void)loadBannersRequest {
-    [self.bannersView loadRequest:[self requestForBanners:self.bannersUrl]];
+    if(!self.isBannersLoaded && !self.isBannersLoading) {
+        [self.bannersView loadRequest:[self requestForBanners:self.bannersUrl]];
+    }
 }
 
 - (NSURLRequest *)requestForBanners:(NSString *)aUrl {
@@ -114,30 +163,6 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
 }
 
 - (void)setupBanners {
-#if 0
-    NSMutableArray *images = [NSMutableArray array];
-    RLScrollItem *item = [RLScrollItem new];
-    item.image = [UIImage imageNamed:@"h1.jpg"];
-    [images addObject:item];
-    
-    item = [RLScrollItem new];
-    item.image = [UIImage imageNamed:@"h2.jpg"];
-    [images addObject:item];
-    
-    item = [RLScrollItem new];
-    item.image = [UIImage imageNamed:@"h3.jpg"];
-    [images addObject:item];
-    
-    item = [RLScrollItem new];
-    item.imageURL = @"https://ss0.baidu.com/-Po3dSag_xI4khGko9WTAnF6hhy/super/whfpf%3D425%2C260%2C50/sign=a41eb338dd33c895a62bcb3bb72e47c2/5fdf8db1cb134954a2192ccb524e9258d1094a1e.jpg";
-    [images addObject:item];
-    
-    CGFloat w = self.view.bounds.size.width;
-    RLCycleScrollView *cycleScrollView = [[RLCycleScrollView alloc] initWithFrame:CGRectMake(0, 0, w, BannerViewHeight)];
-    cycleScrollView.items = images;
-    cycleScrollView.delegate = self;
-    [self.view addSubview:cycleScrollView];
-#else
     CGFloat ratio = (3.0/1.0);
     self.bannersUrl = (NSString *)kBannersURLString;
     CGRect frame = self.view.frame;
@@ -147,7 +172,6 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
     self.bannersView.scrollView.bounces = NO;
     [self.view addSubview:self.bannersView];
     [self loadBannersRequest];
-#endif
 }
 
 - (void)setupMainView {
@@ -241,60 +265,30 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
 }
 
 - (void)loadLockList {
+    __weak __typeof(self)weakSelf = self;
+    [weakSelf.lockList removeAllObjects];
+    NSArray *array = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([KeyEntity class])];
+    for(KeyEntity *key in array) {
+        [weakSelf.lockList addObject:[[KeyModel alloc] initWithKeyEntity:key]];
+    }
+    [self loadLockListForNet];
+}
+
+- (void)loadLockListForNet {
+    __weak __typeof(self)weakSelf = self;
     [DeviceManager lockList:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
-        if(error) {
-            return ;
-        }
-        if(response.status) {
-            return;
-        }
         if(!response.list.count) {
             return;
         }
         
-        [self.lockList addObjectsFromArray:response.list];
+        [weakSelf.lockList removeAllObjects];
+        [weakSelf.lockList addObjectsFromArray:response.list];
+        for(KeyModel *key in weakSelf.lockList) {
+            [[MyCoreDataManager sharedManager] insertUpdateObjectInObjectTable:keyEntityDictionaryFromKeyModel(key) updateOnExistKey:@"keyID" withTablename:NSStringFromClass([KeyEntity class])];
+        }
         
     }];
-}
 
-- (void)clickRightItem:(UIBarButtonItem *)item {
-//    LockDevicesVC *vc = [LockDevicesVC new];
-//    [self.navigationController pushViewController:vc animated:YES];
-//    LockModel *lock = [[LockModel alloc] init];
-//    lock.name = @"1111111";
-//    lock.address = @"2222222";
-//    lock.token = [User sharedUser].sessionToken;
-//    [DeviceManager addBluLock:lock withBlock:^(DeviceResponse *response, NSError *error) {
-//        if(error) {
-//            DLog(@"%@", error);
-//            return ;
-//        }
-//        if(response.status) {
-//        
-//        }
-//        else {
-//            
-//        }
-//    }];
-    
-//    KeyModel *key = [KeyModel new];
-//    key.lockID = 1;
-//    key.ower = @"abc";
-//    key.type = 1;
-//    key.validCount = 3;
-//    key.token = [User sharedUser].sessionToken;
-//    [DeviceManager sendKey:key withBlock:^(DeviceResponse *response, NSError *error) {
-//        
-//    }];
-    
-//    [DeviceManager lockList:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
-//        
-//    }];
-    
-//    [DeviceManager keyListOfAdmin:11 token:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
-//        DLog(@"");
-//    }];
-    
 }
 
 - (void)clickOpenLockBtn:(UIButton *)button {
@@ -306,14 +300,25 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
     __weak __typeof(self)weakSelf = self;
     
     [[RLBluetooth sharedBluetooth] scanBLPeripheralsWithCompletionBlock:^(NSArray *peripherals) {
+        if(peripherals == nil) {
+            weakSelf.openLockBtn.userInteractionEnabled = YES;
+            return ;
+        }
+        
         if(!peripherals.count) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"未找到设备,请检查蓝牙设备", nil)];
+            });
             weakSelf.openLockBtn.userInteractionEnabled = YES;
             return ;
         }
         
         for(RLPeripheral *peripheral in peripherals) {
-            for(LockModel *lock in self.lockList) {
-                if([peripheral.name isEqualToString:lock.name]) {
+            for(KeyModel *key in self.lockList) {
+                if(![key isValid]) {
+                    continue;
+                }
+                if([peripheral.name isEqualToString:key.keyOwner.address]) {
                     [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
                         weakSelf.openLockBtn.userInteractionEnabled = YES;
                         for(RLService *service in peripheral.services) {
@@ -324,7 +329,7 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
                                         [characteristic setNotifyValue:YES completion:^(NSError *error) {
                                             for(RLCharacteristic *characteristic in service.characteristics) {
                                                 if([characteristic.UUIDString isEqualToString:@"fff2"]) {
-                                                    [weakSelf writeDataToCharacteristic:characteristic withData:453289921600ll];//lock.pwd];
+                                                    [weakSelf writeDataToCharacteristic:characteristic withKey:key];//lock.pwd];
                                                     
                                                     return ;
                                                 }
@@ -334,8 +339,7 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
                                             Byte crc = CRCOfCMDBytes((Byte *)[data bytes], data.length);
                                             
                                             if(crc == cmdResponse.CRC && cmdResponse.result.result == 0) {
-//                                                crc++;
-                                                [weakSelf openLock:nil];
+                                                [weakSelf openLock:key];
                                             }
                                         }];
                                     }
@@ -348,6 +352,11 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
                 }
             }
         }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"没有可用的钥匙", nil)];
+            weakSelf.openLockBtn.userInteractionEnabled = YES;
+        });
     }];
 }
 
@@ -355,18 +364,27 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
     [[SoundManager sharedManager] playSound:@"SoundOperator.mp3" looping:NO];
     button.userInteractionEnabled = NO;
     CGRect orignalFrame = self.arrow.frame;
+    __weak __typeof(self)weakSelf = self;
     [UIView animateKeyframesWithDuration:1.0f delay:0.0f options:UIViewAnimationCurveLinear | UIViewAnimationOptionAllowUserInteraction animations:^{
         CGRect frame = self.arrow.frame;
         frame.origin = button.center;//CGPointMake(self.openLockBtn.frame.origin.x, self.openLockBtn.frame.origin.y);
         frame.origin.x += 10;
         frame.origin.y -= 22;
-        self.arrow.frame = frame;
+        weakSelf.arrow.frame = frame;
     } completion:^(BOOL finished) {
         if(finished) {
-            self.arrow.frame = orignalFrame;
-            self.arrow.hidden = YES;
-            button.userInteractionEnabled = YES;
+            weakSelf.arrow.frame = orignalFrame;
+            weakSelf.arrow.hidden = NO;
+            weakSelf.arrow.alpha = 0.0;
             button.selected = !button.selected;
+            
+            [UIView animateKeyframesWithDuration:2.0f delay:5.0 options:UIViewAnimationCurveLinear | UIViewAnimationOptionAllowUserInteraction animations:^{
+                weakSelf.arrow.alpha = 0.95;
+            } completion:^(BOOL finished) {
+                weakSelf.arrow.alpha = 1.0;
+                button.userInteractionEnabled = YES;
+                button.selected = !button.selected;
+            }];
         }
     }];
 }
@@ -396,12 +414,25 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
 
 - (void)clickMyDeviceBtn:(UIButton *)button {
     LockDevicesVC *vc = [LockDevicesVC new];
+    vc.mainVC = self;
 //    vc.manager = self.manager.manager;
     [vc.table addObjectFromArray:self.lockList];
     [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (void)clickSendKeyBtn:(UIButton *)button {
+    BOOL isAdmin = NO;
+    for(KeyModel *key in self.lockList) {
+        if(key.userType == 0) {
+            isAdmin = YES;
+            break;
+        }
+    }
+    
+    if(!isAdmin) {
+        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"你并非管理员！", nil)];
+        return;
+    }
     SendKeyVC *vc = [[SendKeyVC alloc] init];
     vc.title = NSLocalizedString(@"发送钥匙", nil);
     [self.navigationController pushViewController:vc animated:YES];
@@ -413,11 +444,16 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
 }
 
 - (void)clickBuyBtn:(UIButton *)button {
-    
+    BuyVC *vc = [[BuyVC alloc] init];
+    vc.title = NSLocalizedString(@"购买", nil);
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (void)clickMessageBtn:(UIButton *)button {
+    [[MyCoreDataManager sharedManager] updateObjectsInObjectTable:@{@"isRead" : @YES} withKey:@"isRead" contains:@NO withTablename:NSStringFromClass([Message class])];
+
     self.messageBadgeNumber = 0;
+
     NotificationMessageVC *vc = [[NotificationMessageVC alloc] initWithStyle:UITableViewStyleGrouped];
     [self.navigationController pushViewController:vc animated:YES];
 }
@@ -428,16 +464,23 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
 }
 
 #pragma mark - 
-- (void)messageComming {
+- (void)receiveMessage {
     self.messageBadgeNumber ++;
+    [self loadLockListForNet];
 }
 
 #pragma mark - public methods
 #pragma mark -
-- (void)addLock:(LockModel *)lock {
-    if(!lock)
+- (void)addKey:(KeyModel *)key {
+    if(!key )
         return;
-    [self.lockList addObject:lock];
+    [self.lockList addObject:key ];
+}
+
+- (void)removeKey:(KeyModel *)key {
+    if(!key)
+        return;
+    [self.lockList removeObject:key];
 }
 
 - (void)setMessageBadgeNumber:(NSInteger)messageBadgeNumber {
@@ -449,24 +492,37 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
     
     self.messageBadgeLabel.hidden = NO;
     _messageBadgeNumber = messageBadgeNumber;
-    self.messageBadgeLabel.text = [NSString stringWithFormat:@"%i", messageBadgeNumber];
+    self.messageBadgeLabel.text = [NSString stringWithFormat:@"%li", (long)messageBadgeNumber];
 }
 
 #pragma mark - private methods
-- (void)openLock:(LockModel *)lock {
+- (void)openLock:(KeyModel *)key {
     [self performSelectorOnMainThread:@selector(startOpenLockAnimation:) withObject:self.openLockBtn waitUntilDone:YES];
+    if(key.type == kKeyTypeTimes) {
+        if(key.validCount > 0) {
+            --key.validCount;
+            
+            [[MyCoreDataManager sharedManager] updateObjectsInObjectTable:@{@"useCount":[NSNumber numberWithInteger:key.validCount]} withKey:@"keyID" contains:[NSNumber numberWithInteger:key.ID] withTablename:NSStringFromClass([KeyEntity class])];
+        }
+    }
+    NSDictionary *record = createOpenLockRecord(key.ID, key.lockID);
+    [[MyCoreDataManager sharedManager] insertObjectInObjectTable:record withTablename:NSStringFromClass([OpenLockRecord class])];
+    [DeviceManager openLock:openLockRecordToString(record) token:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
+        [[MyCoreDataManager sharedManager] updateObjectsInObjectTable:record withKey:@"keyID" contains:[NSNumber numberWithLongLong:key.ID] withTablename:NSStringFromClass([OpenLockRecord class])];
+    }];
 }
 
-- (void)writeDataToCharacteristic:(RLCharacteristic *)characteristic withData:(long long)data {
-    int size = sizeof(data)+6;
+- (void)writeDataToCharacteristic:(RLCharacteristic *)characteristic withKey:(KeyModel *)key {
+    int len = 0;
+    long long data = key.keyOwner.pwd;
+    Byte *dateData = dateToBytes(&len, key.invalidDate.length? key.invalidDate: @"2015-12-18");
+    int size = sizeof(data)+len;
     Byte *tempData = calloc(size, sizeof(Byte));
-    tempData[0] = 0xff;
-    for(NSInteger j=1; j<6; j++) {
-        tempData[j] = 0x0a;
-    }
-    Byte *temp = (Byte *)&data;
-    for(NSInteger j = 6; j<size; j++) {
-        tempData[j] = temp[j-6];
+    memcpy(tempData, dateData, len);
+    
+    Byte *temp = (Byte *)&(data);
+    for(NSInteger j = len; j<size; j++) {
+        tempData[j] = temp[j-len];
     }
     
     NSData *writeData = [NSData dataWithBytes:tempData length:size];
@@ -482,13 +538,19 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
 
 #pragma mark - UIWebViewDelegate
 - (void)webViewDidStartLoad:(UIWebView *)webView {
+    self.isBannersLoaded = NO;
+    self.isBannersLoading = YES;
     [RLHUD hudProgressWithBody:nil onView:webView timeout:5.0f];
 }
 - (void)webViewDidFinishLoad:(UIWebView *)webView{
+    self.isBannersLoaded = YES;
+    self.isBannersLoading = NO;
     [RLHUD hideProgress];
 }
 - (void) webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     DLog(@"error=%@", error);
+    self.isBannersLoaded = NO;
+    self.isBannersLoading = NO;
     [RLHUD hideProgress];
 }
 @end

@@ -50,7 +50,7 @@
 #pragma mark - Getter/Setter -
 /*----------------------------------------------------*/
 - (BOOL)isCentralReady {
-    return self.manager.state == CBCentralManagerStatePoweredOff;
+    return self.manager.state == CBCentralManagerStatePoweredOn;
 }
 
 - (NSString *)centralNotReadyReason {

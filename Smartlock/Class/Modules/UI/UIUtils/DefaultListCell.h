@@ -18,6 +18,9 @@
 
 #define Space (5)
 
+extern NSString *kCellIdentifier;
+
 @interface DefaultListCell : UITableViewCell
 
+- (void)setDefaultProperties;
 @end

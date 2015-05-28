@@ -11,15 +11,23 @@
 #import "MoreDetailVC.h"
 
 @implementation MoreVC
+{
+    NSMutableArray *imageArray;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.title = NSLocalizedString(@"更多", nil);
     
     self.table.tableView.rowHeight = 60.0f;
+    self->imageArray = [NSMutableArray array];
     [self.table.datas addObject:@"关于"];
     [self.table.datas addObject:@"帮助"];
     [self.table.datas addObject:@"安装教程"];
+    
+    [self->imageArray addObject:@"About.png"];
+    [self->imageArray addObject:@"Help.png"];
+    [self->imageArray addObject:@"SetupNav.png"];
 }
 
 #pragma mark -
@@ -45,8 +53,8 @@
     DefaultListCell *cell = [tableView dequeueReusableCellWithIdentifier:(NSString *)kCellIdentifier forIndexPath:indexPath];
     NSInteger index = [self indexForData:indexPath];
     cell.textLabel.text = [self.table.datas objectAtIndex:index];
-    cell.imageView.image = [UIImage imageNamed:@"Phone.png"];
-//    cell.detailTextLabel.text = [self.table.datas objectAtIndex:index];
+    cell.imageView.image = [UIImage imageNamed:[self->imageArray objectAtIndex:index]];
+
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
     return cell;

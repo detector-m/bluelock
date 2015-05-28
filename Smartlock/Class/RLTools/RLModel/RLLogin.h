@@ -14,6 +14,7 @@
 @property (nonatomic, copy) NSString *account;
 @property (nonatomic, copy) NSString *password;
 @property (nonatomic, unsafe_unretained) RLLocation *location;
+@property (nonatomic, weak) NSData *deviceToken;
 
 - (NSDictionary *)toDictionary;
 @end

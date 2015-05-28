@@ -8,16 +8,25 @@
 
 #import "RLRequest.h"
 
+#import "RLHUD.h"
+
 @implementation RLRequest
 
 + (NSURLSessionDataTask *)requestWithUrl:(NSString *)url withParameters:(NSDictionary *)parameters andBlock:(void (^)(id responseObject, NSError * error)) block {
     return [[RLHTTPAPIClient sharedClient] POST:url parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
+        [RLHUD hideProgress];
         if(block) {
-            block(responseObject, nil);
+            RLResponse *response = [[RLResponse alloc] initWithResponseObject:responseObject];
+            if(response.success || response.status > 0) {
+                block(responseObject, nil);
+            }
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [RLHUD hideProgress];
         if(block) {
-            block(@"Error", error);
+            DLog(@"%@", error);
+//            block(@"Error", error);
+            [RLHUD hudAlertErrorWithBody:@"网络有问题！请检查网络"];
         }
     }];
 }

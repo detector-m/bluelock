@@ -13,5 +13,9 @@
 @property (nonatomic, strong) UIWebView *webView;
 
 #pragma mark -
+@property (assign) BOOL isWebViewLoaded;
+@property (assign) BOOL isWebViewLoading;
+
+#pragma mark -
 - (void)loadRequest;
 @end

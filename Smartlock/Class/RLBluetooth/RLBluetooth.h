@@ -18,6 +18,9 @@
 + (instancetype)sharedBluetooth;
 
 #pragma mark -
+- (BOOL)bluetoothIsReady;
+
+#pragma mark -
 - (void)scanBLPeripheralsWithCompletionBlock:(void (^)(NSArray *peripherals))completionCallback;
 - (void)removeBLPeripherals;
 

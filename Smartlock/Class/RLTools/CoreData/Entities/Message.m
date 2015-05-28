@@ -22,7 +22,7 @@ NSDictionary *messageDictionaryFromXMPPMessage(XMPPMessage *xmppMessage) {
     [muDic setObject:[[xmppMessage elementForName:@"body"] stringValue]?:@"" forKey:@"content"];
     [muDic setObject:[xmppMessage fromStr]?:@"" forKey:@"from"];
     [muDic setObject:[xmppMessage toStr]?:@"" forKey:@"to"];
-    [muDic setObject:[[xmppMessage elementForName:@"extension"] stringValue]?:@"" forKey:@"extension"];
+    [muDic setObject:[[xmppMessage elementForName:@"backJson"] stringValue]?:@"" forKey:@"extension"];
     [muDic setObject:@0 forKey:@"id"];
     [muDic setObject:@NO forKey:@"isRead"];
     

@@ -39,7 +39,7 @@ NSString *timeStringWithTimestamp(long long timestamp) {
     }
     
     if(sub >= hour && sub < day) {
-        return [NSString stringWithFormat:@"%i小时前", (NSInteger)(sub/hour)];
+        return [NSString stringWithFormat:@"%li小时前", (long)(sub/hour)];
     }
     
     NSDate *date = [NSDate dateWithTimeIntervalSinceNow:-sub];
@@ -81,5 +81,32 @@ NSString *timeStringWithTimestamp(long long timestamp) {
 
 #pragma mark -
 @implementation RLDate
++ (NSDate *)dateFromString:(NSString *)dateString {
+    if(!dateString || dateString.length == 0) {
+        return nil;
+    }
+    NSDateFormatter *dateformatter = [[NSDateFormatter alloc] init];
+    [dateformatter setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
+    dateformatter.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+    NSDate *date = [dateformatter dateFromString:dateString];
+    
+    return date;
+}
 
+#pragma mark -
++ (NSDateComponents *)dateComponentsWithDate:(NSDate *)date {
+    if(!date)
+        return nil;
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSCalendarUnit unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
+    NSDateComponents *dateComponents = [calendar components:unitFlags fromDate:date];
+    
+    return dateComponents;
+}
+
++ (NSDateComponents *)dateComponentsNow {
+    NSDate *date = [NSDate date];
+    
+    return [self dateComponentsWithDate:date];
+}
 @end

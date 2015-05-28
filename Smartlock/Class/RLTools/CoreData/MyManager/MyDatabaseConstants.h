@@ -12,9 +12,4 @@
 #define kEmail          @"email"
 #define kName           @"name"
 #define kPhoneNumber    @"phoneNumber"
-
-#define kPassword       @"password"
-
-
-
 #endif

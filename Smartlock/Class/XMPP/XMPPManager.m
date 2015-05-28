@@ -26,6 +26,9 @@
 #import "MyCoreDataManager.h"
 #import "Message.h"
 
+#import "Login.h"
+#import "RLJSON.h"
+
 // Log levels: off, error, warn, info, verbose
 #if DEBUG
 static const int ddLogLevel = LOG_LEVEL_VERBOSE;
@@ -33,8 +36,23 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 static const int ddLogLevel = LOG_LEVEL_INFO;
 #endif
 
+#pragma mark -
 static NSString *kXMPPHostName = @"dqcc.com.cn";
 static const NSInteger kXMPPHostPort = 5222;
+
+#pragma mark -
+const NSString *kDidConnected = @"didConnected";
+const NSString *kDidDisconnected = @"didDisconnected";
+const NSString *kReceiveMessage = @"didReceiveMessage";
+
+#pragma mark -
+void postNotification(const NSString *notificationName, id object) {
+    [[NSNotificationCenter defaultCenter] postNotificationName:(NSString *)notificationName object:object];
+}
+
+void postNotificationWithNone(const NSString *notificationName) {
+    postNotification(notificationName, nil);
+}
 
 @interface XMPPManager ()
 - (void)setupStream;
@@ -274,14 +292,15 @@ static const NSInteger kXMPPHostPort = 5222;
 #pragma mark Connect/disconnect
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)connect {
-    return [self connect:@"00000026@dqcc.com.cn" password:@"123456"];
+    return [self connect:[User sharedUser].dqID password:[User sharedUser].password];
 }
 - (BOOL)connect:(NSString *)_jid password:(NSString *)_password {
+    
     if (![xmppStream isDisconnected]) {
         return YES;
     }
     
-    NSString *myJID = _jid;
+    NSString *myJID = [_jid stringByAppendingString:@"@dqcc.com.cn"];
     NSString *myPassword = _password;
     //
     // If you don't want to use the Settings view to set the JID,
@@ -378,7 +397,12 @@ static const NSInteger kXMPPHostPort = 5222;
     
     if (![self.xmppStream authenticateWithPassword:password error:&error]) {
         DDLogError(@"Error authenticating: %@", error);
+        
+        postNotification(kDidConnected, error);
+        return;
     }
+    
+    postNotificationWithNone(kDidConnected);
 }
 
 - (void)xmppStreamDidAuthenticate:(XMPPStream *)sender {
@@ -398,45 +422,57 @@ static const NSInteger kXMPPHostPort = 5222;
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message {
-    //    SystemSoundID soundID;
-    //    NSString *strSoundFile = [[NSBundle mainBundle] pathForResource:@"alertsound" ofType:@"wav"];
-    //    AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:strSoundFile],&soundID);
-    //    AudioServicesPlaySystemSound(soundID);
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
-    DDLogVerbose(@"message type = %@", message.type);
-    if ([message isChatMessageWithBody]) {
-        XMPPUserCoreDataStorageObject *user = [xmppRosterStorage userForJID:[message from]
-                                                                 xmppStream:xmppStream
-                                                       managedObjectContext:[self managedObjectContext_roster]];
-        
-        NSString *body = [[message elementForName:@"body"] stringValue];
-        NSString *json = [[message elementForName:@"json"] stringValue];
-        json = [NSString stringWithFormat:@"  json=%@", json];
-        NSString *displayName = [user displayName];
-        
-        if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:displayName
-                                                                message:[body stringByAppendingString:json]
-                                                               delegate:nil
-                                                      cancelButtonTitle:@"Ok"
-                                                      otherButtonTitles:nil];
-            [alertView show];
-        }
-        else {
-            // We are not active, so use a local notification instead
-            UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-            localNotification.alertAction = @"Ok";
-            localNotification.alertBody = [NSString stringWithFormat:@"From: %@\n\n%@",displayName,body];
-            
-            [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
-        }
+//    DDLogVerbose(@"message type = %@", message.type);
+    DDLogVerbose(@"message = %@", message);
+
+#if 0
+//    SystemSoundID soundID;
+    NSString *strSoundFile = [[NSBundle mainBundle] pathForResource:@"alertsound" ofType:@"wav"];
+//    AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:strSoundFile],&soundID);
+//    AudioServicesPlaySystemSound(soundID);
+//    [[SoundManager sharedManager] playSound:strSoundFile];
+#endif
+    [[SoundManager sharedManager] playSound:@"ScanQRCode.mp3"];
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+
+    [[MyCoreDataManager sharedManager] insertObjectInObjectTable:messageDictionaryFromXMPPMessage(message) withTablename:NSStringFromClass([Message class])];
+#if 0
+//    XMPPUserCoreDataStorageObject *user = [xmppRosterStorage userForJID:[message from] xmppStream:xmppStream managedObjectContext:[self managedObjectContext_roster]];
+//    NSString *displayName = [user displayName];
+#endif
+    
+    if([message.type isEqualToString:@"chat"]) {
+        return;
     }
+    
+    NSString *body = [[message elementForName:@"body"] stringValue];
+    
+    if (![[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+        // We are not active, so use a local notification instead
+        UILocalNotification *localNotification = [[UILocalNotification alloc] init];
+        localNotification.applicationIconBadgeNumber = (++[UIApplication sharedApplication].applicationIconBadgeNumber);
+
+//        localNotification.alertAction = @"Ok";
+        localNotification.alertBody = [NSString stringWithFormat:@"%@",body];
+        
+        [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
+    }
+#if 0
     else {
-        
-        [[MyCoreDataManager sharedManager] insertObjectInObjectTable:messageDictionaryFromXMPPMessage(message) withTablename:NSStringFromClass([Message class])];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"MessageComming" object:nil];
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:displayName message:[body stringByAppendingString:json] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [alertView show];
     }
+#endif
+    NSString *json = [[[message elementForName:@"dqcc"] elementForName:@"backJson"] stringValue];
+    NSDictionary *backDic = [RLJSON JSONObjectWithString:json];
+    if([[backDic objectForKey:@"backCode"] integerValue] == 101) {
+        [Login hudAlertLogout];
+        return;
+    }
+    if([[backDic objectForKey:@"flag"] integerValue] == 0)
+        return;
+    postNotificationWithNone(kReceiveMessage);
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence {
@@ -452,7 +488,11 @@ static const NSInteger kXMPPHostPort = 5222;
     
     if (!isXmppConnected) {
         DDLogError(@"Unable to connect to server. Check xmppStream.hostName");
+        postNotification(kDidDisconnected, error);
+        return;
     }
+    
+    postNotificationWithNone(kDidDisconnected);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

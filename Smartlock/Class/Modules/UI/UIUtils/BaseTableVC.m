@@ -53,6 +53,7 @@
 - (void)setupTable {
     if(!self.table) {
         self.table = [RLTable new];
+        self.table.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     }
     self.table.tableView = self.tableView;
 }

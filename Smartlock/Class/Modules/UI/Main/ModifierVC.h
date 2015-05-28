@@ -8,7 +8,10 @@
 
 #import "BaseVC.h"
 #import "RLTitleTextField.h"
+#import "UserOperationRequest.h"
+
+#import "ProfileVC.h"
 
 @interface ModifierVC : BaseVC
-
+@property (nonatomic, weak) ProfileVC *vc;
 @end

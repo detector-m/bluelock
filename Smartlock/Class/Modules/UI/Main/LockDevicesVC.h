@@ -13,11 +13,10 @@
 #import "RLPeripheral.h"
 #import "BluetoothLockCommand.h"
 
-#import "LockModel.h"
+#import "KeyModel.h"
 
 @class MainVC;
 @interface LockDevicesVC : BaseTableVC
-//@property (nonatomic, weak) RLCentralManager *manager;
 @property (nonatomic, weak) MainVC *mainVC;
 #pragma mark -
 - (void)addLockWithPeripheral:(LockModel *)lock;

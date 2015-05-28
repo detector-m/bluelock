@@ -12,6 +12,9 @@
 #import "MyCoreDataManager.h"
 #import "RLDate.h"
 
+#pragma mark -
+#import "XMPPManager.h"
+
 @interface NotificationMessageCell : ListCell
 
 @end
@@ -41,11 +44,11 @@
     NSArray *messages = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([Message class])];
     [self.table addObjectFromArray:messages];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(messageComming) name:@"MessageComming" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage) name:(NSString *)kReceiveMessage object:nil];
 }
 
 #pragma mark -
-- (void)messageComming {
+- (void)receiveMessage {
     [self.table.datas removeAllObjects];
     NSArray *messages = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([Message class])];
 
@@ -80,8 +83,8 @@
     NotificationMessageCell *cell = [tableView dequeueReusableCellWithIdentifier:(NSString *)kCellIdentifier forIndexPath:indexPath];
     NSInteger index = [self indexForData:indexPath];
     Message *message = [self.table.datas objectAtIndex:index];
-    cell.textLabel.text = message.from;//[self.table.datas objectAtIndex:index];
-    cell.imageView.image = [UIImage imageNamed:@"Phone.png"];
+    cell.textLabel.text = NSLocalizedString(@"永家科技", nil); //message.from;//[self.table.datas objectAtIndex:index];
+    cell.imageView.image = [UIImage imageNamed:@"MessageAvater.png"];
     cell.detailTextLabel.text = message.content;
     cell.timeLabel.text = timeStringWithTimestamp([message.timestamp longLongValue]);
     
@@ -103,4 +106,22 @@
     }
 }
 
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
+}
+
+// Override to support editing the table view.
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        NSInteger index = [self indexForData:indexPath];
+        Message *message = [self.table.datas objectAtIndex:index];
+        [[MyCoreDataManager sharedManager] deleteTableRecord:message withTablename:NSStringFromClass([message class])];
+        [self.table.datas removeObject:message];
+        [self.table.tableView reloadData];
+                
+    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
+        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+    }
+}
 @end

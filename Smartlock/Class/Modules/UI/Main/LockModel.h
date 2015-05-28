@@ -7,7 +7,11 @@
 //
 
 #import "DeviceModel.h"
+#import "LockEntity.h"
 
+@class LockEntity;
 @interface LockModel : DeviceModel
 @property (nonatomic, copy) NSString *address;
+
+- (instancetype)initWithLockEntity:(LockEntity *)lockEntity;
 @end 

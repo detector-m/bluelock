@@ -42,6 +42,7 @@
     self.title = NSLocalizedString(@"我的资料", nil);
     [self setupBackItem:NSLocalizedString(@"取消", nil)];
     self.table.tableView.tableFooterView = self.footer;
+    
     [self.table.datas addObject:@"昵称"];
     [self.table.datas addObject:@"账户名"];
     [self.table.datas addObject:@"更改密码"];
@@ -51,6 +52,7 @@
 #define FooterHeight (100.0f)
 - (UIView *)footer {
     if(!_footer) {
+        
         CGRect frame = self.view.frame;
         _footer = [[UIView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, 100.0f)];
         UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -59,6 +61,10 @@
         [button setTitle:NSLocalizedString(@"退出登录", nil)forState:UIControlStateNormal];
         [button addTarget:self action:@selector(clickLogoutBtn:) forControlEvents:UIControlEventTouchUpInside];
         [_footer addSubview:button];
+        
+        UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(16, 0, frame.size.width-16, .5)];
+        lineView.backgroundColor = [UIColor lightGrayColor];
+        [_footer addSubview:lineView];
     }
     
     return _footer;
@@ -79,7 +85,8 @@
             [[XMPPManager sharedXMPPManager] disconnect];
             [weakSelf.navigationController popToRootViewControllerAnimated:YES];
         });
-
+        
+//        [Login forcedLogout];
     }];
 }
 
@@ -110,6 +117,14 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:(NSString *)kCellIdentifier forIndexPath:indexPath];
     NSInteger index = [self indexForData:indexPath];
     cell.textLabel.text = [self.table.datas objectAtIndex:index];
+    if(indexPath.section == 0) {
+        if(indexPath.row == 0) {
+            cell.detailTextLabel.text = [User sharedUser].nickname;
+        }
+        else {
+            cell.detailTextLabel.text = [User sharedUser].phone;
+        }
+    }
     
     return cell;
 }
@@ -119,9 +134,12 @@
     
     switch (indexPath.section) {
         case 0: {
-            ModifierVC *vc = [[ModifierVC alloc] init];
-            vc.title = NSLocalizedString([self.table.datas objectAtIndex:index], nil);
-            [self.navigationController pushViewController:vc animated:YES];
+            if(indexPath.row == 0) {
+                ModifierVC *vc = [[ModifierVC alloc] init];
+                vc.vc = self;
+                vc.title = NSLocalizedString([self.table.datas objectAtIndex:index], nil);
+                [self.navigationController pushViewController:vc animated:YES];
+            }
         }
             break;
         case 1:

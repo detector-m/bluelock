@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "BaseCell.h"
+
+#import "DefaultListCell.h"
 
 @interface ListCell : UITableViewCell
 @property (nonatomic, strong) UIImage *placeholderImage;

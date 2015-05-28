@@ -40,6 +40,27 @@
 }
 
 - (void)clickRightItem {
+    [self.view endEditing:YES];
+    if(self.textField.textField.text.length <= 0) {
+        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"输入为空！", nil)];
+        return;
+    }
     
+    __weak __typeof(self)weakSelf = self;
+    [UserOperationRequest modifyInfo:[UserOperationRequest paramaterForModifyNickname:self.textField.textField.text andToken:[User sharedUser].sessionToken] withBlock:^(UserOperationResponse *response, NSError *error) {
+        if(error || !response.success) {
+            [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"修改失败", nil)];
+            return ;
+        }
+        
+        if(response.success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [RLHUD hudAlertSuccessWithBody:NSLocalizedString(@"修改成功", nil)];
+                [User sharedUser].nickname = weakSelf.textField.textField.text;
+                [User saveArchiver];
+                [_vc.table.tableView reloadData];
+            });
+        }
+    }];
 }
 @end

@@ -17,6 +17,7 @@
     [parameters setObject:self.account forKey:@"userName"];
     [parameters setObject:self.password forKey:@"passward"];
     
+    [parameters setObject:self.deviceToken forKey:@"deviceToken"];
     [parameters setObject:[RLTypecast doubleToString:self.location.latitude] forKey:@"latitude"];
     [parameters setObject:[RLTypecast doubleToString:self.location.longitude] forKey:@"longitude"];
     [parameters setObject:self.location.city forKey:@"registeredCity"];

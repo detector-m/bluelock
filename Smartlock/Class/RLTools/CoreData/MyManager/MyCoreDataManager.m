@@ -7,7 +7,6 @@
 //
 
 #import "MyCoreDataManager.h"
-#import "RLCoreDataManagerSubclass.h"
 
 @implementation MyCoreDataManager
 + (NSURL*)modelURL
@@ -79,15 +78,30 @@
     return [self allObjectsFromTable:tablename where:key contains:value sortDescriptor:sortDescriptor];
 }
 
+- (NSInteger)objectsCountWithKey:(NSString *)key contains:(id)value withTablename:(NSString *)tablename {
+    return [self objectsSortByAttribute:nil where:key contains:value withTabelname:tablename].count;
+}
+
 - (id)insertObjectInObjectTable:(NSDictionary *)objectAttributes withTablename:(NSString *)tablename {
     return [self insertRecordInTable:tablename withAttribute:objectAttributes];
 }
 
-- (id)insertUpdateObjectInObjectTable:(NSDictionary *)objectAttributes withTablename:(NSString *)tablename {
-    return [self insertRecordInTable:tablename withAttribute:objectAttributes updateOnExistKey:kEmail equals:[objectAttributes objectForKey:kEmail]];
+- (id)insertUpdateObjectInObjectTable:(NSDictionary *)objectAttributes updateOnExistKey:(NSString *)key withTablename:(NSString *)tablename {
+    return [self insertRecordInTable:tablename withAttribute:objectAttributes updateOnExistKey:key equals:[objectAttributes objectForKey:key]];
 }
 - (id)updateObject:(id)object inObjectTable:(NSDictionary *)objectAttributes withTablename:(NSString *)tablename {
     return [self updateRecord:object withAttribute:objectAttributes];
+}
+
+- (NSArray *)updateObjectsInObjectTable:(NSDictionary *)objectAttributes withKey:(NSString *)key contains:(id)value withTablename:(NSString *)tablename {
+    NSArray *objects = [self objectsSortByAttribute:nil where:key contains:value withTabelname:tablename];
+    NSMutableArray *returnObjects = [NSMutableArray array];
+    for(id object in objects) {
+        id returnObject = [self updateObject:object inObjectTable:objectAttributes withTablename:tablename];
+        [returnObjects addObject:returnObject];
+    }
+    
+    return returnObjects;
 }
 
 - (BOOL)deleteTableRecord:(id)object withTablename:(NSString *)tablename {
@@ -97,4 +111,6 @@
 - (BOOL)deleteAllTableObjectInTable:(NSString *)tablename {
     return [self flushTable:tablename];
 }
+
+#pragma mark -
 @end

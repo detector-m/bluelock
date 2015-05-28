@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "RLDate.h"
 
 /*cmd*/
 union union_mode {
@@ -49,23 +50,9 @@ extern Byte *wrappCMDToBytes(struct BL_cmd *cmd, Byte bytes[]);
 extern BOOL wrappCMDDatasToBytes(long long int *data, Byte bytes[], NSInteger len);
 extern BOOL freeBLCMDData(const Byte *data);
 
-//cmd response
-//struct BL_response {
-//    Byte ST;
-//    
-//    Byte cmd_code;
-//    union union_mode union_mode;
-//    Byte cmd_result;
-//    
-//    Byte keep;
-//    
-//    Byte data_len;
-//    Byte *data;
-//    
-//    Byte CRC;
-//    Byte END;
-//};
+extern Byte *dateToBytes(int * const len, NSString * const dateString);
 
+//cmd response
 typedef struct BL_cmd BL_response;
 
 extern BL_response responseWithBytes(Byte *bytes, NSInteger length);

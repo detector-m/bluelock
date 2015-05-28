@@ -10,21 +10,44 @@
 #import "AddDeviceVC.h"
 //#import "ScanningQRCodeVC.h"
 #import "MainVC.h"
+#import "SubTitleListCell.h"
+#import "KeysOfLockVC.h"
 
+#import "SCLAlertView.h"
+
+#pragma mark -
 #import "LockModel.h"
+#import "DeviceManager.h"
+
+#import "MyCoreDataManager.h"
+#import "KeyEntity.h"
+
+@interface LockDevicesVC () <UIAlertViewDelegate>
+//@property (nonatomic) UIAlertView *alertView;
+@property (nonatomic) KeyModel *modifyKey;
+@end
 
 @implementation LockDevicesVC
+
+//- (void)viewWillAppear:(BOOL)animated {
+//    [super viewWillAppear:animated];
+//    
+//    [self.table.tableView reloadData];
+//}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.title = NSLocalizedString(@"My Devices", nil);
  
-//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(clickRightItem)];
+    self.table.tableView.rowHeight = 60.0f;
+    [self setupLongPressGesture];
 }
 
 - (void)setupRightItem {
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(clickRightItem)];
 }
+
 
 - (void)clickRightItem {
 #if 0
@@ -40,9 +63,70 @@
 }
 
 #pragma mark -
+- (void)showAlertView {
+#if 0
+    if(self.alertView) {
+        [self.alertView show];
+        
+        return;
+    }
+    self.alertView = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"请输入修改的锁名", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"取消", nil) otherButtonTitles:NSLocalizedString(@"确定", nil), nil];
+    self.alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [self.alertView show];
+#endif
+    
+    SCLAlertView *alert = [[SCLAlertView alloc] init];
+    
+    UITextField *txt = [alert addTextField:@"请输入"];
+    __weak __typeof(self)weakSelf = self;
+    [alert addButton:NSLocalizedString(@"确定", nil) actionBlock:^(void) {
+        if(!txt || txt.text.length == 0)
+            return;
+        
+        [DeviceManager modifyKeyName:self.modifyKey.ID gid:self.modifyKey.ower token:[User sharedUser].sessionToken keyName:txt.text withBlock:^(DeviceResponse *response, NSError *error) {
+            if(response.status) {
+                return;
+            }
+            self.modifyKey.name = txt.text;
+            [[MyCoreDataManager sharedManager] insertUpdateObjectInObjectTable:keyEntityDictionaryFromKeyModel(self.modifyKey) updateOnExistKey:@"keyID" withTablename:NSStringFromClass([KeyEntity class])];
+            [RLHUD hudAlertSuccessWithBody:NSLocalizedString(@"成功", nil)];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf.table.tableView reloadData];
+            });
+        }];
+    }];
+    
+    [alert showEdit:self title:NSLocalizedString(@"修改钥匙名", nil) subTitle:nil closeButtonTitle:NSLocalizedString(@"取消", nil) duration:0.0f];
+    
+}
+
+- (void)setupLongPressGesture {
+    UILongPressGestureRecognizer *gesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressAction:)];
+    gesture.minimumPressDuration = 1.0f;
+    gesture.numberOfTouchesRequired = 1;
+    [self.table.tableView addGestureRecognizer:gesture];
+}
+
+- (void)longPressAction:(UILongPressGestureRecognizer *)gesture {
+    if(gesture.state == UIGestureRecognizerStateBegan) {
+        CGPoint point = [gesture locationInView:self.table.tableView];
+        NSIndexPath *indexPath = [self.table.tableView indexPathForRowAtPoint:point];
+        if(indexPath == nil)
+            return;
+        
+        self.modifyKey = [self.table.datas objectAtIndex:indexPath.row];
+        [self showAlertView];
+    }
+}
+
+#pragma mark -
 - (void)addLockWithPeripheral:(LockModel *)lock {
-    [self.mainVC addLock:lock];
-    [self.table.datas addObject:lock];
+    KeyModel *key = [[KeyModel alloc] init];
+    key.keyOwner = lock;
+    key.name = lock.address;
+    key.ower = [User sharedUser].gid;
+    [self.mainVC addKey:key];
+    [self.table.datas addObject:key];
     __weak __typeof(self)weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         [weakSelf.table.tableView reloadData];
@@ -55,29 +139,104 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView registerClass:[BaseCell class] forCellReuseIdentifier:kCellIdentifier];
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:(NSString *)kCellIdentifier forIndexPath:indexPath];
-//     cell.textLabel.text = @"lock";
-    LockModel *lock = [self.table.datas objectAtIndex:indexPath.row];
-    cell.textLabel.text = lock.name;
-    cell.imageView.image = [UIImage imageNamed:@"LockIcon"];
+    SubTitleListCell *cell = [tableView dequeueReusableCellWithIdentifier:(NSString *)kCellIdentifier];
+    if(!cell) {
+        cell = [[SubTitleListCell alloc] initWithReuseIdentifier:kCellIdentifier aClass:/*[UIButton class]*/NULL];
+        UIButton *button = (UIButton *)cell.contentAccessoryView;
+        [button addTarget:self action:@selector(clickCellBtn:) forControlEvents:UIControlEventTouchUpInside];
+        
+    }
+    KeyModel *key = [self.table.datas objectAtIndex:indexPath.row];
+    cell.textLabel.text = key.name;
+    if(key.type == kKeyTypeForever) {
+        cell.detailTextLabel.text = @"永久";
+    }
+    else if(key.type == kKeyTypeTimes) {
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"还可使用%d次", key.validCount];
+    }
+    else  {
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"钥匙有效期限%@", key.invalidDate];
+    }
+    
+    if(key.userType == kUserTypeAdmin) {
+        cell.imageView.image = [UIImage imageNamed:@"LockIcon"];
+    }
+    else {
+        cell.imageView.image = [UIImage imageNamed:@"KeyIcon"];
+    }
+    
+    if(!key.userType) {
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    }
+    else {
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    }
+#if 0
+    UIButton *button = (UIButton *)cell.contentAccessoryView;
+    if(!key.userType) {
+        button.hidden = YES;
+        return cell;
+    }
+    
+    button.hidden = NO;
+    button.tag = indexPath.row;
+    if(!key.status) {
+        [button setTitle:NSLocalizedString(@"冻结", nil) forState:UIControlStateNormal];
+    }
+    else {
+        [button setTitle:NSLocalizedString(@"解冻", nil) forState:UIControlStateNormal];
+    }
+#endif
     
     return cell;
  }
 
+- (void)clickCellBtn:(UIButton *)button {
+
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    KeyModel *key = [self.table.datas objectAtIndex:indexPath.row];
+    if(!key.userType) {
+        KeysOfLockVC *vc = [[KeysOfLockVC alloc] init];
+        vc.lockId = key.lockID;
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+}
 
  // Override to support conditional editing of the table view.
  - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
  // Return NO if you do not want the specified item to be editable.
+     KeyModel *key = [self.table.datas objectAtIndex:indexPath.row];
+//     if([key.ower isEqualToString:[User sharedUser].gid]) {
+//         return NO;
+//     }
+     if(!key.userType)
+         return NO;
      return YES;
  }
 
  // Override to support editing the table view.
  - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+     KeyModel *key = [self.table.datas objectAtIndex:indexPath.row];
+
      if (editingStyle == UITableViewCellEditingStyleDelete) {
          // Delete the row from the data source
-         [self.table.datas removeObjectAtIndex:indexPath.row];
-         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+         __weak __typeof(self)weakSelf = self;
+         if([key.ower isEqualToString:[User sharedUser].gid])
+             return;
+         [DeviceManager deleteKey:key.ID token:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
+             if(error || response.status) {
+                 return ;
+             }
+             
+             dispatch_async(dispatch_get_main_queue(), ^{
+                 [weakSelf.table.datas removeObjectAtIndex:indexPath.row];
+                 [weakSelf.mainVC removeKey:key];
+                 [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+             });
+         }];
+         
      } else if (editingStyle == UITableViewCellEditingStyleInsert) {
          // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
      }
@@ -97,5 +256,27 @@
  return YES;
  }
  */
+
+#pragma mark - UIAlertViewDelegate
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if(buttonIndex == 1) {
+        UITextField *txt = [alertView textFieldAtIndex:0];
+        if(!txt || txt.text.length == 0)
+            return;
+        
+        [DeviceManager modifyKeyName:self.modifyKey.ID gid:self.modifyKey.ower token:[User sharedUser].sessionToken keyName:txt.text withBlock:^(DeviceResponse *response, NSError *error) {
+            if(error) {
+                DLog(@"%@", error);
+                
+                return ;
+            }
+            
+            if(response.status) {
+                return;
+            }
+            
+        }];
+    }
+}
 
 @end

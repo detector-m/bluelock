@@ -16,16 +16,6 @@
 @property (nonatomic, readwrite, weak) UIView *separateView;
 @end
 
-#define ImageViewSize (44)
-
-#define TimeLabelHeight (16)
-#define TimeLabelWidth (80)
-
-#define BadgeLabelHeight (20)
-#define BadgeLabelWidth (20)
-
-#define Space (5)
-
 @implementation ListCell
 - (id)initWithStyle:(UITableViewCellStyle)style
     reuseIdentifier:(NSString *)reuseIdentifier {

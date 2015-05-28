@@ -86,19 +86,14 @@
 
 - (void)clickedAuthcodeButton {
     if(![self.phoneTextField.textField.text isMobile]) {
-        [RLHUD hudAlertWithBody:NSLocalizedString(@"手机号码有误！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
+        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"手机号码有误！", nil)];
         return;
     }
     
     void (^verifyBlock)(BaseResponse *response, NSError *error) = ^(BaseResponse *response, NSError *error) {
-        if(error) {
-            [RLHUD hudAlertWithBody:NSLocalizedString(@"请检查网络！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
-            
-            return;
-        }
+        
         if(response.status) {
-            DLog(@"验证码获取出错");
-            [RLHUD hudAlertWithBody:NSLocalizedString(@"获取验证码出错！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
+            [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"获取验证码出错！", nil)];
         }
     };
     
@@ -107,16 +102,12 @@
     __weak __typeof(self)weakSelf = self;
     [Register verifyPhone:self.phoneTextField.textField.text withBlock:^(BaseResponse *response, NSError *error) {
         button.enabled = YES;
-        if(error) {
-            [RLHUD hudAlertWithBody:NSLocalizedString(@"请检查网络！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
-            
-            return;
-        }
         
         if(weakSelf.type == kRegister) {
             if(response.status) {
                 DLog(@"验证码获取出错");
-                [RLHUD hudAlertWithBody:NSLocalizedString(@"手机号码已被用！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
+                
+                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"手机号码已被用！", nil)];
             }
             else {
                 [Register getAuthcode:self.phoneTextField.textField.text withBlock:verifyBlock];
@@ -125,12 +116,11 @@
         }
         else {
             if(response.status == 1) {
-                DLog(@"验证码获取出错");
                 [Register getAuthcode:self.phoneTextField.textField.text withBlock:verifyBlock];
                 [self startTimer:self.authcodeButton];
             }
             else {
-                [RLHUD hudAlertWithBody:NSLocalizedString(@"手机号码可用！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
+                [RLHUD hudAlertSuccessWithBody:NSLocalizedString(@"手机号码可用！", nil)];
             }
         }
     }];
@@ -138,29 +128,27 @@
 
 - (void)clickedNextButton {
     if(![self.phoneTextField.textField.text isMobile]) {
-        [RLHUD hudAlertWithBody:NSLocalizedString(@"手机号码有误！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
+        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"手机号码有误！", nil)];
         return;
     }
     
     if(![self.authcodeTextField.text isMobileAuthCode]) {
-        [RLHUD hudAlertWithBody:NSLocalizedString(@"验证码有误！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
+        
+        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"验证码有误！", nil)];
         return;
     }
     
-    [RLHUD hudProgressWithBody:NSLocalizedString(@"正在验证。。。", nil) onView:self.view timeout:20.0f];
+    [RLHUD hudProgressWithBody:NSLocalizedString(@"正在验证。。。", nil) onView:self.view timeout:10.0f];
 
     __weak __typeof(self)weakSelf = self;
     [Register verifyAuthcode:self.phoneTextField.textField.text authcode:self.authcodeTextField.text withBlock:^(BaseResponse *response, NSError *error) {
-        if(error) {
-            [RLHUD hudAlertWithBody:NSLocalizedString(@"请检查网络！", nil) type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
-            
-            return;
-        }
+        [RLHUD hideProgress];
+
         if(response.status) {
-            DLog(@"验证码获取出错");
+            [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"验证失败！", nil)];
+            return ;
         }
 
-        [RLHUD hideProgress];
         dispatch_async(dispatch_get_main_queue(), ^{
             SetPasswordVC *vc = [[SetPasswordVC alloc] init];
             vc.type = weakSelf.type;

@@ -228,7 +228,7 @@
     NSError *serializationError = nil;
     NSMutableURLRequest *request = [self.requestSerializer requestWithMethod:method URLString:[[NSURL URLWithString:URLString relativeToURL:self.baseURL] absoluteString] parameters:parameters error:&serializationError];
 #warning "Print url and parameters -------------"
-    NSLog(@"%@?%@", [request.URL absoluteString], [[NSString alloc] initWithData:request.HTTPBody encoding:self.requestSerializer.stringEncoding]);
+    DLog(@"%@?%@", [request.URL absoluteString], [[NSString alloc] initWithData:request.HTTPBody encoding:self.requestSerializer.stringEncoding]);
     if (serializationError) {
         if (failure) {
 #pragma clang diagnostic push

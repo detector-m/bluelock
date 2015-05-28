@@ -21,6 +21,6 @@
 + (void)logout:(NSString *)token withBlock:(void (^)(LoginResponse *response, NSError *error))block {
     NSDictionary *parameters = [LoginModel logoutWithToken:token];
     
-    [self requestWithUrl:@"member/logOut.jhtml" withParameters:parameters andBlock:block];
+    [self requestWithUrl:@"member/loginOut.jhtml" withParameters:parameters andBlock:block];
 }
 @end

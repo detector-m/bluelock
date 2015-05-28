@@ -57,4 +57,8 @@
 - (BOOL)deleteRecord:(NSManagedObject *)object;
 //Delete all the records in table
 - (BOOL)flushTable:(NSString *)tableName;
+
+#pragma mark -
+- (NSManagedObject *)insertRecordForTable:(NSString *)tableName;
+- (NSManagedObject *)insertRecordForTable:(NSString *)tableName attributes:(NSDictionary *)attributes;
 @end
