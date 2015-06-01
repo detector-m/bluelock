@@ -201,6 +201,8 @@
         KeysOfLockVC *vc = [[KeysOfLockVC alloc] init];
         vc.lockId = key.lockID;
         [self.navigationController pushViewController:vc animated:YES];
+        
+        [self deselectRow];
     }
 }
 

@@ -15,4 +15,6 @@
 
 - (void)setupBackItem;
 - (void)setupRightItem;
+
+- (void)setBackButtonHide:(BOOL)hide;
 @end

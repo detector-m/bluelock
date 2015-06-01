@@ -43,7 +43,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.title = NSLocalizedString(@"永家", nil);
+    self.title = NSLocalizedString(@"永家科技", nil);
     [self.backgroundImage removeFromSuperview];
     [self setupForDismissKeyboard];
     
@@ -116,6 +116,7 @@
 
 - (void)clickedLoginButton {
     [self.view endEditing:YES];
+    self.navigationItem.backBarButtonItem = nil;
     if(![self.account.textField.text isMobile]) {
         [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"账号输入有误！", nil)];
         return;
@@ -141,19 +142,17 @@
         return;
     }
 
-    __weak typeof(self)weakSelf = self;
     [Login login:login withBlock:^(LoginResponse *response, NSError *error) {
         [RLHUD hideProgress];
         if(response.success) {
             [User sharedUser].password = login.password;
             dispatch_async(dispatch_get_main_queue(), ^{
-                [User saveArchiver];
                 if(![[XMPPManager sharedXMPPManager] connect]) {
                     [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"登录失败", nil)];
                     return ;
                 }
-                MainVC *vc = [MainVC new];
-                [weakSelf.navigationController pushViewController:vc animated:YES];
+                
+                [Login login];
             });
         }
         else {

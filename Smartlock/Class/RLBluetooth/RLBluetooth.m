@@ -21,8 +21,8 @@
     self.connectedCallback = nil;
 }
 
+static RLBluetooth *_sharedBluetooth = nil;
 + (instancetype)sharedBluetooth {
-    static RLBluetooth *_sharedBluetooth = nil;
     
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -30,6 +30,11 @@
     });
     
     return _sharedBluetooth;
+}
+
++ (void)sharedRelease {
+    if(_sharedBluetooth)
+        _sharedBluetooth = nil;
 }
 
 - (instancetype)init {
@@ -72,7 +77,6 @@
 
 - (void)connectPeripheral:(RLPeripheral *)peripheral withConnectedBlock:(void (^)())callback {
     __weak __typeof(self)weakSelf = self;
-//    DLog(@"%@", peripheral.cbPeripheral.uuid)
     if(callback) {
         self.connectedCallback = nil;
         self.connectedCallback = callback;
@@ -95,6 +99,7 @@
 }
 
 - (void)disconnectAllPeripherals {
+    [self.manager stopScanForPeripherals];
     for(RLPeripheral *peripheral in self.manager.peripherals) {
         if(peripheral.cbPeripheral.state == CBPeripheralStateConnected || peripheral.cbPeripheral.state == CBPeripheralStateConnecting) {
             [self disconnectPeripheral:peripheral];
@@ -106,6 +111,20 @@
     if(!peripheral) return;
     
     self.connectedCallback = nil;
+    
+    for(RLService *service in peripheral.services) {
+        for (RLCharacteristic *characteristic in [service characteristics]) {
+            if(characteristic.cbCharacteristic.properties == CBCharacteristicPropertyNotify) {
+                [characteristic setNotifyValue:NO completion:^(NSError *error) {
+                    [peripheral disconnectWithCompletion:^(NSError *error) {
+                        DLog(@"%@", error);
+                    }];
+                }];
+                
+                return ;
+            }
+        }
+    }
     [peripheral disconnectWithCompletion:^(NSError *error) {
         DLog(@"%@", error);
     }];
@@ -131,8 +150,6 @@
 }
 
 - (void)discoverServiceCharacteristicsWithService:(RLService *)service {
-//    __weak __typeof(self)weakSelf = self;
-    
     RLServiceDiscoverCharacteristicsCallback discoverServiceCharacteristicsCallback = ^(NSArray *characteristics, NSError *error) {
         if(error) {
             self.connectedCallback = nil;
@@ -186,6 +203,81 @@
         DLog(@"str = %@", str);
         free((void *)bytes);
     }
+}
+
+#pragma mark - 
+- (RLPeripheral *)peripheralForName:(NSString *)name {
+    for(RLPeripheral *peripheral in self.peripherals) {
+        if([peripheral.name isEqualToString:name]) {
+            return peripheral;
+        }
+    }
+    return nil;
+}
+
+- (RLPeripheral *)peripheralForUUIDString:(NSString *)uuidString {
+    for(RLPeripheral *peripheral in self.peripherals) {
+        if([peripheral.UUIDString isEqualToString:uuidString]) {
+            return peripheral;
+        }
+    }
+    return nil;
+}
+
+- (RLService *)serviceForUUIDString:(NSString *)uuidString withPeripheral:(RLPeripheral *)peripheral {
+    if(peripheral == nil)
+        return nil;
+    
+    for(RLService *service in peripheral.services) {
+        if([service.UUIDString isEqualToString:uuidString]) {
+            return service;
+        }
+    }
+    return nil;
+}
+- (RLCharacteristic *)characteristicForUUIDString:(NSString *)uuidString withService:(RLService *)service {
+    
+    if(!service) {
+        return nil;
+    }
+    
+    for(RLCharacteristic *characteristic in service.characteristics) {
+        if([characteristic.UUIDString isEqualToString:uuidString])
+            return characteristic;
+    }
+    
+    return nil;
+}
+
+- (RLCharacteristic *)characteristicForNotifyWithService:(RLService *)service {
+    if(!service) {
+        return nil;
+    }
+    
+    for(RLCharacteristic *characteristic in service.characteristics) {
+        if(characteristic.cbCharacteristic.properties == CBCharacteristicPropertyNotify)
+            return characteristic;
+    }
+    
+    return nil;
+}
+
+
+#pragma mark - public methods
+- (NSArray *)peripherals {
+    return self.manager.peripherals;
+}
+
+#pragma mark - private methods
+
+
+#pragma mark - app method
+- (RLCharacteristic *)characteristicForNotifyWithPeripheralName:(NSString *)peripheralName {
+    RLPeripheral *peripheral = [self peripheralForName:peripheralName];
+    RLService *service = [self serviceForUUIDString:@"1910" withPeripheral:peripheral];
+    RLCharacteristic *characteristic = [self characteristicForNotifyWithService:service];
+    
+    return characteristic;
 }
 
 @end

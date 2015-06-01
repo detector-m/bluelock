@@ -80,6 +80,18 @@ NSString *timeStringWithTimestamp(long long timestamp) {
 }
 
 #pragma mark -
+NSString *dateStringFromTimestamp(long long timestamp) {
+    if(timestamp < 0)
+        return @"";
+    
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp];
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init] ;
+    [formatter setDateFormat:@"yyyy-MM-dd"];
+    
+    return [formatter stringFromDate:date];
+}
+
+#pragma mark -
 @implementation RLDate
 + (NSDate *)dateFromString:(NSString *)dateString {
     if(!dateString || dateString.length == 0) {

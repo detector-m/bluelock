@@ -19,4 +19,6 @@
 
 - (void)setupBackItem:(NSString *)title;
 - (void)setupRightItem;
+
+- (void)deselectRow;
 @end

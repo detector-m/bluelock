@@ -13,7 +13,8 @@
 
 + (void)logout:(NSString *)token withBlock:(void (^)(LoginResponse *response, NSError *error))block;
 
+#pragma mark - UI
++ (void)login;
 + (void)forcedLogout;
-
 + (void)hudAlertLogout;
 @end

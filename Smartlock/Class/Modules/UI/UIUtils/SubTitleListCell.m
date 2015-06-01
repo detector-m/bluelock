@@ -7,6 +7,10 @@
 //
 
 #import "SubTitleListCell.h"
+#import "RLColor.h"
+
+#define ButtonWidth 60
+#define ButtonHeight 35
 
 @interface SubTitleListCell ()
 @property (nonatomic, readwrite, weak) UIView *contentAccessoryView;
@@ -41,10 +45,11 @@
             }
             else if(self.contentAccessoryViewClass == [UIButton class]) {
                 tempView = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-                tempView.frame = CGRectMake(240, 7, TimeLabelWidth, TimeLabelHeight);
-//                tempView.backgroundColor = [UIColor blueColor];
+                tempView.frame = CGRectMake(240, 7, ButtonWidth, ButtonHeight);
                 UIButton *button = (UIButton *)tempView;
-                [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+                [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+                button.backgroundColor = [RLColor colorWithHex:0xFF7B00];
+                button.layer.cornerRadius = 10;
             }
             
             if(tempView) {
@@ -113,9 +118,16 @@
     xOffset = self.imageView.frame.origin.x + self.imageView.frame.size.width - Space;
     self.badgeLabel.frame = CGRectMake(xOffset, 2, BadgeLabelWidth, BadgeLabelHeight);
     
-    xOffset = contentWidth - Space - TimeLabelWidth;
-    width = TimeLabelWidth;
-    height = TimeLabelHeight;
+    if(self.contentAccessoryViewClass == [UIButton class]) {
+        xOffset = contentWidth - Space - ButtonWidth;
+        width = ButtonWidth;
+        height = ButtonHeight;
+    }
+    else {
+        xOffset = contentWidth - Space - TimeLabelWidth;
+        width = TimeLabelWidth;
+        height = TimeLabelHeight;
+    }
     self.contentAccessoryView.frame = CGRectMake(xOffset, yOffset, width, height);
     
     xOffset = self.imageView.frame.origin.x + self.imageView.frame.size.width + Space + self.badgeLabel.frame.size.width;

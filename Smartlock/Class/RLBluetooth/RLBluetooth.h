@@ -12,10 +12,13 @@
 #import "BluetoothLockCommand.h"
 
 @interface RLBluetooth : NSObject
+@property (nonatomic, readonly, weak) NSArray *peripherals;
+
 @property (nonatomic, readonly, strong) RLCentralManager *manager;
 
 #pragma mark -
 + (instancetype)sharedBluetooth;
++ (void)sharedRelease;
 
 #pragma mark -
 - (BOOL)bluetoothIsReady;
@@ -34,4 +37,14 @@
 
 #pragma mark -
 - (void)writeDataToCharacteristic:(RLCharacteristic *)characteristic cmdCode:(Byte)cmdCode cmdMode:(Byte)cmdMode withDatas:(NSData *)data;
+
+#pragma mark -
+- (RLPeripheral *)peripheralForName:(NSString *)name;
+- (RLPeripheral *)peripheralForUUIDString:(NSString *)uuidString;
+- (RLService *)serviceForUUIDString:(NSString *)uuidString withPeripheral:(RLPeripheral *)peripheral;
+- (RLCharacteristic *)characteristicForUUIDString:(NSString *)uuidString withService:(RLService *)service;
+- (RLCharacteristic *)characteristicForNotifyWithService:(RLService *)service;
+
+#pragma mark - appmethod
+- (RLCharacteristic *)characteristicForNotifyWithPeripheralName:(NSString *)peripheralName;
 @end

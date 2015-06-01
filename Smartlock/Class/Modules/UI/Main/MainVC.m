@@ -65,29 +65,37 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [self setBackButtonHide:YES];
 
     self.messageBadgeNumber = [[MyCoreDataManager sharedManager] objectsCountWithKey:@"isRead" contains:@NO withTablename:NSStringFromClass([Message class])];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    [self setBackButtonHide:YES];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    [self setBackButtonHide:NO];
     [self.bannersView stopLoading];
     self.bannersView.delegate = nil;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    [self setBackButtonHide:YES];
+
     self.title = NSLocalizedString(@"yongjiakeji", nil);
     
     [self setupBLCentralManaer];
 
     [[SoundManager sharedManager] prepareToPlay];
-    
-    [self.navigationItem setHidesBackButton:YES];
     
     [self setupBackground];
     [self setupBanners];
@@ -135,11 +143,12 @@
     NSDictionary *dic = notification.userInfo;
     NSInteger status = [[dic objectForKey:AFNetworkingReachabilityNotificationStatusItem] integerValue];
     if(status > 0) {
+        [[XMPPManager sharedXMPPManager] reconnect];
         [self loadBannersRequest];
         
-        [self loadLockListForNet];
+        [self loadLockListFromNet];
         [RecordManager updateRecordsWithBlock:^(BOOL success) {
-            [self loadLockListForNet];
+            [self loadLockListFromNet];
         }];
     }
     else {
@@ -271,10 +280,10 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
     for(KeyEntity *key in array) {
         [weakSelf.lockList addObject:[[KeyModel alloc] initWithKeyEntity:key]];
     }
-    [self loadLockListForNet];
+    [self loadLockListFromNet];
 }
 
-- (void)loadLockListForNet {
+- (void)loadLockListFromNet {
     __weak __typeof(self)weakSelf = self;
     [DeviceManager lockList:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
         if(!response.list.count) {
@@ -283,6 +292,7 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
         
         [weakSelf.lockList removeAllObjects];
         [weakSelf.lockList addObjectsFromArray:response.list];
+        [[MyCoreDataManager sharedManager] deleteAllTableObjectInTable:NSStringFromClass([KeyEntity class])];
         for(KeyModel *key in weakSelf.lockList) {
             [[MyCoreDataManager sharedManager] insertUpdateObjectInObjectTable:keyEntityDictionaryFromKeyModel(key) updateOnExistKey:@"keyID" withTablename:NSStringFromClass([KeyEntity class])];
         }
@@ -313,6 +323,7 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
             return ;
         }
         
+#if 0
         for(RLPeripheral *peripheral in peripherals) {
             for(KeyModel *key in self.lockList) {
                 if(![key isValid]) {
@@ -321,6 +332,7 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
                 if([peripheral.name isEqualToString:key.keyOwner.address]) {
                     [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
                         weakSelf.openLockBtn.userInteractionEnabled = YES;
+#if 0
                         for(RLService *service in peripheral.services) {
                             if([service.UUIDString isEqualToString:@"1910"]) {
                                 for(RLCharacteristic *characteristic in service.characteristics) {
@@ -346,11 +358,43 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
                                 }
                             }
                         }
+#endif
                     }];
                     
                     return;
                 }
             }
+        }
+#endif
+        for(KeyModel *key in self.lockList) {
+            if(![key isValid]) {
+                continue;
+            }
+
+            RLPeripheral *peripheral = [[RLBluetooth sharedBluetooth] peripheralForName:key.keyOwner.address];
+            if(peripheral) {
+                [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
+                    weakSelf.openLockBtn.userInteractionEnabled = YES;
+                    RLService *service = [[RLBluetooth sharedBluetooth] serviceForUUIDString:@"1910" withPeripheral:peripheral];
+                    RLCharacteristic *characteristic = [[RLBluetooth sharedBluetooth] characteristicForNotifyWithService:service];
+                    
+                    [characteristic setNotifyValue:YES completion:^(NSError *error) {
+                        RLCharacteristic *innerCharacteristic = [[RLBluetooth sharedBluetooth] characteristicForUUIDString:@"fff2" withService:service];
+                        [weakSelf writeDataToCharacteristic:innerCharacteristic withKey:key];//lock.pwd];
+                        
+                    } onUpdate:^(NSData *data, NSError *error) {
+                        BL_response cmdResponse = responseWithBytes(( Byte *)[data bytes], data.length);
+                        Byte crc = CRCOfCMDBytes((Byte *)[data bytes], data.length);
+                        
+                        if(crc == cmdResponse.CRC && cmdResponse.result.result == 0) {
+                            [weakSelf openLock:key];
+                        }
+                    }];
+                }];
+                
+                return;
+            }
+            
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -415,7 +459,6 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
 - (void)clickMyDeviceBtn:(UIButton *)button {
     LockDevicesVC *vc = [LockDevicesVC new];
     vc.mainVC = self;
-//    vc.manager = self.manager.manager;
     [vc.table addObjectFromArray:self.lockList];
     [self.navigationController pushViewController:vc animated:YES];
 }
@@ -466,7 +509,7 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
 #pragma mark - 
 - (void)receiveMessage {
     self.messageBadgeNumber ++;
-    [self loadLockListForNet];
+    [self loadLockListFromNet];
 }
 
 #pragma mark - public methods

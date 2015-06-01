@@ -11,7 +11,7 @@
 @implementation LockModel
 
 - (instancetype)initWithParameters:(NSDictionary *)parameters {
-    if(self = [super init]) {
+    if(self = [super initWithParameters:parameters]) {
         self.pwd = [RLTypecast stringToLongLongInteger:[parameters objectForKey:@"lockPwd"]];
         self.address = [parameters objectForKey:@"bleAddress"];
     }

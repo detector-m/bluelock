@@ -20,9 +20,21 @@ NSString *kWarningTitle = @"Warning ⚠️";
 NSString *kInfoTitle = @"Info";
 NSString *kWaitingTitle = @"Waiting... ⌛️";
 
++ (SCLAlertView *)alertViewOnScreenHide {
+    for(UIViewController *vc in [UIApplication sharedApplication].keyWindow.rootViewController.childViewControllers) {
+        if([vc isKindOfClass:[SCLAlertView class]]) {
+            [(SCLAlertView *)vc hideView];
+            return (SCLAlertView *)vc;
+        }
+    }
+    
+    return nil;
+}
+
 #pragma mark -
 + (void)hudAlertSuccessWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self alertViewOnScreenHide];
         SCLAlertView *alert = [[SCLAlertView alloc] init];
         if(block) {
             [alert alertIsDismissed:block];
@@ -34,6 +46,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
 }
 + (void)hudAlertErrorWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self alertViewOnScreenHide];
         SCLAlertView *alert = [[SCLAlertView alloc] init];
         if(block) {
             [alert alertIsDismissed:block];
@@ -45,6 +58,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
 }
 + (void)hudAlertNoticeWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self alertViewOnScreenHide];
         SCLAlertView *alert = [[SCLAlertView alloc] init];
         if(block) {
             [alert alertIsDismissed:block];
@@ -57,6 +71,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
 }
 + (void)hudAlertWarningWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self alertViewOnScreenHide];
         SCLAlertView *alert = [[SCLAlertView alloc] init];
         if(block) {
             [alert alertIsDismissed:block];
@@ -68,6 +83,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
 }
 + (void)hudAlertInfoWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self alertViewOnScreenHide];
         SCLAlertView *alert = [[SCLAlertView alloc] init];
         if(block) {
             [alert alertIsDismissed:block];
@@ -79,6 +95,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
 }
 + (void)hudAlertEditWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self alertViewOnScreenHide];
         SCLAlertView *alert = [[SCLAlertView alloc] init];
         if(block) {
             [alert alertIsDismissed:block];
@@ -92,6 +109,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
 }
 + (void)hudAlertWaitingWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self alertViewOnScreenHide];
         SCLAlertView *alert = [[SCLAlertView alloc] init];
         if(block) {
             [alert alertIsDismissed:block];
@@ -126,6 +144,8 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
 + (void)hudAlertWaitingWithBody:(NSString *)body {
     [self hudAlertWarningWithBody:body dimissBlock:nil];
 }
+
+
 #pragma mark - 
 static MBProgressHUD *hudProgress = nil;
 + (void)hudProgressWithBody:(NSString *)body onView:(UIView *)view timeout:(NSTimeInterval)timeout {

@@ -19,6 +19,8 @@
 
 #import "RLHTTPAPIClient.h"
 
+#import "RLBluetooth.h"
+
 /************** Test *****************/
 #import "ViewController.h"
 #import "TestViewController.h"
@@ -185,24 +187,19 @@
 #else
 //    MainVC *vc = [MainVC new];
 //    LoginVC *vc = [LoginVC new];
-    UIViewController *vc = nil;
     User *user = [User loadArchiver];
-    vc = [LoginVC new];
-
-    RLBaseNavigationController *nav = [RLBaseNavigationController new];
-    [nav pushViewController:vc animated:NO];
+    
+    [[self class] setLoginVCToRootVCAnimate:NO];
     if(user) {
         [[User sharedUser] setWithUser:user];
         if([[XMPPManager sharedXMPPManager] connect]) {
-            vc = [MainVC new];
-            [nav pushViewController:vc animated:NO];
+            [[self class] setMainVCToRootVCAnimate:NO];
         }
         else {
             [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"登录失败", nil)];
         }
     }
-
-    self.window.rootViewController = nav;
+    
     [self.window makeKeyAndVisible];
     
 #pragma mark -
@@ -230,6 +227,7 @@
 - (void)applicationWillResignActive:(UIApplication *)application {
     [[AFNetworkReachabilityManager sharedManager] stopMonitoring];
     [[RLLocationManager sharedLocationManager] stopUpdatingLocation];
+    [[RLBluetooth sharedBluetooth] disconnectAllPeripherals];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -266,6 +264,7 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
+    [RLBluetooth sharedRelease];
 }
 
 #pragma mark -
@@ -280,7 +279,7 @@
 //本地推送通知
 -(void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings {
     //成功注册registerUserNotificationSettings:后，回调的方法
-    DLog(@"%@",notificationSettings);
+//    DLog(@"%@",notificationSettings);
 }
 
 -(void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
@@ -319,6 +318,76 @@
     //在没有启动本App时，收到服务器推送消息，下拉消息会有快捷回复的按钮，点击按钮后调用的方法，根据identifier来判断点击的哪个按钮
 
 }
+
+#pragma mark -
++ (void)setLoginVCToRootVCAnimate:(BOOL)animate {
+    UIViewController *loginVC = ((AppDelegate *)([UIApplication sharedApplication].delegate)).window.rootViewController;
+    
+    if([loginVC isKindOfClass:[RLBaseNavigationController class]]) {
+        if([[loginVC.childViewControllers firstObject] isKindOfClass:[LoginVC class]]) {
+            return;
+        }
+    }
+    
+    loginVC = [LoginVC new];
+    
+    RLBaseNavigationController *nav = [[RLBaseNavigationController alloc] initWithRootViewController:loginVC];
+    if(animate) {
+        [[self class] changeRootViewController:nav];
+    }
+    else {
+        ((AppDelegate *)([UIApplication sharedApplication].delegate)).window.rootViewController = nav;
+    }
+}
+
++ (void)setMainVCToRootVCAnimate:(BOOL)animate {
+    
+    UIViewController *vc = ((AppDelegate *)([UIApplication sharedApplication].delegate)).window.rootViewController;
+    
+    if([vc isKindOfClass:[RLBaseNavigationController class]]) {
+        if([[vc.childViewControllers firstObject] isKindOfClass:[MainVC class]]) {
+            return;
+        }
+    }
+    
+    vc = [MainVC new];
+    RLBaseNavigationController *mainNav = [[RLBaseNavigationController alloc] initWithRootViewController:vc];
+    if(animate) {
+        [[self class] changeRootViewController:mainNav];
+    }
+    else {
+        ((AppDelegate *)([UIApplication sharedApplication].delegate)).window.rootViewController = mainNav;
+    }
+}
+
+#pragma mark - public methods
++ (void)changeRootViewController:(UIViewController *)vc {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIWindow *windown = ((AppDelegate *)[[UIApplication sharedApplication] delegate]).window;
+        if(vc == nil || windown.rootViewController == vc)
+            return;
+        
+        CGPoint currentCenter;
+        UIViewController *currentVC = windown.rootViewController;
+        currentCenter = currentVC.view.center;
+        [vc.view addSubview:currentVC.view];
+        
+        vc.view.center = CGPointMake(currentCenter.x, -currentCenter.y);
+        [windown setRootViewController:vc];
+        [UIView animateWithDuration:.5f delay:0.0f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+            currentVC.view.center = CGPointMake(currentCenter.x, currentCenter.y+vc.view.frame.size.height);
+            vc.view.center = currentCenter;
+        } completion:^(BOOL finished) {
+            for(UIViewController *tempVC in currentVC.childViewControllers) {
+                [tempVC.view removeFromSuperview];
+                [tempVC removeFromParentViewController];
+            }
+            
+            [currentVC.view removeFromSuperview];
+        }];
+    });
+}
+
 @end
 
 #if 0

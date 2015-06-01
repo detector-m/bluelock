@@ -13,6 +13,7 @@
 #import "RLTitleTextField.h"
 
 #import "Register.h"
+#import "Login.h"
 
 #pragma mark -
 #import "XMPPManager.h" 
@@ -92,17 +93,12 @@
             else {
                 [User sharedUser].password = aRegister.password;
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [User saveArchiver];
                     if(![[XMPPManager sharedXMPPManager] connect]) {
                         [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"登录失败", nil)];
                         
-                        [self.navigationController popToRootViewControllerAnimated:NO];
                         return ;
                     }
-                    MainVC *vc = [MainVC new];
-                    
-                    [self.navigationController popToRootViewControllerAnimated:NO];
-                    [self.navigationController pushViewController:vc animated:YES];
+                    [Login login];
                 });
             }
         }];

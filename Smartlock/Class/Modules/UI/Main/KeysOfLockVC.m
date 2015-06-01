@@ -11,6 +11,7 @@
 #import "SubTitleListCell.h"
 
 #import "DeviceManager.h"
+#import "RLColor.h"
 
 @implementation KeysOfLockVC
 - (void)viewDidLoad {
@@ -51,7 +52,7 @@
         cell = [[SubTitleListCell alloc] initWithReuseIdentifier:kCellIdentifier aClass:[UIButton class]];
         UIButton *button = (UIButton *)cell.contentAccessoryView;
         [button addTarget:self action:@selector(clickCellBtn:) forControlEvents:UIControlEventTouchUpInside];
-        
+        button.backgroundColor = [RLColor colorWithHex:0xFF7B00];//[UIColor blueColor];
     }
     KeyModel *key = [self.table.datas objectAtIndex:indexPath.row];
     cell.textLabel.text = key.name;

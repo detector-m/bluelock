@@ -12,6 +12,7 @@
 #ifdef __OBJC__
 #import <Foundation/Foundation.h>
 #endif
+#import "AppDelegate.h"
 #import "RLDebug.h"
 #import "RLTypecast.h"
 #import "NSString+Regex.h"

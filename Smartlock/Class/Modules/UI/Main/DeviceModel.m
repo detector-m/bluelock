@@ -11,8 +11,8 @@
 @implementation DeviceModel
 - (instancetype)initWithParameters:(NSDictionary *)parameters {
     if(self = [super init]) {
-        self.ID = [parameters[@"id"] integerValue];//[RLTypecast stringToInteger:[parameters objectForKey:@"id"]];
-        self.status = [parameters[@"status"] integerValue];//[RLTypecast stringToInteger:[parameters objectForKey:@"status"]];
+        self.ID = [parameters[@"id"] integerValue];
+        self.status = [parameters[@"status"] integerValue];
         self.time = [parameters objectForKey:@"addTime"];
         self.ower = [parameters objectForKey:@"memberGid"];
     }

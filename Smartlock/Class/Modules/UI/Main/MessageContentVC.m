@@ -11,6 +11,8 @@
 #import "TimeCell.h"
 #import "MessageCell.h"
 
+#import "RLColor.h"
+
 @implementation MessageContentVC
 
 - (void)viewDidLoad {
@@ -19,7 +21,7 @@
     self.title = NSLocalizedString(@"消息", nil);
     
     self.table.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.table.tableView.backgroundColor = [UIColor grayColor];
+    self.table.tableView.backgroundColor = [RLColor colorWithHex:0xE5E5E5];//[UIColor grayColor];
     
     self.table.tableView.rowHeight = 66.0f;
 }
@@ -47,7 +49,7 @@
     NSInteger index = [self indexForData:indexPath];
     id obj = [self.table.datas objectAtIndex:index];
     if([obj isKindOfClass:[NSString class]]) {
-        return 40;
+        return 30;
     }
     else {
         return [MessageCell tableView:tableView heightForRowAtIndexPath:indexPath withObject:obj];
@@ -73,8 +75,8 @@
         TimeCell *cell = (TimeCell *)[tableView dequeueReusableCellWithIdentifier:timeIdentifier];
         if(cell == nil) {
             cell = [[TimeCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:timeIdentifier];
-            cell.backgroundColor = [UIColor clearColor];
-            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//            cell.backgroundColor = [UIColor clearColor];
+//            cell.selectionStyle = UITableViewCellSelectionStyleNone;
         }
         cell.textLabel.text = obj;
         return cell;

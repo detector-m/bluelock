@@ -9,18 +9,37 @@
 #import "KeyModel.h"
 #import "KeyEntity.h"
 
+#import "RLDate.h"
+
+static NSString *kForeverDateString = @"2099-12-31";
+static NSString *kInvalidDateString = @"1970-01-01";
 @implementation KeyModel
 
 - (instancetype)initWithParameters:(NSDictionary *)parameters {
     if(self = [super initWithParameters:parameters]) {
         self.keyStatus = self.status;
-        self.type = [parameters[@"keyType"] integerValue];//[RLTypecast stringToInteger:[parameters objectForKey:@"keyType"]];
-        self.userType = [parameters[@"userType"] integerValue]; //[RLTypecast stringToInteger:[parameters objectForKey:@"userType"]];
-        self.name = [parameters objectForKey:@"lockName"];
-        self.invalidDate = [parameters objectForKey:@"validTime"];
+        self.type = [parameters[@"keyType"] integerValue];
+        self.userType = [parameters[@"userType"] integerValue];        self.name = [parameters objectForKey:@"lockName"];
+        if(self.type == kKeyTypeForever) {
+            self.invalidDate = kForeverDateString;
+        }
+        else if(self.type == kKeyTypeDate) {
+            long long timeStamp = [[parameters objectForKey:@"validTime"] longLongValue];
+            timeStamp /= 1000;
+            NSString *timeString = dateStringFromTimestamp(timeStamp);
+            self.invalidDate = timeString;
+        }
+        else {
+            self.validCount = [[parameters objectForKey:@"validTime"] integerValue];
+            if(self.validCount <= 0) {
+                self.invalidDate = kInvalidDateString;
+            }
+            else {
+                self.invalidDate = kForeverDateString;
+            }
+        }
         
-        self.lockID = [parameters[@"bleLockId"] integerValue];//[RLTypecast stringToInteger:[parameters objectForKey:@"bleLockId"]];
-
+        self.lockID = [parameters[@"bleLockId"] integerValue];
         _keyOwner = [[LockModel alloc] initWithParameters:parameters[@"bleLock"]];
     }
     

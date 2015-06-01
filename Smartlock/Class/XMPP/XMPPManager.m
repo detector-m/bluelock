@@ -331,6 +331,28 @@ void postNotificationWithNone(const NSString *notificationName) {
         return NO;
     }
     
+    [self setXmppConnecting:YES];
+    
+    return YES;
+}
+
+- (BOOL)reconnect {
+    NSError *error = nil;
+    if(isXmppConnected || [self isXmppConnecting])
+        return YES;
+    if (![xmppStream connectWithTimeout:XMPPStreamTimeoutNone error:&error]) {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error connecting"
+                                                            message:@"See console for error details."
+                                                           delegate:nil
+                                                  cancelButtonTitle:@"Ok"
+                                                  otherButtonTitles:nil];
+        [alertView show];
+        
+        DDLogError(@"Error connecting: %@", error);
+        
+        return NO;
+    }
+    
     return YES;
 }
 
@@ -392,7 +414,7 @@ void postNotificationWithNone(const NSString *notificationName) {
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
     
     isXmppConnected = YES;
-    
+    [self setXmppConnecting:NO];
     NSError *error = nil;
     
     if (![self.xmppStream authenticateWithPassword:password error:&error]) {
@@ -467,12 +489,14 @@ void postNotificationWithNone(const NSString *notificationName) {
     NSString *json = [[[message elementForName:@"dqcc"] elementForName:@"backJson"] stringValue];
     NSDictionary *backDic = [RLJSON JSONObjectWithString:json];
     if([[backDic objectForKey:@"backCode"] integerValue] == 101) {
-        [Login hudAlertLogout];
+//        [Login hudAlertLogout];
         return;
     }
-    if([[backDic objectForKey:@"flag"] integerValue] == 0)
-        return;
+//    if([[backDic objectForKey:@"flag"] integerValue] == 0)
+//        return;
     postNotificationWithNone(kReceiveMessage);
+    
+//    [self.xmppStream authenticateWithPassword:pwd error:&error];
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence {
@@ -485,7 +509,7 @@ void postNotificationWithNone(const NSString *notificationName) {
 
 - (void)xmppStreamDidDisconnect:(XMPPStream *)sender withError:(NSError *)error {
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
-    
+    [self setXmppConnecting:NO];
     if (!isXmppConnected) {
         DDLogError(@"Unable to connect to server. Check xmppStream.hostName");
         postNotification(kDidDisconnected, error);
@@ -526,6 +550,19 @@ void postNotificationWithNone(const NSString *notificationName) {
         localNotification.alertBody = body;
         
         [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
+    }
+}
+
+#pragma mark - 
+- (BOOL)isXmppConnecting {
+    @synchronized(self) {
+        return isXmppConnecting;
+    }
+}
+
+- (void)setXmppConnecting:(BOOL)value  {
+    @synchronized(self) {
+        isXmppConnecting = value;
     }
 }
 @end

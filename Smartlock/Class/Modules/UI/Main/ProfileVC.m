@@ -71,7 +71,7 @@
 }
 
 - (void)clickLogoutBtn:(UIButton *)button {
-    __weak __typeof(self)weakSelf = self;
+//    __weak __typeof(self)weakSelf = self;
     [RLHUD hudProgressWithBody:nil onView:self.view timeout:6.0f];
     [Login logout:[User sharedUser].sessionToken withBlock:^(LoginResponse *response, NSError *error) {
         [RLHUD hideProgress];
@@ -82,11 +82,8 @@
             return;
         }
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[XMPPManager sharedXMPPManager] disconnect];
-            [weakSelf.navigationController popToRootViewControllerAnimated:YES];
+            [Login forcedLogout];
         });
-        
-//        [Login forcedLogout];
     }];
 }
 

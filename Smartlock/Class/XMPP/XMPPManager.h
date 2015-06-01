@@ -38,6 +38,7 @@ extern const NSString *kReceiveMessage;
     BOOL customCertEvaluation;
     
     BOOL isXmppConnected;
+    BOOL isXmppConnecting;
 }
 #pragma mark -
 @property (nonatomic, strong, readonly) XMPPStream *xmppStream;
@@ -61,5 +62,6 @@ extern const NSString *kReceiveMessage;
 //- (void)setupStream;
 - (BOOL)connect;
 - (BOOL)connect:(NSString *)_jid password:(NSString *)_password;
+- (BOOL)reconnect;
 - (void)disconnect;
 @end

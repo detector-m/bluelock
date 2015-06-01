@@ -66,6 +66,18 @@
 - (void)setupRightItem {
 
 }
+
+#pragma mark -
+- (void)deselectRow {
+    [self performSelector:@selector(deselectRow:) withObject:self.table.tableView afterDelay:0.5];
+}
+
+
+- (void)deselectRow:(UITableView *)tableView {
+    [tableView deselectRowAtIndexPath:[tableView indexPathForSelectedRow] animated:NO];
+    tableView.userInteractionEnabled = YES;
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

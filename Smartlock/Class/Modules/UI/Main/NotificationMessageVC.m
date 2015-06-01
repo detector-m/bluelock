@@ -50,8 +50,10 @@
 #pragma mark -
 - (void)receiveMessage {
     [self.table.datas removeAllObjects];
-    NSArray *messages = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([Message class])];
+    [[MyCoreDataManager sharedManager] updateObjectsInObjectTable:@{@"isRead" : @YES} withKey:@"isRead" contains:@NO withTablename:NSStringFromClass([Message class])];
 
+    NSArray *messages = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([Message class])];
+    
     [self.table.datas addObjectsFromArray:messages];
     
     __weak typeof(self)weakSelf = self;

@@ -50,13 +50,17 @@
     [LoginRequest logout:token withBlock:logoutBlock];
 }
 
+#pragma mark - UI
++ (void)login {
+    [User saveArchiver];
+    [AppDelegate setMainVCToRootVCAnimate:YES];
+}
 + (void)forcedLogout {
     dispatch_async(dispatch_get_main_queue(), ^{
         [[XMPPManager sharedXMPPManager] disconnect];
-        [(UINavigationController *)[UIApplication sharedApplication].keyWindow.rootViewController popToRootViewControllerAnimated:YES];
-        [User removeArchiver];
+        [AppDelegate setLoginVCToRootVCAnimate:YES];
         
-//        [RLHUD hudAlertWithBody:@"用户异地登陆"];
+        [User removeArchiver];
     });
 }
 

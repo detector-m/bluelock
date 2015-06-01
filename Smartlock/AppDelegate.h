@@ -14,6 +14,8 @@
 
 @property (nonatomic, weak) NSData *deviceToken;
 
-
++ (void)setLoginVCToRootVCAnimate:(BOOL)animate;
++ (void)setMainVCToRootVCAnimate:(BOOL)animate;
++ (void)changeRootViewController:(UIViewController *)vc;
 @end
 
