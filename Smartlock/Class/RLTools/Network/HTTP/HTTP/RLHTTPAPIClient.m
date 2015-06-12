@@ -8,7 +8,10 @@
 
 #import "RLHTTPAPIClient.h"
 
-NSString * const kRLHTTPAPIBaseURLString = @"http://www.dqcc.com.cn:7080/mobile/api/v20";
+//NSString * const kRLHTTPAPIBaseURLString = @"http://www.dqcc.com.cn:7080/mobile/api/v20";
+//NSString * const kRLHTTPMobileBaseURLString = @"http://www.dqcc.com.cn:7080/mobile";
+NSString * const kRLHTTPAPIBaseURLString = @"http://www.dqcc.com.cn/mobile/api/v20";
+NSString * const kRLHTTPMobileBaseURLString = @"http://www.dqcc.com.cn/mobile/";
 
 @implementation RLHTTPAPIClient
 + (instancetype)sharedClient {

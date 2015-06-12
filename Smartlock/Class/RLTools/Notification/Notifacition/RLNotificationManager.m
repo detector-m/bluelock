@@ -31,6 +31,7 @@
 }
 
 #pragma mark -
+#define MessageNotificationType @"MessageNotificationType"
 //----------------------------------------//
 + (void)messageNotification {
     UILocalNotification* localNotification = [[UILocalNotification alloc] init];
@@ -38,6 +39,32 @@
     localNotification.alertBody = @"Email Based Notification";
     localNotification.category = @"Email";  // This should match categories identifier which we have defined in App delegate
     [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+}
+
++ (void)scheduleMessageNotificationWithAlert:(NSString *)alert {
+    // We are not active, so use a local notification instead
+    UILocalNotification *localNotification = [[UILocalNotification alloc] init];
+    localNotification.applicationIconBadgeNumber = (++[UIApplication sharedApplication].applicationIconBadgeNumber);
+        //        localNotification.alertAction = @"Ok";
+    localNotification.alertBody = alert;
+    localNotification.soundName = UILocalNotificationDefaultSoundName;
+    NSDictionary *infoDic = @{@"type":MessageNotificationType};
+    localNotification.userInfo = infoDic;
+    [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
+}
+
++ (void)removeMessageNotification {
+    NSArray *notificaitons = [[UIApplication sharedApplication] scheduledLocalNotifications];
+    //获取当前所有的本地通知
+    if (!notificaitons || notificaitons.count <= 0) {
+        return;
+    }
+    for (UILocalNotification *notify in notificaitons) {
+        if ([[notify.userInfo objectForKey:@"type"] isEqualToString:MessageNotificationType]) {
+            //取消一个特定的通知
+            [[UIApplication sharedApplication] cancelLocalNotification:notify];
+        }
+    }
 }
 //----------------------------------------//
 

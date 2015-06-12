@@ -10,7 +10,9 @@
 #import <CoreData/CoreData.h>
 
 @interface RLCoreDataManager : NSObject
+@property (nonatomic, copy) NSString *identifier;
 + (instancetype)sharedManager;
+//+ (void)setIdentifier:(NSString *)identifier;
 
 - (BOOL)save;
 @end

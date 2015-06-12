@@ -7,6 +7,7 @@
 //
 
 #import "RecordManager.h"
+#import "KeyEntity.h"
 
 @implementation RecordManager
 + (void)updateRecordsWithBlock:(void (^)(BOOL success))block {
@@ -14,7 +15,9 @@
     if(!records.count)
         return;
     NSString *recordsListString = @"";
+//    [RecordManager removeRecordsWithKeyID:[((OpenLockRecord *)[records firstObject]).keyID longLongValue]];
     for(OpenLockRecord *record in records) {
+        DLog(@"%@", record);
         recordsListString = [recordsListString stringByAppendingString:record.toString];
         recordsListString = [recordsListString stringByAppendingString:@","];
     }
@@ -26,6 +29,23 @@
             block(YES);
         }
     }];
+}
+
++ (void)removeRecordsWithAddress:(NSString *)address {
+    NSArray *array = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([KeyEntity class])];
+    for(KeyEntity *key in array) {
+        LockEntity *lock = key.ownLock;
+        if([lock.address isEqualToString:address]) {
+            [self removeRecordsWithKeyID:[key.keyID longLongValue]];
+            return;
+        }
+    }
+}
++ (void)removeRecordsWithKeyID:(long long)keyID {
+    NSArray *records = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil where:@"keyID" contains:[NSNumber numberWithLongLong:keyID] withTabelname:NSStringFromClass([OpenLockRecord class])];
+    for(OpenLockRecord *record in records) {
+        [[MyCoreDataManager sharedManager] deleteRecord:record];
+    }
 }
 
 @end

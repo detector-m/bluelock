@@ -12,7 +12,7 @@
 
 @property (strong, nonatomic) UIWindow *window;
 
-@property (nonatomic, weak) NSData *deviceToken;
+//@property (nonatomic, weak) NSString *deviceTokenString;
 
 + (void)setLoginVCToRootVCAnimate:(BOOL)animate;
 + (void)setMainVCToRootVCAnimate:(BOOL)animate;

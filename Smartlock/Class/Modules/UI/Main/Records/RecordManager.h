@@ -15,4 +15,7 @@
 @interface RecordManager : NSObject
 #pragma mark -
 + (void)updateRecordsWithBlock:(void (^)(BOOL success))block;
+
++ (void)removeRecordsWithAddress:(NSString *)address;
++ (void)removeRecordsWithKeyID:(long long)keyID;
 @end

@@ -119,8 +119,16 @@ BOOL freeBLCMDData(const Byte *data) {
     return YES;
 }
 
+//extern int datasForCMD(Byte *datas, int *len, struct BL_cmd *cmd) {
+//    if(datas == nil || len == nil || cmd == nil) {
+//        return -1;
+//    }
+//    
+//    
+//}
+
 static Byte date[6] = {0};
-extern Byte *dateToBytes(int * const len, NSString * const dateString) {
+Byte *dateToBytes(int * const len, NSString * const dateString) {
     if(!len || !dateString || dateString.length == 0)
         return NULL;
     NSDateComponents *dateComponents = [RLDate dateComponentsWithDate:[RLDate dateFromString:dateString]];
@@ -136,6 +144,21 @@ extern Byte *dateToBytes(int * const len, NSString * const dateString) {
     return date;
 }
 
+Byte *dateNowToBytes(int * const len) {
+    if(!len)
+        return NULL;
+    NSDateComponents *dateComponents = [RLDate dateComponentsNow];
+    *len = sizeof(date);
+    int i = 0;
+    date[i++] = dateComponents.year - 2000;
+    date[i++] = dateComponents.month;
+    date[i++] = dateComponents.day;
+    date[i++] = dateComponents.hour;
+    date[i++] = dateComponents.minute;
+    date[i] = dateComponents.second;
+    
+    return date;
+}
 //cmd response
 static Byte BL_responseData[240] = {0};
 BL_response responseWithBytes(Byte *bytes, NSInteger length) {
@@ -147,10 +170,11 @@ BL_response responseWithBytes(Byte *bytes, NSInteger length) {
         response.union_mode.common = bytes[i++];
         response.result.result = bytes[i++];
         response.data_len = bytes[i++];
-        memset(BL_responseData, 0, 1);
+        memset(BL_responseData, 0, sizeof(BL_responseData));
         for(NSInteger j=i; i<j+response.data_len; i++) {
-            BL_responseData[i-j] = bytes[j];
+            BL_responseData[i-j] = bytes[i];
         }
+        response.data = BL_responseData;
         response.CRC = bytes[length-2];
         response.END = bytes[length-1];
         response.fixation_len = BLcmdFixationLen();

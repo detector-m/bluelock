@@ -55,6 +55,23 @@
     [User saveArchiver];
     [AppDelegate setMainVCToRootVCAnimate:YES];
 }
+
++ (void)logout {
+    [RLHUD hudProgressWithBody:nil onView:[UIApplication sharedApplication].keyWindow timeout:URLTimeoutInterval];
+    [Login logout:[User sharedUser].sessionToken withBlock:^(LoginResponse *response, NSError *error) {
+        [RLHUD hideProgress];
+        if(error) {
+            return ;
+        }
+        if(response.status) {
+            return;
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [Login forcedLogout];
+        });
+    }];
+}
+
 + (void)forcedLogout {
     dispatch_async(dispatch_get_main_queue(), ^{
         [[XMPPManager sharedXMPPManager] disconnect];

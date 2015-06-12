@@ -21,6 +21,7 @@
 
 #import "MyCoreDataManager.h"
 #import "KeyEntity.h"
+#import "RecordManager.h"
 
 @interface LockDevicesVC () <UIAlertViewDelegate>
 //@property (nonatomic) UIAlertView *alertView;
@@ -29,11 +30,11 @@
 
 @implementation LockDevicesVC
 
-//- (void)viewWillAppear:(BOOL)animated {
-//    [super viewWillAppear:animated];
-//    
-//    [self.table.tableView reloadData];
-//}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self.table.tableView reloadData];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -58,23 +59,11 @@
     
     AddDeviceVC *vc = [AddDeviceVC new];
     vc.lockDevicesVC = self;
-//    vc.manager = self.manager;
     [self.navigationController pushViewController:vc animated:YES];
 }
 
 #pragma mark -
 - (void)showAlertView {
-#if 0
-    if(self.alertView) {
-        [self.alertView show];
-        
-        return;
-    }
-    self.alertView = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"请输入修改的锁名", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"取消", nil) otherButtonTitles:NSLocalizedString(@"确定", nil), nil];
-    self.alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [self.alertView show];
-#endif
-    
     SCLAlertView *alert = [[SCLAlertView alloc] init];
     
     UITextField *txt = [alert addTextField:@"请输入"];
@@ -84,6 +73,7 @@
             return;
         
         [DeviceManager modifyKeyName:self.modifyKey.ID gid:self.modifyKey.ower token:[User sharedUser].sessionToken keyName:txt.text withBlock:^(DeviceResponse *response, NSError *error) {
+            if(error) return ;
             if(response.status) {
                 return;
             }
@@ -152,7 +142,7 @@
         cell.detailTextLabel.text = @"永久";
     }
     else if(key.type == kKeyTypeTimes) {
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"还可使用%d次", key.validCount];
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"还可使用%d次", (int)key.validCount];
     }
     else  {
         cell.detailTextLabel.text = [NSString stringWithFormat:@"钥匙有效期限%@", key.invalidDate];
@@ -234,6 +224,7 @@
              
              dispatch_async(dispatch_get_main_queue(), ^{
                  [weakSelf.table.datas removeObjectAtIndex:indexPath.row];
+                 [RecordManager removeRecordsWithKeyID:(long long)key.ID];
                  [weakSelf.mainVC removeKey:key];
                  [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
              });

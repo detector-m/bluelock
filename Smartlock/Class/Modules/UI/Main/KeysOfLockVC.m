@@ -30,8 +30,15 @@
 #pragma mark - 
 - (void)loadKeysOfLockWithLockID:(NSUInteger)lockID {
     __weak __typeof(self)weakSelf = self;
+    
+    [RLHUD hudProgressWithBody:nil onView:self.view timeout:URLTimeoutInterval];
     [DeviceManager keyListOfAdmin:lockID token:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            [RLHUD hideProgress];
+            if(!response.success || response.list.count == 0) {
+                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"加载失败", nil)];
+                return ;
+            }
             [weakSelf.table.datas removeAllObjects];
             [weakSelf.table.datas addObjectsFromArray:response.list];
             [weakSelf.table.tableView reloadData];
@@ -53,14 +60,15 @@
         UIButton *button = (UIButton *)cell.contentAccessoryView;
         [button addTarget:self action:@selector(clickCellBtn:) forControlEvents:UIControlEventTouchUpInside];
         button.backgroundColor = [RLColor colorWithHex:0xFF7B00];//[UIColor blueColor];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     KeyModel *key = [self.table.datas objectAtIndex:indexPath.row];
-    cell.textLabel.text = key.name;
+    cell.textLabel.text = key.user.phone;
     if(key.type == kKeyTypeForever) {
         cell.detailTextLabel.text = @"永久";
     }
     else if(key.type == kKeyTypeTimes) {
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"还可使用%d次", key.validCount];
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"还可使用%d次", (int)key.validCount];
     }
     else  {
         cell.detailTextLabel.text = [NSString stringWithFormat:@"钥匙有效期限%@", key.invalidDate];
@@ -76,29 +84,39 @@
     
     button.hidden = NO;
     button.tag = indexPath.row;
-    if(!key.status) {
+    button.enabled = YES;
+    if(key.status == kKeyNormal) {
         [button setTitle:NSLocalizedString(@"冻结", nil) forState:UIControlStateNormal];
     }
-    else {
+    else if(key.status == kKeyFreeze) {
         [button setTitle:NSLocalizedString(@"解冻", nil) forState:UIControlStateNormal];
+    }
+    else {
+        [button setTitle:NSLocalizedString(@"无效", nil) forState:UIControlStateNormal];
+        button.enabled = NO;
     }
     
     return cell;
 }
 
 - (void)clickCellBtn:(UIButton *)button {
+    KeyModel *key = [self.table.datas objectAtIndex:button.tag];
+    if(key.status != kKeyNormal && key.status != kKeyFreeze)
+        return;
     button.enabled = NO;
 //    __weak __typeof(self)weakSelf = self;
-    KeyModel *key = [self.table.datas objectAtIndex:button.tag];
+    
     [DeviceManager lockOrUnlockKey:key.ID operation:!key.status token:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            button.enabled = YES;
+        });
+        
         if(error || response.status) {
             return ;
         }
         
         key.status = !key.status;
         dispatch_async(dispatch_get_main_queue(), ^{
-            button.enabled = YES;
-            
             if(!key.status) {
                 [button setTitle:NSLocalizedString(@"冻结", nil) forState:UIControlStateNormal];
             }

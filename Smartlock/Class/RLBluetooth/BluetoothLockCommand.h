@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "RLDate.h"
 
+#define BluetoothPackageSize (20)
 /*cmd*/
 union union_mode {
     Byte common;
@@ -50,8 +51,10 @@ extern Byte *wrappCMDToBytes(struct BL_cmd *cmd, Byte bytes[]);
 extern BOOL wrappCMDDatasToBytes(long long int *data, Byte bytes[], NSInteger len);
 extern BOOL freeBLCMDData(const Byte *data);
 
-extern Byte *dateToBytes(int * const len, NSString * const dateString);
+//extern int datasForCMD(Byte *datas, int *len, struct BL_cmd *cmd);
 
+extern Byte *dateToBytes(int * const len, NSString * const dateString);
+extern Byte *dateNowToBytes(int * const len);
 //cmd response
 typedef struct BL_cmd BL_response;
 

@@ -74,7 +74,7 @@
  */
 + (NSData *)stringToHexData:(NSString *)string
 {
-    int len = [string length] / 2; // Target length
+    int len = (int)[string length] / 2; // Target length
     unsigned char *buf = malloc(len);
     unsigned char *wholeByte = buf;
     char byteChars[3] = {0, 0, 0};

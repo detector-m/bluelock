@@ -14,6 +14,7 @@ typedef NS_ENUM(NSInteger, GenderType) {
     kGenderFemale,
     kGenderMale
 };
+
 @interface RLUser : NSObject <NSCoding>
 @property (nonatomic, readonly, assign) NSUInteger ID;
 @property (nonatomic, readonly, copy) NSString *name;
@@ -26,6 +27,7 @@ typedef NS_ENUM(NSInteger, GenderType) {
 
 @property (nonatomic, copy) NSString *sessionToken;
 @property (nonatomic, strong) NSData *deviceToken;
+@property (nonatomic, weak) NSString *deviceTokenString;
 
 + (instancetype)sharedUser;
 + (BOOL)saveArchiver;
@@ -34,4 +36,8 @@ typedef NS_ENUM(NSInteger, GenderType) {
 
 - (void)setWithUser:(id)user;
 - (void)setWithParameters:(NSDictionary *)parameters;
+
+#pragma mark -
++ (BOOL)getVoiceSwitch;
++ (void)setVoiceSwitch:(BOOL)on;
 @end

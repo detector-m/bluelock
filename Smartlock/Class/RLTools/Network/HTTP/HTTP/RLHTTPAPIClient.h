@@ -8,6 +8,7 @@
 
 #import "AFHTTPSessionManager.h"
 extern NSString * const kRLHTTPAPIBaseURLString;
+extern NSString * const kRLHTTPMobileBaseURLString;
 @interface RLHTTPAPIClient : AFHTTPSessionManager
 + (instancetype)sharedClient;
 @end

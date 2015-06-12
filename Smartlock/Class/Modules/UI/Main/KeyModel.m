@@ -26,6 +26,7 @@ static NSString *kInvalidDateString = @"1970-01-01";
         else if(self.type == kKeyTypeDate) {
             long long timeStamp = [[parameters objectForKey:@"validTime"] longLongValue];
             timeStamp /= 1000;
+            self.invalidTimeInterval = timeStamp;
             NSString *timeString = dateStringFromTimestamp(timeStamp);
             self.invalidDate = timeString;
         }
@@ -82,6 +83,11 @@ static NSString *kInvalidDateString = @"1970-01-01";
 - (BOOL)isValid {
     if(self.type == kKeyTypeTimes) {
         return self.validCount > 0;
+    }
+    else if(self.type == kKeyTypeDate) {
+        long long time = timestampSince1970();
+        
+        return self.invalidTimeInterval >= time;
     }
     return self.status != kKeyExpire && self.status != kKeyFreeze;
 }

@@ -27,6 +27,18 @@
     return nil;
 }
 
+//static NSString *_identifier = nil;
+//+ (void)setIdentifier:(NSString *)identifier {
+//
+//    _identifier = [NSString stringWithString:identifier];
+//}
+//
+//+ (NSString *)identifier {
+//    if(_identifier == nil)
+//        _identifier = @"default";
+//    return _identifier;
+//}
+
 + (instancetype)sharedManager {
     static NSMutableDictionary *_sharedDictionary = nil;
     id sharedObject = nil;
@@ -55,29 +67,43 @@
 #pragma mark -
 - (instancetype)init {
     if(self = [super init]) {
-        self.managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:[[self class] modelURL]];
-        
-        //initializing persistentstorecoordinator with managedObjectModel
-        NSURL *applicationDocumentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-        NSURL *storeURL = [applicationDocumentsDirectory URLByAppendingPathComponent:[NSString stringWithFormat:@"%@.sqlite", NSStringFromClass([self class])]];
-        
-        NSError *error = nil;
-        self.persistentSotoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:self.managedObjectModel];
-        if(![self.persistentSotoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error]) {
-            NSLog(@"PersistentStore Error: %@, %@", error, [error userInfo]);
-            [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil];
-            abort();
-        }
-        
-        // initializing managedObjectContext with persistentStoreCoordinator
-        self.managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
-        [self.managedObjectContext setPersistentStoreCoordinator:self.persistentSotoreCoordinator];
+        _identifier = @"default";
+        [self setupCoredataManager];
     }
     
     return self;
 }
 
-#pragma mark - 
+- (void)setupCoredataManager {
+    if(self.managedObjectModel)
+        [self save];
+    self.managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:[[self class] modelURL]];
+    
+    //initializing persistentstorecoordinator with managedObjectModel
+    NSURL *applicationDocumentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+    NSURL *storeURL = [applicationDocumentsDirectory URLByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@.sqlite", NSStringFromClass([self class]), _identifier]];
+    
+    NSError *error = nil;
+    self.persistentSotoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:self.managedObjectModel];
+    if(![self.persistentSotoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error]) {
+        NSLog(@"PersistentStore Error: %@, %@", error, [error userInfo]);
+        [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil];
+        abort();
+    }
+    
+    // initializing managedObjectContext with persistentStoreCoordinator
+    self.managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+    [self.managedObjectContext setPersistentStoreCoordinator:self.persistentSotoreCoordinator];
+}
+
+#pragma mark -
+- (void)setIdentifier:(NSString *)identifier {
+    if(!identifier)
+        return;
+    _identifier = identifier;
+    [self setupCoredataManager];
+}
+#pragma mark -
 - (BOOL)save {
     NSError *error = nil;
     BOOL ret = [self.managedObjectContext save:&error];

@@ -8,6 +8,9 @@
 
 #import "RLImage.h"
 
+#import <Accelerate/Accelerate.h>
+#import <QuartzCore/QuartzCore.h>
+
 @implementation RLImage
 + (UIImage *)imageWithColor:(UIColor *)color size:(CGSize)size
 {
@@ -197,5 +200,161 @@
     CGContextRelease(ctx);
     CGImageRelease(cgimg);
     return img;
+}
+
+#pragma mark - UIImage + Blur
+
++ (UIImage *)boxblurImageWithBlur:(CGFloat)blur image:(UIImage *)image {
+    if (blur < 0.f || blur > 1.f) {
+        blur = 0.5f;
+    }
+    int boxSize = (int)(blur * 40);
+    boxSize = boxSize - (boxSize % 2) + 1;
+    
+    CGImageRef img = image.CGImage;
+    
+    vImage_Buffer inBuffer, outBuffer;
+    
+    vImage_Error error;
+    
+    void *pixelBuffer;
+    
+    
+    //create vImage_Buffer with data from CGImageRef
+    
+    CGDataProviderRef inProvider = CGImageGetDataProvider(img);
+    CFDataRef inBitmapData = CGDataProviderCopyData(inProvider);
+    
+    
+    inBuffer.width = CGImageGetWidth(img);
+    inBuffer.height = CGImageGetHeight(img);
+    inBuffer.rowBytes = CGImageGetBytesPerRow(img);
+    
+    inBuffer.data = (void*)CFDataGetBytePtr(inBitmapData);
+    
+    //create vImage_Buffer for output
+    
+    pixelBuffer = malloc(CGImageGetBytesPerRow(img) * CGImageGetHeight(img));
+    
+    if(pixelBuffer == NULL)
+        NSLog(@"No pixelbuffer");
+    
+    outBuffer.data = pixelBuffer;
+    outBuffer.width = CGImageGetWidth(img);
+    outBuffer.height = CGImageGetHeight(img);
+    outBuffer.rowBytes = CGImageGetBytesPerRow(img);
+    
+    // Create a third buffer for intermediate processing
+    void *pixelBuffer2 = malloc(CGImageGetBytesPerRow(img) * CGImageGetHeight(img));
+    vImage_Buffer outBuffer2;
+    outBuffer2.data = pixelBuffer2;
+    outBuffer2.width = CGImageGetWidth(img);
+    outBuffer2.height = CGImageGetHeight(img);
+    outBuffer2.rowBytes = CGImageGetBytesPerRow(img);
+    
+    //perform convolution
+    error = vImageBoxConvolve_ARGB8888(&inBuffer, &outBuffer2, NULL, 0, 0, boxSize, boxSize, NULL, kvImageEdgeExtend);
+    error = vImageBoxConvolve_ARGB8888(&outBuffer2, &inBuffer, NULL, 0, 0, boxSize, boxSize, NULL, kvImageEdgeExtend);
+    error = vImageBoxConvolve_ARGB8888(&inBuffer, &outBuffer, NULL, 0, 0, boxSize, boxSize, NULL, kvImageEdgeExtend);
+    
+    if (error) {
+        NSLog(@"error from convolution %ld", error);
+    }
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef ctx = CGBitmapContextCreate(outBuffer.data,
+                                             outBuffer.width,
+                                             outBuffer.height,
+                                             8,
+                                             outBuffer.rowBytes,
+                                             colorSpace,
+                                             (CGBitmapInfo)kCGImageAlphaNoneSkipLast);
+    CGImageRef imageRef = CGBitmapContextCreateImage (ctx);
+    UIImage *returnImage = [UIImage imageWithCGImage:imageRef];
+    
+    //clean up
+    CGContextRelease(ctx);
+    CGColorSpaceRelease(colorSpace);
+    free(pixelBuffer2);
+    free(pixelBuffer);
+    CFRelease(inBitmapData);
+    
+    CGImageRelease(imageRef);
+    
+    return returnImage;
+}
+
++ (UIImage *)closeButtonImageWithFrame:(CGRect)bounds {
+    UIGraphicsBeginImageContextWithOptions(bounds.size, NO, 0);
+    
+    //// General Declarations
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    //// Color Declarations
+    UIColor *topGradient = [UIColor colorWithRed:0.21 green:0.21 blue:0.21 alpha:0.9];
+    UIColor *bottomGradient = [UIColor colorWithRed:0.03 green:0.03 blue:0.03 alpha:0.9];
+    
+    //// Gradient Declarations
+    NSArray *gradientColors = @[(id)topGradient.CGColor,
+                                (id)bottomGradient.CGColor];
+    CGFloat gradientLocations[] = {0, 1};
+    CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)gradientColors, gradientLocations);
+    
+    //// Shadow Declarations
+    CGColorRef shadow = [UIColor blackColor].CGColor;
+    CGSize shadowOffset = CGSizeMake(0, 1);
+    CGFloat shadowBlurRadius = 3;
+    CGColorRef shadow2 = [UIColor blackColor].CGColor;
+    CGSize shadow2Offset = CGSizeMake(0, 1);
+    CGFloat shadow2BlurRadius = 0;
+    
+    
+    //// Oval Drawing
+    UIBezierPath *ovalPath = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(4, 3, 24, 24)];
+    CGContextSaveGState(context);
+    [ovalPath addClip];
+    CGContextDrawLinearGradient(context, gradient, CGPointMake(16, 3), CGPointMake(16, 27), 0);
+    CGContextRestoreGState(context);
+    
+    CGContextSaveGState(context);
+    CGContextSetShadowWithColor(context, shadowOffset, shadowBlurRadius, shadow);
+    [[UIColor whiteColor] setStroke];
+    ovalPath.lineWidth = 2;
+    [ovalPath stroke];
+    CGContextRestoreGState(context);
+    
+    
+    //// Bezier Drawing
+    UIBezierPath *bezierPath = [UIBezierPath bezierPath];
+    [bezierPath moveToPoint:CGPointMake(22.36, 11.46)];
+    [bezierPath addLineToPoint:CGPointMake(18.83, 15)];
+    [bezierPath addLineToPoint:CGPointMake(22.36, 18.54)];
+    [bezierPath addLineToPoint:CGPointMake(19.54, 21.36)];
+    [bezierPath addLineToPoint:CGPointMake(16, 17.83)];
+    [bezierPath addLineToPoint:CGPointMake(12.46, 21.36)];
+    [bezierPath addLineToPoint:CGPointMake(9.64, 18.54)];
+    [bezierPath addLineToPoint:CGPointMake(13.17, 15)];
+    [bezierPath addLineToPoint:CGPointMake(9.64, 11.46)];
+    [bezierPath addLineToPoint:CGPointMake(12.46, 8.64)];
+    [bezierPath addLineToPoint:CGPointMake(16, 12.17)];
+    [bezierPath addLineToPoint:CGPointMake(19.54, 8.64)];
+    [bezierPath addLineToPoint:CGPointMake(22.36, 11.46)];
+    [bezierPath closePath];
+    CGContextSaveGState(context);
+    CGContextSetShadowWithColor(context, shadow2Offset, shadow2BlurRadius, shadow2);
+    [[UIColor whiteColor] setFill];
+    [bezierPath fill];
+    CGContextRestoreGState(context);
+    
+    
+    //// Cleanup
+    CGGradientRelease(gradient);
+    CGColorSpaceRelease(colorSpace);
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return image;
 }
 @end

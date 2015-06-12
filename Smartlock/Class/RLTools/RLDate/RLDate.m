@@ -21,6 +21,10 @@ long long timestampSince1970() {
     return timestamp;
 }
 
+NSTimeInterval timestampSince1970WithReal() {
+    return [[NSDate date] timeIntervalSince1970];
+}
+
 NSString *timeStringWithTimestamp(long long timestamp) {
     long long sub = secondTimestampSince1970() - timestamp;
     

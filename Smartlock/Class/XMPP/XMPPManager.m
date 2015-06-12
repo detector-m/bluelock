@@ -29,6 +29,9 @@
 #import "Login.h"
 #import "RLJSON.h"
 
+#pragma mark -
+#import "RLNotificationManager.h"
+
 // Log levels: off, error, warn, info, verbose
 #if DEBUG
 static const int ddLogLevel = LOG_LEVEL_VERBOSE;
@@ -39,6 +42,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 #pragma mark -
 static NSString *kXMPPHostName = @"dqcc.com.cn";
 static const NSInteger kXMPPHostPort = 5222;
+static NSString *kXMPPDomain = @"dqcc.com.cn";
+static NSString *kXMPPResource = nil;
+static NSString *kXMPPAdmin = @"00000000";
 
 #pragma mark -
 const NSString *kDidConnected = @"didConnected";
@@ -274,7 +280,7 @@ void postNotificationWithNone(const NSString *notificationName) {
 //        NSXMLElement *priority = [NSXMLElement elementWithName:@"priority" stringValue:@"24"];
 //        [presence addChild:priority];
 //    }
-    if([domain isEqualToString:kXMPPHostName]) {
+    if([domain isEqualToString:kXMPPDomain]) {
         NSXMLElement *proiority = [NSXMLElement elementWithName:@"priority" stringValue:@"24"];
         [presence addChild:proiority];
     }
@@ -300,7 +306,7 @@ void postNotificationWithNone(const NSString *notificationName) {
         return YES;
     }
     
-    NSString *myJID = [_jid stringByAppendingString:@"@dqcc.com.cn"];
+    NSString *myJID = _jid;//[_jid stringByAppendingString:kXMPPDomain.length? kXMPPDomain:@"dqcc.com.cn"];
     NSString *myPassword = _password;
     //
     // If you don't want to use the Settings view to set the JID,
@@ -312,19 +318,17 @@ void postNotificationWithNone(const NSString *notificationName) {
     if (myJID == nil || myPassword == nil) {
         return NO;
     }
-    
-    [xmppStream setMyJID:[XMPPJID jidWithString:myJID]];
+    XMPPJID *xmppJID = [XMPPJID jidWithUser:myJID domain:kXMPPDomain resource:kXMPPResource];
+    [xmppStream setMyJID:xmppJID/*[XMPPJID jidWithString:myJID]*/];
     jid = myJID;
     password = myPassword;
     
     NSError *error = nil;
     if (![xmppStream connectWithTimeout:XMPPStreamTimeoutNone error:&error]) {
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error connecting"
-                                                            message:@"See console for error details."
-                                                           delegate:nil
-                                                  cancelButtonTitle:@"Ok"
-                                                  otherButtonTitles:nil];
+#ifdef DEBUG
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error connecting" message:@"See console for error details." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alertView show];
+#endif
         
         DDLogError(@"Error connecting: %@", error);
         
@@ -445,9 +449,11 @@ void postNotificationWithNone(const NSString *notificationName) {
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message {
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
-//    DDLogVerbose(@"message type = %@", message.type);
     DDLogVerbose(@"message = %@", message);
-
+    
+    if([message.type isEqualToString:@"chat"] || ![message.from.user isEqualToString:kXMPPAdmin] || ![message.from.domain isEqualToString:kXMPPDomain]) {
+        return;
+    }
 #if 0
 //    SystemSoundID soundID;
     NSString *strSoundFile = [[NSBundle mainBundle] pathForResource:@"alertsound" ofType:@"wav"];
@@ -455,48 +461,38 @@ void postNotificationWithNone(const NSString *notificationName) {
 //    AudioServicesPlaySystemSound(soundID);
 //    [[SoundManager sharedManager] playSound:strSoundFile];
 #endif
-    [[SoundManager sharedManager] playSound:@"ScanQRCode.mp3"];
+    
+    if([Message messageTypeWithXMPPMessage:message] == 101) {
+//        [Login hudAlertLogout];
+        return;
+    }
+    else if([Message messageTypeWithXMPPMessage:message] == 105) {
+        return;
+    }
+    else if([Message messageTypeWithXMPPMessage:message] == 106) {
+        
+    }
+//    if([Message messageFlagWithXMPPMessage:message]) {
+//    
+//    }
+    if(![User getVoiceSwitch]) {
+        [[SoundManager sharedManager] playSound:@"ReceiveMessage.mp3"];
+    }
     AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
 
     [[MyCoreDataManager sharedManager] insertObjectInObjectTable:messageDictionaryFromXMPPMessage(message) withTablename:NSStringFromClass([Message class])];
 #if 0
-//    XMPPUserCoreDataStorageObject *user = [xmppRosterStorage userForJID:[message from] xmppStream:xmppStream managedObjectContext:[self managedObjectContext_roster]];
-//    NSString *displayName = [user displayName];
+    XMPPUserCoreDataStorageObject *user = [xmppRosterStorage userForJID:[message from] xmppStream:xmppStream managedObjectContext:[self managedObjectContext_roster]];
+    NSString *displayName = [user displayName];
 #endif
-    
-    if([message.type isEqualToString:@"chat"]) {
-        return;
-    }
     
     NSString *body = [[message elementForName:@"body"] stringValue];
     
     if (![[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
-        // We are not active, so use a local notification instead
-        UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-        localNotification.applicationIconBadgeNumber = (++[UIApplication sharedApplication].applicationIconBadgeNumber);
+        [RLNotificationManager scheduleMessageNotificationWithAlert:body];
+    }
 
-//        localNotification.alertAction = @"Ok";
-        localNotification.alertBody = [NSString stringWithFormat:@"%@",body];
-        
-        [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
-    }
-#if 0
-    else {
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:displayName message:[body stringByAppendingString:json] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [alertView show];
-    }
-#endif
-    NSString *json = [[[message elementForName:@"dqcc"] elementForName:@"backJson"] stringValue];
-    NSDictionary *backDic = [RLJSON JSONObjectWithString:json];
-    if([[backDic objectForKey:@"backCode"] integerValue] == 101) {
-//        [Login hudAlertLogout];
-        return;
-    }
-//    if([[backDic objectForKey:@"flag"] integerValue] == 0)
-//        return;
     postNotificationWithNone(kReceiveMessage);
-    
-//    [self.xmppStream authenticateWithPassword:pwd error:&error];
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence {

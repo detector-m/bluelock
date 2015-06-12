@@ -10,8 +10,12 @@
 #import "RLHUD.h"
 #import "LockDevicesVC.h"
 #import "DeviceManager.h"
+#import "MainVC.h"
 
 #import "RLBluetooth.h"
+
+#import "RLDate.h"
+#import "RecordManager.h"
 
 @interface AddDeviceVC ()
 @property (nonatomic, strong) UILabel *warnLabel;
@@ -58,8 +62,13 @@
     __weak __typeof(self)weakSelf = self;
     
     [[RLBluetooth sharedBluetooth] scanBLPeripheralsWithCompletionBlock:^(NSArray *peripherals) {
+        [self.table.datas removeAllObjects];
         if(!peripherals.count) return ;
-        weakSelf.table.datas = [NSMutableArray arrayWithArray:peripherals];
+        for(RLPeripheral *peripheral in peripherals) {
+            if(peripheral.name.length == 0)
+                continue;
+            [weakSelf.table.datas addObject:peripheral];
+        }
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakSelf.table.tableView reloadData];
@@ -90,8 +99,8 @@
 }
 
 - (BOOL)isAddedWithName:(NSString *)name {
-    for(LockModel *lock in self.lockDevicesVC.table.datas) {
-        if([lock.name isEqualToString:name]) {
+    for(KeyModel *key in self.lockDevicesVC.table.datas) {
+        if([key.keyOwner.address isEqualToString:name]) {
             return YES;
         }
     }
@@ -104,7 +113,7 @@
     LockCell *cell = [tableView dequeueReusableCellWithIdentifier:(NSString *)kCellIdentifier forIndexPath:indexPath];
     NSInteger index = [self indexForData:indexPath];
     RLPeripheral *peripheral = [self.table.datas objectAtIndex:index];
-    cell.textLabel.text = peripheral.cbPeripheral.name;
+    cell.textLabel.text = peripheral.name;
     cell.imageView.image = [UIImage imageNamed:@"Bluetooth.png"];
     cell.imageView.backgroundColor = [UIColor lightGrayColor];
     cell.accessoryType = UITableViewCellAccessoryNone;
@@ -125,109 +134,59 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSInteger index = [self indexForData:indexPath];
 
-    __weak __typeof(self)weakSelf = self;
-
     RLPeripheral *peripheral = [self.table.datas objectAtIndex:index];
-    [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            for(RLService *service in peripheral.services) {
-                if([service.UUIDString isEqualToString:@"1910"]) {
-                    for(RLCharacteristic *characteristic in service.characteristics) {
-                        if(characteristic.cbCharacteristic.properties == CBCharacteristicPropertyNotify) {
-                            
-                            [characteristic setNotifyValue:YES completion:^(NSError *error) {
-                                for(RLCharacteristic *characteristic in service.characteristics) {
-                                    if([characteristic.UUIDString isEqualToString:@"fff2"]) {
-                                        [weakSelf writeDataToCharacteristic:characteristic withData:nil];
-                                    
-                                        return ;
-                                    }
-                                }
-                            } onUpdate:^(NSData *data, NSError *error) {
-                                BL_response cmdResponse = responseWithBytes(( Byte *)[data bytes], data.length);
-                                Byte crc = CRCOfCMDBytes((Byte *)[data bytes], data.length);
-                                
-                                if(crc == cmdResponse.CRC && cmdResponse.result.result == 0) {
-                                    LockModel *lock = [LockModel new];
-                                    lock.name = NSLocalizedString(@"我的智能锁", nil);
-                                    lock.address = peripheral.name;
-                                    lock.token = [User sharedUser].sessionToken;
-                                    lock.pwd = weakSelf.pwd;
-                                    
-                                    [DeviceManager addBluLock:lock withBlock:^(DeviceResponse *response, NSError *error) {
-                                        if(error) {
-                                            DLog(@"%@", error);
-                                            
-                                            return;
-                                        }
-                                        if(response.status == 0) {
-                                            [RLHUD hideProgress];
-                                            [[weakSelf lockDevicesVC] addLockWithPeripheral:lock];
-                                            
-                                            [RLHUD hudAlertSuccessWithBody:NSLocalizedString(@"配对成功", nil)];
-                                        }
-                                    }];
-                                }
-                            }];
-                        }
-                    }
-                }
-            }
-
-        });
-    }];
+    [self connectPeripheral:peripheral];
     [RLHUD hudProgressWithBody:NSLocalizedString(@"正在配对...", nil) onView:self.view.superview timeout:6.0f];
 }
 
-- (void)writeDataToCharacteristic:(RLCharacteristic *)characteristic withData:(NSData *)data {
-    if(characteristic.cbCharacteristic.properties == CBCharacteristicPropertyWrite || CBCharacteristicPropertyWriteWithoutResponse == characteristic.cbCharacteristic.properties) {
-        [self pairPeripheral:characteristic];
-    }
+- (void)connectPeripheral:(RLPeripheral *)peripheral {
+    __weak __typeof(self)weakSelf = self;
+    [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
+        RLService *service = [[RLBluetooth sharedBluetooth] serviceForUUIDString:@"1910" withPeripheral:peripheral];
+        RLCharacteristic *characteristic = [[RLBluetooth sharedBluetooth] characteristicForNotifyWithService:service];
+        
+        [characteristic setNotifyValue:YES completion:^(NSError *error) {
+            RLCharacteristic *innerCharacteristic = [[RLBluetooth sharedBluetooth] characteristicForUUIDString:@"fff2" withService:service];
+            [weakSelf writeData:innerCharacteristic];
+            
+        } onUpdate:^(NSData *data, NSError *error) {
+            BL_response cmdResponse = responseWithBytes(( Byte *)[data bytes], data.length);
+            Byte crc = CRCOfCMDBytes((Byte *)[data bytes], data.length);
+            
+            if(crc == cmdResponse.CRC && cmdResponse.result.result == 0) {
+                LockModel *lock = [LockModel new];
+                lock.name = NSLocalizedString(@"我的智能锁", nil);
+                lock.address = peripheral.name;
+                lock.token = [User sharedUser].sessionToken;
+                lock.pwd = weakSelf.pwd;
+                
+                [DeviceManager addBluLock:lock withBlock:^(DeviceResponse *response, NSError *error) {
+                    [RLHUD hideProgress];
+                    if(error) return ;
+                    if(response.status) {
+                        [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"配对失败", nil)];
+                        return ;
+                    }
+                    [RecordManager removeRecordsWithAddress:lock.address];
+                    [[weakSelf lockDevicesVC].mainVC loadLockList];
+                    [RLHUD hudAlertSuccessWithBody:NSLocalizedString(@"配对成功", nil)];
+                }];
+            }
+            else {
+                [RLHUD hideProgress];
+                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"配对失败", nil)];
+            }
+        }];
+    }];
 }
 
-- (void)pairPeripheral:(RLCharacteristic *)cb {
-//        Byte data[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b};
-    long long data = [NSDate timeIntervalSinceReferenceDate]*1000;
-//    DLog(@"%lli", data);
+- (void)writeData:(RLCharacteristic *)characteristic {
+//    Byte data[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0xcc, 0xbb, 0xaa, 0xff, 0xee, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0xcc, 0xbb, 0xaa, 0xff, 0xee};
+    long long data = timestampSince1970();//[NSDate timeIntervalSinceReferenceDate]*1000;
     self.pwd = data;
-    struct BL_cmd cmd = {0};
-    cmd.ST = 0x55;
-    cmd.CRC += cmd.ST;
-    cmd.cmd_code = 0x01;
-    cmd.CRC += cmd.cmd_code;
-    cmd.union_mode.connection = 0x01;
-    cmd.CRC += cmd.union_mode.connection;
-    cmd.result.keep = 0x00;
-    cmd.CRC += cmd.result.keep;
-    cmd.END = 0x66;
+    int size = sizeof(data);
     
-    cmd.data = (Byte *)&data;
-    cmd.data_len = sizeof(data);
-    cmd.CRC += cmd.data_len;
-    
-    cmd.CRC +=  CMDDatasCRCCheck(cmd.data, cmd.data_len);
-    
-    cmd.fixation_len = BLcmdFixationLen();
-    NSInteger len = cmd.data_len + cmd.fixation_len;
-    
-    Byte *bytes = calloc(len, sizeof(UInt8));
-    
-    wrappCMDToBytes(&cmd, bytes);
-    
-    int i;
-    
-    NSMutableString *str = [NSMutableString stringWithString:@""];
-    NSInteger length = len;//sizeof(bytes);
-    
-    for(i=0; i<length; i++) {
-        [str appendString:[NSString stringWithFormat:@"%02x", bytes[i]]];
-    }
-    for(i=0; i<length; i++) {
-        [cb writeValue:[NSData dataWithBytes:&bytes[i] length:1] completion:nil];
-        [NSThread sleepForTimeInterval:0.05];
-    }
-    
-    NSLog(@"str = %@", str);
-    free((void *)bytes);
+    NSData *writeData = [NSData dataWithBytes:&data length:size];
+    [[RLBluetooth sharedBluetooth] writeDataToCharacteristic:characteristic cmdCode:0x01 cmdMode:0x01 withDatas:writeData];
 }
 @end

@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "MBHUDView.h"
 #import "MBProgressHUD.h"
 
 #pragma mark -

@@ -15,6 +15,7 @@
 
 #pragma mark - UI
 + (void)login;
++ (void)logout;
 + (void)forcedLogout;
 + (void)hudAlertLogout;
 @end

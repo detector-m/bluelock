@@ -10,7 +10,7 @@
 #import "RLDate.h"
 
 NSDictionary *createOpenLockRecord(NSUInteger keyID, NSUInteger lockID) {
-    return @{@"keyID":[NSNumber numberWithLongLong:keyID], @"lockID":[NSNumber numberWithLongLong:lockID], @"timeinterval":[NSNumber numberWithLongLong: timestampSince1970()], @"isUpdate":@NO};
+    return @{@"keyID":[NSNumber numberWithLongLong:keyID], @"lockID":[NSNumber numberWithLongLong:lockID], @"timeinterval":[NSNumber numberWithLongLong: timestampSince1970WithReal()*1000], @"isUpdate":@NO};
 }
 
 extern NSString *openLockRecordToString(NSDictionary *record) {

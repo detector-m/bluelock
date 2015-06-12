@@ -13,6 +13,8 @@ extern long long timestampSince1970();
 extern NSString *timeStringWithTimestamp(long long timestamp);
 extern NSString *dateStringFromTimestamp(long long timestamp);
 
+extern NSTimeInterval timestampSince1970WithReal();
+
 #pragma mark - 
 @interface RLDate : NSObject
 + (NSDate *)dateFromString:(NSString *)dateString;

@@ -21,6 +21,8 @@
 
 #import "RLBluetooth.h"
 
+#import "RLUtilitiesMethods.h"
+
 /************** Test *****************/
 #import "ViewController.h"
 #import "TestViewController.h"
@@ -192,6 +194,7 @@
     [[self class] setLoginVCToRootVCAnimate:NO];
     if(user) {
         [[User sharedUser] setWithUser:user];
+        [[MyCoreDataManager sharedManager] setIdentifier:user.dqID];
         if([[XMPPManager sharedXMPPManager] connect]) {
             [[self class] setMainVCToRootVCAnimate:NO];
         }
@@ -227,12 +230,13 @@
 - (void)applicationWillResignActive:(UIApplication *)application {
     [[AFNetworkReachabilityManager sharedManager] stopMonitoring];
     [[RLLocationManager sharedLocationManager] stopUpdatingLocation];
-    [[RLBluetooth sharedBluetooth] disconnectAllPeripherals];
+//    [[RLBluetooth sharedBluetooth] disconnectAllPeripherals];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    UIApplication*
-    app = [UIApplication sharedApplication];
+#warning "background"
+#if 1
+    UIApplication *app = [UIApplication sharedApplication];
     
     __block UIBackgroundTaskIdentifier bgTask;
     
@@ -251,19 +255,22 @@
             }
         });
     });
+#endif
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-
+    [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     [[AFNetworkReachabilityManager sharedManager] startMonitoring];
-
     [[RLLocationManager sharedLocationManager] startUpdatingLocation];
+    
+    [RLNotificationManager removeMessageNotification];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
+    [[RLBluetooth sharedBluetooth] disconnectAllPeripherals];
     [RLBluetooth sharedRelease];
 }
 
@@ -301,7 +308,6 @@
     
     DLog(@"APNS OK device token = %@", deviceToken);
     [User sharedUser].deviceToken = deviceToken;
-    self.deviceToken = deviceToken;
 }
 
 -(void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
@@ -363,17 +369,18 @@
 #pragma mark - public methods
 + (void)changeRootViewController:(UIViewController *)vc {
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIWindow *windown = ((AppDelegate *)[[UIApplication sharedApplication] delegate]).window;
-        if(vc == nil || windown.rootViewController == vc)
+        UIWindow *window = ((AppDelegate *)[[UIApplication sharedApplication] delegate]).window;
+        if(vc == nil || window.rootViewController == vc)
             return;
         
         CGPoint currentCenter;
-        UIViewController *currentVC = windown.rootViewController;
+        UIViewController *currentVC = window.rootViewController;
+        [window setRootViewController:vc];
+
         currentCenter = currentVC.view.center;
-        [vc.view addSubview:currentVC.view];
+        [vc.view.superview addSubview:currentVC.view];
         
         vc.view.center = CGPointMake(currentCenter.x, -currentCenter.y);
-        [windown setRootViewController:vc];
         [UIView animateWithDuration:.5f delay:0.0f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
             currentVC.view.center = CGPointMake(currentCenter.x, currentCenter.y+vc.view.frame.size.height);
             vc.view.center = currentCenter;

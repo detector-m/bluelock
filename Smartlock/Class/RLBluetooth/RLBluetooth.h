@@ -47,4 +47,5 @@
 
 #pragma mark - appmethod
 - (RLCharacteristic *)characteristicForNotifyWithPeripheralName:(NSString *)peripheralName;
+
 @end

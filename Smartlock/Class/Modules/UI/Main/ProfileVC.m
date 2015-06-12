@@ -72,19 +72,7 @@
 
 - (void)clickLogoutBtn:(UIButton *)button {
 //    __weak __typeof(self)weakSelf = self;
-    [RLHUD hudProgressWithBody:nil onView:self.view timeout:6.0f];
-    [Login logout:[User sharedUser].sessionToken withBlock:^(LoginResponse *response, NSError *error) {
-        [RLHUD hideProgress];
-        if(error) {
-            return ;
-        }
-        if(response.status) {
-            return;
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [Login forcedLogout];
-        });
-    }];
+    [Login logout];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

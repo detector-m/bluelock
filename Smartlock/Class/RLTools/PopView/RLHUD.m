@@ -8,23 +8,24 @@
 
 #import "RLHUD.h"
 
+static const float kPopViewDuration  = 5.0f;
+
+NSString * const kSuccessTitle = @"Congratulations 😊";
+NSString * const kErrorTitle = @"Error 😭";
+NSString * const kNoticeTitle = @"Notice";
+NSString * const kWarningTitle = @"Warning ⚠️";
+NSString * const kInfoTitle = @"Info";
+NSString * const kWaitingTitle = @"Waiting... ⌛️";
+
 @implementation RLHUD
 //+ (MBHUDView *)hudAlertWithBody:(NSString *)body type:(MBAlertViewHUDType)type hidesAfter:(float)delay show:(BOOL)show {
 //    return [MBHUDView hudWithBody:body type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
 //}
-
-NSString *kSuccessTitle = @"Congratulations 😊";
-NSString *kErrorTitle = @"Error 😭";
-NSString *kNoticeTitle = @"Notice";
-NSString *kWarningTitle = @"Warning ⚠️";
-NSString *kInfoTitle = @"Info";
-NSString *kWaitingTitle = @"Waiting... ⌛️";
-
 + (SCLAlertView *)alertViewOnScreenHide {
     for(UIViewController *vc in [UIApplication sharedApplication].keyWindow.rootViewController.childViewControllers) {
         if([vc isKindOfClass:[SCLAlertView class]]) {
             [(SCLAlertView *)vc hideView];
-            return (SCLAlertView *)vc;
+//            return (SCLAlertView *)vc;
         }
     }
     
@@ -41,7 +42,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
         }
         [alert showSuccess:[UIApplication sharedApplication].keyWindow.rootViewController title:kSuccessTitle
                 subTitle:body
-        closeButtonTitle:NSLocalizedString(@"确定", nil) duration:5.0f];
+        closeButtonTitle:NSLocalizedString(@"确定", nil) duration:kPopViewDuration];
     });
 }
 + (void)hudAlertErrorWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
@@ -53,7 +54,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
         }
         [alert showError:[UIApplication sharedApplication].keyWindow.rootViewController title:kErrorTitle
                   subTitle:body
-          closeButtonTitle:NSLocalizedString(@"确定", nil) duration:5.0f];
+          closeButtonTitle:NSLocalizedString(@"确定", nil) duration:kPopViewDuration];
     });
 }
 + (void)hudAlertNoticeWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
@@ -65,7 +66,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
         }
         [alert showNotice:[UIApplication sharedApplication].keyWindow.rootViewController title:kNoticeTitle
                 subTitle:body
-        closeButtonTitle:NSLocalizedString(@"确定", nil) duration:5.0f];
+        closeButtonTitle:NSLocalizedString(@"确定", nil) duration:kPopViewDuration];
     });
 
 }
@@ -78,7 +79,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
         }
         [alert showWarning:[UIApplication sharedApplication].keyWindow.rootViewController title:kWarningTitle
                  subTitle:body
-         closeButtonTitle:NSLocalizedString(@"确定", nil) duration:5.0f];
+         closeButtonTitle:NSLocalizedString(@"确定", nil) duration:kPopViewDuration];
     });
 }
 + (void)hudAlertInfoWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
@@ -90,7 +91,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
         }
         [alert showInfo:[UIApplication sharedApplication].keyWindow.rootViewController title:kInfoTitle
                  subTitle:body
-         closeButtonTitle:NSLocalizedString(@"确定", nil) duration:5.0f];
+         closeButtonTitle:NSLocalizedString(@"确定", nil) duration:kPopViewDuration];
     });
 }
 + (void)hudAlertEditWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
@@ -102,7 +103,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
         }
         [alert showEdit:[UIApplication sharedApplication].keyWindow.rootViewController title:body
                  subTitle:nil
-         closeButtonTitle:NSLocalizedString(@"确定", nil) duration:5.0f];
+         closeButtonTitle:NSLocalizedString(@"确定", nil) duration:kPopViewDuration];
     });
 }
 + (void)hudAlertCustomWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
@@ -116,7 +117,7 @@ NSString *kWaitingTitle = @"Waiting... ⌛️";
         }
         [alert showWaiting:[UIApplication sharedApplication].keyWindow.rootViewController title:kWaitingTitle
                  subTitle:body
-         closeButtonTitle:NSLocalizedString(@"确定", nil) duration:5.0f];
+         closeButtonTitle:NSLocalizedString(@"确定", nil) duration:kPopViewDuration];
     });
 }
 

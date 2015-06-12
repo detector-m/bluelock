@@ -91,7 +91,7 @@
     }
     
     void (^verifyBlock)(BaseResponse *response, NSError *error) = ^(BaseResponse *response, NSError *error) {
-        
+        if(error) return ;
         if(response.status) {
             [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"获取验证码出错！", nil)];
         }
@@ -104,6 +104,7 @@
         button.enabled = YES;
         
         if(weakSelf.type == kRegister) {
+            if(error) return ;
             if(response.status) {
                 DLog(@"验证码获取出错");
                 
@@ -115,6 +116,7 @@
             }
         }
         else {
+            if(error) return ;
             if(response.status == 1) {
                 [Register getAuthcode:self.phoneTextField.textField.text withBlock:verifyBlock];
                 [self startTimer:self.authcodeButton];
@@ -127,6 +129,7 @@
 }
 
 - (void)clickedNextButton {
+    [self endEditing];
     if(![self.phoneTextField.textField.text isMobile]) {
         [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"手机号码有误！", nil)];
         return;
@@ -138,24 +141,25 @@
         return;
     }
     
-    [RLHUD hudProgressWithBody:NSLocalizedString(@"正在验证。。。", nil) onView:self.view timeout:10.0f];
+    [RLHUD hudProgressWithBody:NSLocalizedString(@"正在验证。。。", nil) onView:self.view timeout:URLTimeoutInterval];
 
     __weak __typeof(self)weakSelf = self;
     [Register verifyAuthcode:self.phoneTextField.textField.text authcode:self.authcodeTextField.text withBlock:^(BaseResponse *response, NSError *error) {
         [RLHUD hideProgress];
-
+        if(error) return ;
         if(response.status) {
             [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"验证失败！", nil)];
             return ;
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
+            [User sharedUser].phone = weakSelf.phoneTextField.textField.text;
             SetPasswordVC *vc = [[SetPasswordVC alloc] init];
             vc.type = weakSelf.type;
             if(vc.type == kForgetPSW) {
                 FindPasswordModel *findPasswordModel = [FindPasswordModel new];
-                findPasswordModel.phone = self.phoneTextField.textField.text;
-                findPasswordModel.authcode = self.authcodeTextField.text;
+                findPasswordModel.phone = weakSelf.phoneTextField.textField.text;
+                findPasswordModel.authcode = weakSelf.authcodeTextField.text;
                 vc.findPasswordModel = findPasswordModel;
             }
             [weakSelf.navigationController pushViewController:vc animated:YES];

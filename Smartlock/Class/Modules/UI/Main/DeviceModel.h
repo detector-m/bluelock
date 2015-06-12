@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "RLPeripheral.h"
 
+#import "DeviceUser.h"
+
 @interface DeviceModel : NSObject
 @property (nonatomic, assign) NSUInteger ID;
 @property (nonatomic, assign) long long pwd;
@@ -22,6 +24,9 @@
 
 #pragma mark -
 @property (nonatomic, weak) NSString *token;
+
+#pragma mark -
+@property (nonatomic, strong) DeviceUser *user;
 
 - (instancetype)initWithParameters:(NSDictionary *)parameters;
 - (NSDictionary *)toDictionary;

@@ -10,6 +10,9 @@
 #import "UIViewController+Expand.h"
 #import "RLTitleTextField.h"
 #import "RLColor.h"
+#import "UserOperationRequest.h"
+
+#import "Login.h"
 
 @interface ResetPasswordVC ()
 @property (nonatomic, strong) RLTitleTextField *oldPassword;
@@ -66,6 +69,29 @@
 }
 
 - (void)clickCommiteBtn:(UIButton *)button {
-
+    [self endEditing];
+    if(self.oldPassword.textField.text.length < 6) {
+        [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"原密码有误！", nil)];
+        return;
+    }
+    
+    if(self.password.textField.text.length < 6 || ![self.password.textField.text isEqualToString:self.pswCheck.textField.text]) {
+        [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"密码输入错误！", nil)];
+        
+        return;
+    }
+    
+    [UserOperationRequest resetPassword:self.oldPassword.textField.text newPwd:self.password.textField.text token:[User sharedUser].sessionToken withBlock:^(UserOperationResponse *response, NSError *error) {
+        if(error) return ;
+        if(response.status > 0) {
+            [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"修改密码失败！", nil)];
+            
+            return ;
+        }
+        
+        [RLHUD hudAlertSuccessWithBody:NSLocalizedString(@"秘密更改成功", nil) dimissBlock:^{
+            [Login logout];
+        }];
+    }];
 }
 @end

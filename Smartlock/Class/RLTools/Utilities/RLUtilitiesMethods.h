@@ -24,3 +24,6 @@ extern NSString* RLLocalizedString(NSString* key, ...);
 
 //从字符串中取16进制数到byte数组
 extern NSData *hexStringToBytes(NSString *hexString);
+
+//
+extern NSString *hexStringFromData(NSData *data);

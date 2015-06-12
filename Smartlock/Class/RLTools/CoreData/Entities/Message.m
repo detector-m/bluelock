@@ -8,6 +8,7 @@
 
 #import "Message.h"
 
+#import "RLJSON.h"
 #import "RLDate.h"
 
 #pragma mark -
@@ -55,4 +56,31 @@ NSDictionary *messageDictionaryFromXMPPMessage(XMPPMessage *xmppMessage) {
 //    [dic setObject:self.isRead forKey:@"isRead"];
 //    return dic;
 //}
+
++ (NSInteger)messageType:(NSString *)jsonString {
+    if(!jsonString)
+        return -1;
+    
+    NSDictionary *backDic = [RLJSON JSONObjectWithString:jsonString];
+    return [[backDic objectForKey:@"backCode"] integerValue];
+}
++ (NSInteger)messageTypeWithXMPPMessage:(XMPPMessage *)xmppMessage {
+    NSString *json = [[[xmppMessage elementForName:@"dqcc"] elementForName:@"backJson"] stringValue];
+    
+    return [self messageType:json];
+    
+}
+
++ (NSInteger)messageFlag:(NSString *)jsonString {
+    if(!jsonString)
+        return -1;
+    NSDictionary *backDic = [RLJSON JSONObjectWithString:jsonString];
+
+    return [[backDic objectForKey:@"flag"] integerValue];
+}
++ (NSInteger)messageFlagWithXMPPMessage:(XMPPMessage *)xmppMessage {
+    NSString *json = [[[xmppMessage elementForName:@"dqcc"] elementForName:@"flag"] stringValue];
+    
+    return [self messageFlag:json];
+}
 @end

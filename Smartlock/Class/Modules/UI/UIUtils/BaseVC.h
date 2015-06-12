@@ -17,4 +17,8 @@
 - (void)setupRightItem;
 
 - (void)setBackButtonHide:(BOOL)hide;
+
+#pragma mark -
+- (void)endEditing;
+
 @end

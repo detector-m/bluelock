@@ -13,6 +13,17 @@
 #import "XMPPManager.h"
 #import "RLDate.h"
 
+/*
+ 值     类型
+ 101    踢下线
+ 102    钥匙被冻结
+ 103    钥匙被解冻
+ 104    钥匙过期
+ 105	版本更新
+ 106	广播
+ 107	收到新钥匙
+ */
+
 extern NSDictionary *messageDictionaryFromXMPPMessage(XMPPMessage *xmppMessage);
 
 #pragma mark -
@@ -29,5 +40,11 @@ extern NSDictionary *messageDictionaryFromXMPPMessage(XMPPMessage *xmppMessage);
 @property (nonatomic, retain) NSNumber * id;
 @property (nonatomic, retain) NSNumber * isRead;
 
+#pragma mark -
++ (NSInteger)messageType:(NSString *)jsonString;
++ (NSInteger)messageTypeWithXMPPMessage:(XMPPMessage *)xmppMessage;
 
+//报文flag：flag=1 需要重新加载；flag=0 无需重新加载
++ (NSInteger)messageFlag:(NSString *)jsonString;
++ (NSInteger)messageFlagWithXMPPMessage:(XMPPMessage *)xmppMessage;
 @end

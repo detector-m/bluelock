@@ -38,7 +38,7 @@
 - (instancetype)init {
     if(self = [super init]) {
         self.centralQueue = dispatch_queue_create("com.RLBluetooth.RLCentralQueue", DISPATCH_QUEUE_SERIAL);
-        self.manager = [[CBCentralManager alloc] initWithDelegate:self queue:self.centralQueue];
+        self.manager = [[CBCentralManager alloc] initWithDelegate:self queue:self.centralQueue options:@{CBCentralManagerScanOptionAllowDuplicatesKey:@YES}];
         self.cbCentralManagerState = self.manager.state;
         self.scannedPeripherals = [NSMutableArray new];
     }

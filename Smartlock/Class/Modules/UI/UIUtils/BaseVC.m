@@ -80,5 +80,9 @@
     return YES;
 }
 
+#pragma mark -
+- (void)endEditing {
+    [self.view endEditing:YES];
+}
 
 @end

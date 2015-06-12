@@ -9,13 +9,12 @@
 #import "BuyVC.h"
 #import "RLHTTPAPIClient.h"
 
+#define ShopLockPage @"shopLock.jsp"
 @implementation BuyVC
-//http://www.dqcc.com.cn:7080/mobile/shopLock.jsp
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-        NSString *requestUrl = @"http://www.dqcc.com.cn:7080/mobile/shopLock.jsp";
-//        self.url = [kRLHTTPAPIBaseURLString stringByAppendingString:requestUrl];
+        NSString *requestUrl = [kRLHTTPMobileBaseURLString stringByAppendingString:ShopLockPage];
         self.url = requestUrl;
     }
     

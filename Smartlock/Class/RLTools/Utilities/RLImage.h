@@ -23,4 +23,8 @@
 - (UIImage *)iconImage:(UIImage *)oriImage;
 
 + (UIImage *)fixOrientation:(UIImage *)aImage;
+
+#pragma mark - UIImage + Blur
++ (UIImage *)boxblurImageWithBlur:(CGFloat)blur image:(UIImage *)image;
++ (UIImage *)closeButtonImageWithFrame:(CGRect)bounds;
 @end

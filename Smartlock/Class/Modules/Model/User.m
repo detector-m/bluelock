@@ -8,6 +8,8 @@
 
 #import "User.h"
 
+#import "MyCoreDataManager.h"
+
 @interface User ()
 @property (nonatomic, readwrite, assign) NSUInteger ID;
 @property (nonatomic, readwrite, copy) NSString *name;

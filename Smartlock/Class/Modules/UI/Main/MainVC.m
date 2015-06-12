@@ -16,6 +16,8 @@
 #import "NotificationMessageVC.h"
 #import "MoreVC.h"
 
+#import "RLAlertLabel.h"
+
 #pragma mark -
 #import "Message.h"
 #import "RecordManager.h"
@@ -56,15 +58,23 @@
 #pragma mark -
 @property (assign) BOOL isBannersLoaded;
 @property (assign) BOOL isBannersLoading;
+
+@property (assign) BOOL isLockListLoading;
+
+#pragma mark -
+@property (nonatomic, strong) NSData *dateData;
+
+#pragma mark -
+@property (nonatomic, strong) NSTimer *animationTimer;
 @end
 
 @implementation MainVC
 
 - (void)dealloc {
+    [self cancelPerformSelector];
     [self.lockList removeAllObjects], self.lockList = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -81,6 +91,8 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
+    [self stopTimer];
     
     [self setBackButtonHide:NO];
     [self.bannersView stopLoading];
@@ -129,12 +141,7 @@
 }
 
 //- (void)applictionWillEnterForeground:(id)sender {
-//    if(![AFNetworkReachabilityManager sharedManager].isReachable)
-//        return;
-//
-//    [RecordManager updateRecordsWithBlock:^(BOOL success) {
-//        [self loadLockList];
-//    }];
+//    [self readLockPower];
 //}
 
 #pragma mark ----------- network status changed
@@ -147,9 +154,7 @@
         [self loadBannersRequest];
         
         [self loadLockListFromNet];
-        [RecordManager updateRecordsWithBlock:^(BOOL success) {
-            [self loadLockListFromNet];
-        }];
+        [self updateRecords];
     }
     else {
         [self.bannersView stopLoading];
@@ -157,9 +162,10 @@
 }
 
 static CGFloat BannerViewHeight = 120.0f;
-static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/advice.jsp";
+static NSString *kBannersPage = @"advice.jsp";
 - (void)loadBannersRequest {
     if(!self.isBannersLoaded && !self.isBannersLoading) {
+        self.isBannersLoading = YES;
         [self.bannersView loadRequest:[self requestForBanners:self.bannersUrl]];
     }
 }
@@ -173,7 +179,7 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
 
 - (void)setupBanners {
     CGFloat ratio = (3.0/1.0);
-    self.bannersUrl = (NSString *)kBannersURLString;
+    self.bannersUrl = [kRLHTTPMobileBaseURLString stringByAppendingString:kBannersPage];
     CGRect frame = self.view.frame;
     BannerViewHeight = frame.size.width/ratio;
     self.bannersView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, BannerViewHeight)];
@@ -183,13 +189,21 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
     [self loadBannersRequest];
 }
 
+#define LockSize (120.0f)
 - (void)setupMainView {
     if(!self.scrollView) {
         CGRect frame = self.view.frame;
+//        CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
         CGFloat heightOffset = BannerViewHeight;
         
         self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, heightOffset, frame.size.width, frame.size.height-heightOffset)];
-        self.scrollView.contentSize = CGSizeMake(frame.size.width, self.scrollView.frame.size.width);
+//        if(screenHeight <= 480) {
+//            self.scrollView.contentSize = CGSizeMake(frame.size.width, self.scrollView.frame.size.height+80);
+//        }
+//        else {
+//
+//        }
+        self.scrollView.contentSize = CGSizeMake(frame.size.width, self.scrollView.frame.size.height);
         self.scrollView.showsHorizontalScrollIndicator = NO;
         self.scrollView.showsVerticalScrollIndicator = NO;
         self.scrollView.backgroundColor = [UIColor clearColor];
@@ -200,7 +214,7 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
         frame = self.scrollView.frame;
         
         self.cupidBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.cupidBtn.frame = CGRectMake(frame.size.width/2+60, 20, 80, 80);
+        self.cupidBtn.frame = CGRectMake(frame.size.width/2+60, 10, 80, 80);
         [self.cupidBtn setImage:[UIImage imageNamed:@"Cupid.png"] forState:UIControlStateNormal];
         [self.scrollView addSubview:self.cupidBtn];
         
@@ -213,14 +227,15 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
         heightOffset = self.cupidBtn.frame.origin.y + self.cupidBtn.frame.size.height;
         
         self.openLockBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.openLockBtn.frame = CGRectMake(frame.size.width/2-120, heightOffset-7, 160, 160);
+        self.openLockBtn.frame = CGRectMake(frame.size.width/2-LockSize, heightOffset-7, LockSize, LockSize+20);
         [self.openLockBtn setImage:[UIImage imageNamed:@"Lock.png"] forState:UIControlStateNormal];
         [self.openLockBtn setImage:[UIImage imageNamed:@"Unlock.png"] forState:UIControlStateSelected];
         [self.openLockBtn addTarget:self action:@selector(clickOpenLockBtn:) forControlEvents:UIControlEventTouchUpInside];
         [self.scrollView addSubview:self.openLockBtn];
         [self.scrollView bringSubviewToFront:self.arrow];
         
-        heightOffset += self.openLockBtn.frame.size.height + 30;
+//        heightOffset += self.openLockBtn.frame.size.height + 20;
+        heightOffset = self.scrollView.frame.size.height - 100;
         CGFloat btnWidth = (frame.size.width - 2*(15+5))/3;
         CGFloat btnWidthOffset = 15;
         CGFloat btnHeight = 40;
@@ -252,7 +267,6 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
         self.messageBadgeLabel.font = [UIFont systemFontOfSize:11];
         self.messageBadgeLabel.layer.cornerRadius = 10;
         self.messageBadgeLabel.clipsToBounds = YES;
-//        self.messageBadgeLabel.text = @"1";
         self.messageBadgeNumber = 0;
         [self.messageBtn addSubview:self.messageBadgeLabel];
         
@@ -268,6 +282,7 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
     button.frame = frame;
     [button setTitle:title forState:UIControlStateNormal];
     [button setTitleColor:[RLColor colorWithHex:0x000000 alpha:0.8]/*[RLColor colorWithHex:0xF2E9AE alpha:0.9]*/ forState:UIControlStateNormal];
+    button.layer.cornerRadius = 5.0f;
     [button addTarget:self action:selector forControlEvents:UIControlEventTouchUpInside];
     
     return button;
@@ -284,88 +299,67 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
 }
 
 - (void)loadLockListFromNet {
+    if(self.isLockListLoading)
+        return;
+    self.isLockListLoading = YES;
     __weak __typeof(self)weakSelf = self;
     [DeviceManager lockList:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
-        if(!response.list.count) {
-            return;
-        }
-        
+        self.isLockListLoading = NO;
+        if(error || !response.list.count) return;
+
         [weakSelf.lockList removeAllObjects];
         [weakSelf.lockList addObjectsFromArray:response.list];
         [[MyCoreDataManager sharedManager] deleteAllTableObjectInTable:NSStringFromClass([KeyEntity class])];
         for(KeyModel *key in weakSelf.lockList) {
             [[MyCoreDataManager sharedManager] insertUpdateObjectInObjectTable:keyEntityDictionaryFromKeyModel(key) updateOnExistKey:@"keyID" withTablename:NSStringFromClass([KeyEntity class])];
         }
-        
     }];
-
 }
 
+- (void)unlockOpenLockBtn {
+    self.openLockBtn.userInteractionEnabled = YES;
+}
+
+- (void)cancelPerformSelector {
+    [self stopTimer];
+    [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(unlockOpenLockBtn) object:nil];
+}
+
+static int retry = 0;
 - (void)clickOpenLockBtn:(UIButton *)button {
-    
-    if(!self.lockList.count)
+
+    if(!self.lockList.count) {
+        [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"未检测到钥匙!", nil)];
         return;
-    
+    }
+    retry = 0;
+    if(![User getVoiceSwitch]) {
+        [[SoundManager sharedManager] playSound:@"SoundOperator.mp3" looping:NO];
+    }
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+
     self.openLockBtn.userInteractionEnabled = NO;
     __weak __typeof(self)weakSelf = self;
+    [self cancelPerformSelector];
+    [self performSelector:@selector(unlockOpenLockBtn) withObject:nil afterDelay:8.f];
+    [self startOpenLockAnimation1:button];
     
     [[RLBluetooth sharedBluetooth] scanBLPeripheralsWithCompletionBlock:^(NSArray *peripherals) {
         if(peripherals == nil) {
+            [weakSelf stopTimer];
             weakSelf.openLockBtn.userInteractionEnabled = YES;
             return ;
         }
         
         if(!peripherals.count) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"未找到设备,请检查蓝牙设备", nil)];
+                [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"未找到设备,请检查蓝牙设备!", nil)];
             });
             weakSelf.openLockBtn.userInteractionEnabled = YES;
+            [weakSelf stopTimer];
             return ;
         }
         
-#if 0
-        for(RLPeripheral *peripheral in peripherals) {
-            for(KeyModel *key in self.lockList) {
-                if(![key isValid]) {
-                    continue;
-                }
-                if([peripheral.name isEqualToString:key.keyOwner.address]) {
-                    [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
-                        weakSelf.openLockBtn.userInteractionEnabled = YES;
-#if 0
-                        for(RLService *service in peripheral.services) {
-                            if([service.UUIDString isEqualToString:@"1910"]) {
-                                for(RLCharacteristic *characteristic in service.characteristics) {
-                                    if(characteristic.cbCharacteristic.properties == CBCharacteristicPropertyNotify) {
-                                        
-                                        [characteristic setNotifyValue:YES completion:^(NSError *error) {
-                                            for(RLCharacteristic *characteristic in service.characteristics) {
-                                                if([characteristic.UUIDString isEqualToString:@"fff2"]) {
-                                                    [weakSelf writeDataToCharacteristic:characteristic withKey:key];//lock.pwd];
-                                                    
-                                                    return ;
-                                                }
-                                            }
-                                        } onUpdate:^(NSData *data, NSError *error) {
-                                            BL_response cmdResponse = responseWithBytes(( Byte *)[data bytes], data.length);
-                                            Byte crc = CRCOfCMDBytes((Byte *)[data bytes], data.length);
-                                            
-                                            if(crc == cmdResponse.CRC && cmdResponse.result.result == 0) {
-                                                [weakSelf openLock:key];
-                                            }
-                                        }];
-                                    }
-                                }
-                            }
-                        }
-#endif
-                    }];
-                    
-                    return;
-                }
-            }
-        }
-#endif
         for(KeyModel *key in self.lockList) {
             if(![key isValid]) {
                 continue;
@@ -374,38 +368,84 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
             RLPeripheral *peripheral = [[RLBluetooth sharedBluetooth] peripheralForName:key.keyOwner.address];
             if(peripheral) {
                 [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
+                    [weakSelf cancelPerformSelector];
                     weakSelf.openLockBtn.userInteractionEnabled = YES;
                     RLService *service = [[RLBluetooth sharedBluetooth] serviceForUUIDString:@"1910" withPeripheral:peripheral];
                     RLCharacteristic *characteristic = [[RLBluetooth sharedBluetooth] characteristicForNotifyWithService:service];
                     
                     [characteristic setNotifyValue:YES completion:^(NSError *error) {
                         RLCharacteristic *innerCharacteristic = [[RLBluetooth sharedBluetooth] characteristicForUUIDString:@"fff2" withService:service];
-                        [weakSelf writeDataToCharacteristic:innerCharacteristic withKey:key];//lock.pwd];
+//                        [weakSelf openLockWithCharacteristic:innerCharacteristic withKey:key];//lock.pwd];
+                        [weakSelf readLockPowerWithCharacteristic:innerCharacteristic withKey:key];
                         
                     } onUpdate:^(NSData *data, NSError *error) {
+                        
                         BL_response cmdResponse = responseWithBytes(( Byte *)[data bytes], data.length);
                         Byte crc = CRCOfCMDBytes((Byte *)[data bytes], data.length);
                         
-                        if(crc == cmdResponse.CRC && cmdResponse.result.result == 0) {
+                        RLCharacteristic *innerCharacteristic = [[RLBluetooth sharedBluetooth] characteristicForUUIDString:@"fff2" withService:service];
+                        
+                        if(cmdResponse.cmd_code == 0x06) {
+                            if(cmdResponse.result.result == 0x01) {
+                                [RLAlertLabel showInView:self.view withText:NSLocalizedString(@"电池电压过低，请更换电池！", nil) andFrame:CGRectMake(button.frame.origin.x+button.frame.size.width+10, button.frame.origin.y+button.frame.size.height+10, 140, 80)];
+                            }
+                            else if(cmdResponse.result.result == 0x00) {
+                            }
+                            else {
+                                [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"管理员实效，请重新配对！", nil)];
+                                return ;
+                            }
+                            [weakSelf openLockWithCharacteristic:innerCharacteristic withKey:key];
+                            return ;
+                        }
+                        
+                        if(![weakSelf isLockResponseDataOK:cmdResponse withCRC:crc]) {
+                            return ;
+                        }
+                        
+                        if(cmdResponse.cmd_code == 0x02) {
+                            if(!button.userInteractionEnabled) return ;
+//                            RLCharacteristic *innerCharacteristic = [[RLBluetooth sharedBluetooth] characteristicForUUIDString:@"fff2" withService:service];
+                            [weakSelf updateLockTimeWithCharacteristic:innerCharacteristic withKey:key];
                             [weakSelf openLock:key];
+                        }
+                        else if(cmdResponse.cmd_code == 0x03) {
+                            NSData *data = [NSData dataWithBytes:cmdResponse.data length:cmdResponse.data_len];
+                            
+                            if(![data isEqualToData:self.dateData]) {
+//                                [weakSelf updateLockTimeWithCharacteristic:innerCharacteristic withKey:key];
+                                if(retry++ < 1) {
+                                    [weakSelf updateLockTimeWithCharacteristic:innerCharacteristic withKey:key];
+                                }
+                                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"时间同步失败！", nil)];
+                            }
+//                            DLog(@"datedata == %@ ==========", data);
                         }
                     }];
                 }];
                 
                 return;
             }
-            
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"没有可用的钥匙", nil)];
+            [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"没有可用的钥匙或设备！", nil)];
+            [weakSelf cancelPerformSelector];
             weakSelf.openLockBtn.userInteractionEnabled = YES;
         });
     }];
 }
 
+- (void)startOpenLockAnimation1:(UIButton *)button {
+    [self startTimer];
+}
+
 - (void)startOpenLockAnimation:(UIButton *)button {
-    [[SoundManager sharedManager] playSound:@"SoundOperator.mp3" looping:NO];
+    [self stopTimer];
+    [self cancelPerformSelector];
+    if(![User getVoiceSwitch]) {
+        [[SoundManager sharedManager] playSound:@"DoorOpened.mp3" looping:NO];
+    }
     button.userInteractionEnabled = NO;
     CGRect orignalFrame = self.arrow.frame;
     __weak __typeof(self)weakSelf = self;
@@ -507,6 +547,20 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
 }
 
 #pragma mark - 
+- (void)startTimer {
+    self.animationTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(updateTimer) userInfo:nil repeats:YES];
+}
+
+- (void)updateTimer {
+    self.arrow.hidden = !self.arrow.hidden;
+}
+
+- (void)stopTimer {
+    [self.animationTimer invalidate], self.animationTimer = nil;
+    self.arrow.hidden = NO;
+}
+
+#pragma mark - 
 - (void)receiveMessage {
     self.messageBadgeNumber ++;
     [self loadLockListFromNet];
@@ -527,6 +581,8 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
 }
 
 - (void)setMessageBadgeNumber:(NSInteger)messageBadgeNumber {
+    _messageBadgeNumber = messageBadgeNumber;
+
     if(messageBadgeNumber == 0) {
         self.messageBadgeLabel.hidden = YES;
         
@@ -534,7 +590,6 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
     }
     
     self.messageBadgeLabel.hidden = NO;
-    _messageBadgeNumber = messageBadgeNumber;
     self.messageBadgeLabel.text = [NSString stringWithFormat:@"%li", (long)messageBadgeNumber];
 }
 
@@ -550,14 +605,38 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
     }
     NSDictionary *record = createOpenLockRecord(key.ID, key.lockID);
     [[MyCoreDataManager sharedManager] insertObjectInObjectTable:record withTablename:NSStringFromClass([OpenLockRecord class])];
-    [DeviceManager openLock:openLockRecordToString(record) token:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
-        [[MyCoreDataManager sharedManager] updateObjectsInObjectTable:record withKey:@"keyID" contains:[NSNumber numberWithLongLong:key.ID] withTablename:NSStringFromClass([OpenLockRecord class])];
+    [self updateRecords];
+//    [DeviceManager openLock:openLockRecordToString(record) token:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
+//        [[MyCoreDataManager sharedManager] updateObjectsInObjectTable:record withKey:@"keyID" contains:[NSNumber numberWithLongLong:key.ID] withTablename:NSStringFromClass([OpenLockRecord class])];
+//    }];
+}
+
+- (void)updateRecords {
+    /*remove invalid records*/
+    [RecordManager updateRecordsWithBlock:^(BOOL success) {
+        [self loadLockListFromNet];
+        
+        for(KeyModel *key in self.lockList) {
+            if(![key isValid]) {
+                [RecordManager removeRecordsWithKeyID:(long long)key.ID];
+                
+                continue;
+            }
+        }
     }];
 }
 
-- (void)writeDataToCharacteristic:(RLCharacteristic *)characteristic withKey:(KeyModel *)key {
+/**
+ *  开锁
+ *
+ *  @param characteristic characteristic
+ *  @param key            key
+ */
+- (void)openLockWithCharacteristic:(RLCharacteristic *)characteristic withKey:(KeyModel *)key {
+//- (void)writeDataToCharacteristic:(RLCharacteristic *)characteristic withKey:(KeyModel *)key {
     int len = 0;
     long long data = key.keyOwner.pwd;
+    DLog(@"key invalid date = %@", key.invalidDate);
     Byte *dateData = dateToBytes(&len, key.invalidDate.length? key.invalidDate: @"2015-12-18");
     int size = sizeof(data)+len;
     Byte *tempData = calloc(size, sizeof(Byte));
@@ -570,7 +649,126 @@ static const NSString *kBannersURLString = @"http://www.dqcc.com.cn:7080/mobile/
     
     NSData *writeData = [NSData dataWithBytes:tempData length:size];
     free(tempData);
-    [[RLBluetooth sharedBluetooth] writeDataToCharacteristic:characteristic cmdCode:0x02 cmdMode:0x00 withDatas:writeData];
+    
+    Byte cmdMode = 0x00; //管理员
+    if(key.userType == kUserTypeCommon) {
+        cmdMode = 0x01; //非管理员
+    }
+    [[RLBluetooth sharedBluetooth] writeDataToCharacteristic:characteristic cmdCode:0x02 cmdMode:cmdMode withDatas:writeData];
+}
+
+/**
+ *  同步时间
+ *
+ *  @param characteristic characteristic
+ */
+- (void)updateLockTimeWithCharacteristic:(RLCharacteristic *)characteristic withKey:(KeyModel *)key {
+    if(!(key.userType == kUserTypeAdmin))
+        return;
+    int len = 0;
+    long long data = key.keyOwner.pwd;
+    Byte *dateData = dateNowToBytes(&len);
+    self.dateData = [NSData dataWithBytes:dateData length:len];
+    int size = sizeof(data)+len;
+    Byte *tempData = calloc(size, sizeof(Byte));
+    memcpy(tempData, dateData, len);
+    
+    Byte *temp = (Byte *)&(data);
+    for(NSInteger j = len; j<size; j++) {
+        tempData[j] = temp[j-len];
+    }
+    
+    NSData *writeData = [NSData dataWithBytes:tempData length:size];
+    free(tempData);
+    
+    Byte cmdMode = 0x01; //0x01->设置 0x00->读取
+    
+    [[RLBluetooth sharedBluetooth] writeDataToCharacteristic:characteristic cmdCode:0x03 cmdMode:cmdMode withDatas:writeData];
+}
+
+- (void)readLockPowerWithCharacteristic:(RLCharacteristic *)characteristic withKey:(KeyModel *)key {
+    long long data = key.keyOwner.pwd;
+    NSData *writeData = [NSData dataWithBytes:&data length:sizeof(long long)];
+    Byte cmdMode = 0x00; //0x01->设置 0x00->读取
+    
+    [[RLBluetooth sharedBluetooth] writeDataToCharacteristic:characteristic cmdCode:0x06 cmdMode:cmdMode withDatas:writeData];
+}
+
+- (void)handleLockResponseData:(NSData *)data {
+    BL_response cmdResponse = responseWithBytes(( Byte *)[data bytes], data.length);
+    Byte crc = CRCOfCMDBytes((Byte *)[data bytes], data.length);
+    switch (cmdResponse.cmd_code) {
+        case 0x01:
+            break;
+        case 0x02:
+            break;
+        case 0x03:
+            break;
+        case 0x04:
+            break;
+        case 0x05:
+            break;
+        default:
+            break;
+    }
+    if(crc == cmdResponse.CRC && cmdResponse.result.result == 0) {
+        
+    }
+}
+
+- (BOOL)isLockResponseDataOK:(BL_response)response withCRC:(Byte)crc {
+    if(crc == response.CRC && response.result.result == 0) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (void)readLockPower {
+    __weak __typeof(self)weakSelf = self;
+    [[RLBluetooth sharedBluetooth] scanBLPeripheralsWithCompletionBlock:^(NSArray *peripherals) {
+        if(peripherals == nil) {
+            return ;
+        }
+        
+        if(!peripherals.count) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"未找到设备,请检查蓝牙设备", nil)];
+            });
+            return ;
+        }
+        
+        for(KeyModel *key in self.lockList) {
+            if(![key isValid]) {
+                continue;
+            }
+            
+            RLPeripheral *peripheral = [[RLBluetooth sharedBluetooth] peripheralForName:key.keyOwner.address];
+            if(peripheral) {
+                [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
+                    RLService *service = [[RLBluetooth sharedBluetooth] serviceForUUIDString:@"1910" withPeripheral:peripheral];
+                    RLCharacteristic *characteristic = [[RLBluetooth sharedBluetooth] characteristicForNotifyWithService:service];
+                    
+                    [characteristic setNotifyValue:YES completion:^(NSError *error) {
+                        RLCharacteristic *innerCharacteristic = [[RLBluetooth sharedBluetooth] characteristicForUUIDString:@"fff2" withService:service];
+                        [weakSelf readLockPowerWithCharacteristic:innerCharacteristic withKey:key];
+                        
+                    } onUpdate:^(NSData *data, NSError *error) {
+                        BL_response cmdResponse = responseWithBytes(( Byte *)[data bytes], data.length);
+//                        Byte crc = CRCOfCMDBytes((Byte *)[data bytes], data.length);
+                        
+                        if(cmdResponse.cmd_code == 0x06) {
+                            if(cmdResponse.result.result == 0x01) {
+                                [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"电池电压过低，请更换电池！", nil)];
+                            }
+                        }
+                    }];
+                }];
+                
+                return;
+            }
+        }
+    }];
 }
 #pragma mark -
 #if 0

@@ -36,6 +36,8 @@ typedef NS_ENUM(NSInteger, KeyType) {
 @property (nonatomic, assign) KeyStatus keyStatus;
 @property (nonatomic, assign) UserType userType;
 
+@property (nonatomic, assign) long long invalidTimeInterval;
+
 #pragma mark -
 @property (nonatomic, strong) LockModel *keyOwner;
 

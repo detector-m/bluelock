@@ -41,6 +41,7 @@
 
 - (void)loadRequest {
     if(!self.isWebViewLoaded && !self.isWebViewLoading) {
+        self.isWebViewLoading = YES;
         [self.webView loadRequest:[self requestForWebContent:self.url]];
     }
 }

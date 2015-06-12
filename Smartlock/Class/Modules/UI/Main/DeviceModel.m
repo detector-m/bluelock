@@ -15,6 +15,9 @@
         self.status = [parameters[@"status"] integerValue];
         self.time = [parameters objectForKey:@"addTime"];
         self.ower = [parameters objectForKey:@"memberGid"];
+        
+        self.user = [[DeviceUser alloc] init];
+        [self.user setWithParameters:[parameters objectForKey:@"member"]];
     }
     
     return self;

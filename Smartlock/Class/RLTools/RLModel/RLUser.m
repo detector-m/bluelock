@@ -7,6 +7,11 @@
 //
 
 #import "RLUser.h"
+#import "RLUtilitiesMethods.h"
+
+NSString *kVoiceSwitchKey = @"voiceSwitchKey";
+
+#pragma mark -
 
 @implementation RLUser
 
@@ -67,6 +72,11 @@
 
 }
 
+#pragma mark - 
+- (NSString *)deviceTokenString {
+    return hexStringFromData(self.deviceToken);
+}
+
 #pragma mark -
 + (BOOL)saveArchiver {
     //获取路径和保存文件
@@ -114,5 +124,26 @@
     if ([defaultManager isDeletableFileAtPath:filename]) {
         [defaultManager removeItemAtPath:filename error:nil];
     }
+}
+
+#pragma mark -
++ (BOOL)getVoiceSwitch {
+    NSUserDefaults *userDefault = [NSUserDefaults standardUserDefaults];
+    NSNumber *voiceSwitch = [userDefault objectForKey:kVoiceSwitchKey];
+    if(voiceSwitch == nil)
+        return NO;
+    
+    return voiceSwitch.boolValue;
+}
++ (void)setVoiceSwitch:(BOOL)on {
+    NSUserDefaults *userDefault = [NSUserDefaults standardUserDefaults];
+    NSNumber *voiceSwitch = [userDefault objectForKey:kVoiceSwitchKey];
+    if(voiceSwitch == nil) {
+    }
+    else if(on == voiceSwitch.boolValue)
+        return;
+    
+    [userDefault setObject:[NSNumber numberWithBool:on] forKey:kVoiceSwitchKey];
+    [userDefault synchronize];
 }
 @end

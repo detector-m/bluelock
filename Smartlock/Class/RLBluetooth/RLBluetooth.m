@@ -84,7 +84,7 @@ static RLBluetooth *_sharedBluetooth = nil;
     RLPeripheralConnectionCallback peripheralConnectionCallback = ^(NSError *error) {
         if(error) {
             if(weakSelf.connectedCallback) {
-                self.connectedCallback();
+                weakSelf.connectedCallback();
             }
             self.connectedCallback = nil;
             NSLog(@"error = %@", error);
@@ -135,7 +135,7 @@ static RLBluetooth *_sharedBluetooth = nil;
     
     RLPeripheralDiscoverServicesCallback discoverPeripheralServicesCallback = ^(NSArray *services, NSError *error) {
         if(error) {
-            self.connectedCallback = nil;
+            weakSelf.connectedCallback = nil;
             NSLog(@"error = %@", error);
             
             return ;
@@ -191,23 +191,32 @@ static RLBluetooth *_sharedBluetooth = nil;
         Byte *bytes = calloc(len, sizeof(Byte));
         
         wrappCMDToBytes(&cmd, bytes);
+        
         int i;
         
         NSMutableString *str = [NSMutableString stringWithString:@""];
         for(i=0; i<len; i++) {
             [str appendString:[NSString stringWithFormat:@"%02x", bytes[i]]];
-            [characteristic writeValue:[NSData dataWithBytes:&bytes[i] length:1] completion:nil];
+//            [characteristic writeValue:[NSData dataWithBytes:&bytes[i] length:1] completion:nil];
+//            [NSThread sleepForTimeInterval:0.05];
+        }
+
+        NSInteger packages = len/BluetoothPackageSize + (len%BluetoothPackageSize ? 1 : 0);
+        
+        for(i = 0; i<packages; i++) {
+            [characteristic writeValue:[NSData dataWithBytes:&bytes[i*BluetoothPackageSize] length:i+1<packages? BluetoothPackageSize : len-i*BluetoothPackageSize] completion:nil];
             [NSThread sleepForTimeInterval:0.05];
         }
         
-        DLog(@"str = %@", str);
         free((void *)bytes);
+        DLog(@"str = %@", str);
     }
 }
 
 #pragma mark - 
 - (RLPeripheral *)peripheralForName:(NSString *)name {
     for(RLPeripheral *peripheral in self.peripherals) {
+        DLog(@"%@", peripheral.name);
         if([peripheral.name isEqualToString:name]) {
             return peripheral;
         }

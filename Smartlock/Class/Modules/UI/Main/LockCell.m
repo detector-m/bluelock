@@ -11,7 +11,7 @@
 @implementation LockCell
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     if(self = [super initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:reuseIdentifier]) {
-        
+        self.textLabel.numberOfLines = 2;
     }
     
     return self;
@@ -26,7 +26,7 @@
     
     frame = self.imageView.frame;
     widthOffset = frame.origin.x + frame.size.width + 15;
-    self.textLabel.frame = CGRectMake(widthOffset, self.textLabel.frame.origin.y, self.textLabel.frame.size.width-widthOffset-20, self.textLabel.frame.size.height);
+    self.textLabel.frame = CGRectMake(widthOffset, 0, self.textLabel.frame.size.width-widthOffset-15, self.contentView.frame.size.height);
     
     frame = self.textLabel.frame;
     widthOffset = self.textLabel.frame.origin.x+self.textLabel.frame.size.width + 10;

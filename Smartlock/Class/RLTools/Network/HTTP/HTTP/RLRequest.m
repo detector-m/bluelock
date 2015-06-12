@@ -25,7 +25,7 @@
         [RLHUD hideProgress];
         if(block) {
             DLog(@"%@", error);
-//            block(@"Error", error);
+            block(@"Error", error);
             [RLHUD hudAlertErrorWithBody:@"网络有问题！请检查网络"];
         }
     }];

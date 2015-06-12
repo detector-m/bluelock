@@ -14,6 +14,8 @@
 + (void)openRemoteNotification;
 #pragma mark -
 //----------------------------------------//
-+ (void)messageNotification;
+//+ (void)messageNotification;
++ (void)scheduleMessageNotificationWithAlert:(NSString *)alert;
++ (void)removeMessageNotification;
 //----------------------------------------//
 @end

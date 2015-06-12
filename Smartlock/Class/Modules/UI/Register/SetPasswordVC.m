@@ -17,6 +17,7 @@
 
 #pragma mark -
 #import "XMPPManager.h" 
+#import "MyCoreDataManager.h"
 
 #define ButtonBackgroundColor (0xcccccc)
 
@@ -69,29 +70,33 @@
 }
 
 - (void)clickedCommiteButton {
+    [self endEditing];
     if(self.password.textField.text.length == 0 || self.pswCheck.textField.text.length == 0 || ![self.password.textField.text isEqualToString:self.pswCheck.textField.text]) {
         [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"密码输入有误！", nil)];
         
         return;
     }
     
-    [RLHUD hudProgressWithBody:nil onView:self.view timeout:20.0f];
     if(self.type == kRegister) {
         RegisterModel *aRegister = [[RegisterModel alloc] init];
+        aRegister.deviceToken = [User sharedUser].deviceToken;
         if(!aRegister.deviceToken) {
             [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"请过5－10s后再试！", nil)];
             return;
         }
+        [RLHUD hudProgressWithBody:nil onView:self.view timeout:URLTimeoutInterval];
+        aRegister.account = [User sharedUser].phone;
         aRegister.password = self.password.textField.text;
         [Register register:aRegister withBlock:^(RegisterResponse *response, NSError *error) {
             [RLHUD hideProgress];
-            
+            if(error) return ;
             if(response.status) {
                 
                 [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"注册失败！", nil)];
             }
             else {
                 [User sharedUser].password = aRegister.password;
+                [[MyCoreDataManager sharedManager] setIdentifier:[User sharedUser].dqID];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if(![[XMPPManager sharedXMPPManager] connect]) {
                         [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"登录失败", nil)];
@@ -104,19 +109,19 @@
         }];
     }
     else {
-        
+        [RLHUD hudProgressWithBody:nil onView:self.view timeout:URLTimeoutInterval];
         self.findPasswordModel.password = self.password.textField.text;
         __weak __typeof(self)weakSelf = self;
         [Register findPassword:self.findPasswordModel withBlock:^(RegisterResponse *response, NSError *error) {
             [RLHUD hideProgress];
-        
+            if(error) return ;
             if(response.status) {
                 [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"找回密码失败！", nil)];
             }
             else {
-                dispatch_async(dispatch_get_main_queue(), ^{
+                [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"成功找回", nil) dimissBlock:^{
                     [weakSelf.navigationController popToRootViewControllerAnimated:YES];
-                });
+                }];
             }
         }];
     }

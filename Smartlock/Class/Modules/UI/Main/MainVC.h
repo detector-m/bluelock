@@ -17,4 +17,6 @@
 
 - (void)addKey:(KeyModel *)key;
 - (void)removeKey:(KeyModel *)key;
+
+- (void)loadLockList;
 @end
