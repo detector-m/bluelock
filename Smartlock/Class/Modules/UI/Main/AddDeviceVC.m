@@ -155,7 +155,9 @@
             
             if(crc == cmdResponse.CRC && cmdResponse.result.result == 0) {
                 LockModel *lock = [LockModel new];
-                lock.name = NSLocalizedString(@"我的智能锁", nil);
+                NSString *subString = [peripheral.name substringWithRange:NSMakeRange(peripheral.name.length-6, 6)];
+                NSString *lockName = [NSString stringWithFormat:@"%@(%@)", NSLocalizedString(@"我的智能锁", nil), subString];
+                lock.name = lockName;
                 lock.address = peripheral.name;
                 lock.token = [User sharedUser].sessionToken;
                 lock.pwd = weakSelf.pwd;
@@ -181,7 +183,6 @@
 }
 
 - (void)writeData:(RLCharacteristic *)characteristic {
-//    Byte data[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0xcc, 0xbb, 0xaa, 0xff, 0xee, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0xcc, 0xbb, 0xaa, 0xff, 0xee};
     long long data = timestampSince1970();//[NSDate timeIntervalSinceReferenceDate]*1000;
     self.pwd = data;
     int size = sizeof(data);
