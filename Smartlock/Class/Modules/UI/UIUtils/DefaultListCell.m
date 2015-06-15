@@ -40,7 +40,7 @@ NSString *kCellIdentifier = @"cellIdentifier";
 
 #pragma mark - 
 - (void)setDefaultProperties {
-//    self.textLabel.font = [UIFont systemFontOfSize:20.0f];
+    self.textLabel.font = [UIFont systemFontOfSize:18.0f];
 //    self.imageView.frame = CGRectMake(0, 0, 35, 35);
 //    self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 }

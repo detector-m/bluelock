@@ -7,7 +7,7 @@
 //
 
 #import "TestViewController.h"
-#if 1
+#if 0
 #import "RLCharacteristic.h"
 #import "RLDefines.h"
 #import "RLPeripheral.h"
@@ -180,6 +180,8 @@
 #import "RLCycleScrollView.h"
 #import "RLScrollItem.h"
 
+#import "RLSecurityPolicy.h"
+
 @interface TestViewController () <RLCycleScrollViewDelegate>
 
 @end
@@ -189,33 +191,36 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = NSLocalizedString(@"测试", nil);
-
-    NSMutableArray *images = [NSMutableArray array];
-    RLScrollItem *item = [RLScrollItem new];
-    item.image = [UIImage imageNamed:@"h1.jpg"];
-    [images addObject:item];
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"Test" ofType:@"txt"];
+    NSData *data = [NSData dataWithContentsOfFile:path];
     
-    item = [RLScrollItem new];
-    item.image = [UIImage imageNamed:@"h2.jpg"];
-    [images addObject:item];
+//    NSString *str = @"abcdef";
+//    NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
+//    DLog(@"%@", data);
+//    Byte key[16] = {0};
+//    XXTEAFillRandomKey(key);
+//    data = XXTEAEncryptData(data, key);
+//    DLog(@"%@", data);
+//    
+//    data = XXTEADecryptData(data, key);
+//    DLog(@"%@", data);
+//    
+//    str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
-    item = [RLScrollItem new];
-    item.image = [UIImage imageNamed:@"h3.jpg"];
-    [images addObject:item];
+    long long timestamp = getTimestamp();
+    NSLog(@"%llx", timestamp);
     
-    item = [RLScrollItem new];
-    item.imageURL = @"https://ss0.baidu.com/-Po3dSag_xI4khGko9WTAnF6hhy/super/whfpf%3D425%2C260%2C50/sign=a41eb338dd33c895a62bcb3bb72e47c2/5fdf8db1cb134954a2192ccb524e9258d1094a1e.jpg";
-    [images addObject:item];
-//    NSArray *images = @[[UIImage imageNamed:@"h1.jpg"],
-//                        [UIImage imageNamed:@"h2.jpg"],
-//                        [UIImage imageNamed:@"h3.jpg"],
-//                        [UIImage imageNamed:@"h4.jpg"]
-//                        ];
-    CGFloat w = self.view.bounds.size.width;
-    RLCycleScrollView *cycleScrollView = [[RLCycleScrollView alloc] initWithFrame:CGRectMake(0, 60, w, 180)];
-    cycleScrollView.items = images;
-    cycleScrollView.delegate = self;
-    [self.view addSubview:cycleScrollView];
+    timestamp = getXorPwdTimestamp(timestamp);
+    NSLog(@"%x", offsetTotal(timestamp));
+    NSLog(@"%x", jumpNumber(timestamp));
+    
+    Byte *key = getKeyFromCertificate(timestamp, data);
+    NSLog(@"%s", key);
+    NSData *tokenData = [@"abcdefg" dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *desData = encryptWithVariableKey(tokenData, key);
+    desData = decryptWithVariableKey(desData, key);
+    
+    NSLog(@"%@", [[NSString alloc] initWithData:desData encoding:NSUTF8StringEncoding]);
 }
 
 @end

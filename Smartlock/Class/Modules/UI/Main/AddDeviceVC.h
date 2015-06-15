@@ -6,7 +6,7 @@
 //  Copyright (c) 2015年 RivenL. All rights reserved.
 //
 
-#import "BaseTableVC.h"
+#import "RLTableViewController.h"
 #import "LockCell.h"
 #import "LockModel.h"
 
@@ -16,7 +16,7 @@
 #import "BluetoothLockCommand.h"
 
 @class LockDevicesVC;
-@interface AddDeviceVC : BaseTableVC
+@interface AddDeviceVC : RLTableViewController
 //@property (nonatomic, weak) RLCentralManager *manager;
 
 @property (nonatomic, weak) LockDevicesVC *lockDevicesVC;

@@ -33,9 +33,9 @@
     
     self.title = NSLocalizedString(@"添加设备", nil);
     
-    CGRect frame = self.table.tableView.frame;
+    CGRect frame = self.view.frame;//self.table.tableView.frame;
     frame.size.height -= WarnLabelHeight;
-    self.table.tableView.rowHeight = 64.0f;
+    self.table.tableView.rowHeight = 60.0f;
     self.table.tableView.frame = frame;
     
     [self.view addSubview:self.warnLabel];
@@ -81,9 +81,6 @@
 }
 
 #pragma mark -
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.table.datas.count;
@@ -120,12 +117,10 @@
     if([self isAddedWithName:peripheral.name]) {
         cell.detailTextLabel.text = NSLocalizedString(@"已存在", nil);
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-//        cell.userInteractionEnabled = NO;
     }
     else {
         cell.detailTextLabel.text = NSLocalizedString(@"新设备", nil);
         cell.selectionStyle = UITableViewCellSelectionStyleDefault;
-//        cell.userInteractionEnabled = YES;
     }
     
     return cell;
@@ -133,7 +128,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSInteger index = [self indexForData:indexPath];
-
+    [self deselectRow];
     RLPeripheral *peripheral = [self.table.datas objectAtIndex:index];
     [self connectPeripheral:peripheral];
     [RLHUD hudProgressWithBody:NSLocalizedString(@"正在配对...", nil) onView:self.view.superview timeout:6.0f];

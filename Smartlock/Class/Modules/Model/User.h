@@ -12,4 +12,6 @@
 @property (nonatomic, copy) NSString *dqID;
 @property (nonatomic, copy) NSString *password;
 @property (nonatomic, copy) NSString *gid;
+
+@property (nonatomic, strong) NSData *certificazte;
 @end

@@ -12,7 +12,8 @@
 + (void)openNotificationPermission {
     // message category
     if([UIDevice currentDevice].systemVersion.floatValue < 8.0) {
-        [[UIApplication sharedApplication]registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound  categories:nil]];
+//        [[UIApplication sharedApplication]registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound  categories:nil]];    
+        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound];
         
         return;
     }
@@ -27,6 +28,11 @@
     [[UIApplication sharedApplication] registerUserNotificationSettings:notificationSettings];
 }
 + (void)openRemoteNotification {
+    if([UIDevice currentDevice].systemVersion.floatValue < 8.0) {
+        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound];
+        
+        return;
+    }
     [[UIApplication sharedApplication] registerForRemoteNotifications];
 }
 

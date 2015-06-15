@@ -8,6 +8,9 @@
 
 #import "UserOperationRequest.h"
 
+#import "RLSecurityPolicy.h"
+
+
 typedef void (^callbackBlock)(UserOperationResponse *, NSError *);
 static void callbackFunction(__weak callbackBlock block, id responseObject, NSError *error) {
     if(error) {
@@ -44,10 +47,10 @@ static void callbackFunction(__weak callbackBlock block, id responseObject, NSEr
 
 #pragma mark -
 + (NSDictionary *)paramaterForModifyNickname:(NSString *)nickname andToken:(NSString *)token {
-    return @{@"memberName" : nickname, @"accessToken" : token};
+    return @{@"memberName" : nickname, @"accessToken" : encryptedTokenToBase64(token, [User sharedUser].certificazte)};
 }
 
 + (NSDictionary *)paramaterForResetPwd:(NSString *)oldPwd newPwd:(NSString *)newPwd token:(NSString *)token {
-    return @{@"oldPassward": oldPwd, @"newPassward":newPwd, @"accessToken":token};
+    return @{@"oldPassward": oldPwd, @"newPassward":newPwd, @"accessToken":encryptedTokenToBase64(token, [User sharedUser].certificazte)};
 }
 @end

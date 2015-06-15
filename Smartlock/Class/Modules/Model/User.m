@@ -9,6 +9,7 @@
 #import "User.h"
 
 #import "MyCoreDataManager.h"
+#import "GTMBase64.h"
 
 @interface User ()
 @property (nonatomic, readwrite, assign) NSUInteger ID;
@@ -24,6 +25,8 @@
         self.dqID = [aDecoder decodeObjectForKey:@"dqID"];
         self.password = [aDecoder decodeObjectForKey:@"password"];
         self.gid = [aDecoder decodeObjectForKey:@"gid"];
+        
+        self.certificazte = [aDecoder decodeObjectForKey:@"certificazte"];
     }
     
     return self;
@@ -35,6 +38,8 @@
     [aCoder encodeObject:self.dqID forKey:@"dqID"];
     [aCoder encodeObject:self.password forKey:@"password"];
     [aCoder encodeObject:self.gid forKey:@"gid"];
+    
+    [aCoder encodeObject:self.certificazte forKey:@"certificazte"];
 }
 
 #pragma mark -
@@ -46,6 +51,8 @@
     self.dqID = user.dqID;
     self.password = user.password;
     self.gid = user.gid;
+    
+    self.certificazte = user.certificazte;
 }
 
 - (void)setWithParameters:(NSDictionary *)parameters {
@@ -64,5 +71,10 @@
     self.dqID = parameters[@"guestChikyugo"];
     self.gid = parameters[@"gid"];
     self.gender = [parameters[@"sex"] integerValue];
+    
+    NSString *string = parameters[@"zs"];
+    self.certificazte = [GTMBase64 webSafeDecodeString:string];
+    
+//    string = [GTMBase64 stringByWebSafeEncodingData:self.certificazte padded:NO];
 }
 @end

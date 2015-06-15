@@ -210,6 +210,11 @@
 		9613EFE71B2ABC1700632912 /* Voice.png in Resources */ = {isa = PBXBuildFile; fileRef = 9613EFE41B2ABC1700632912 /* Voice.png */; };
 		9613EFE81B2ABC1700632912 /* Voice@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9613EFE51B2ABC1700632912 /* Voice@2x.png */; };
 		9613EFE91B2ABC1700632912 /* Voice@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9613EFE61B2ABC1700632912 /* Voice@3x.png */; };
+		9613EFF71B2BD91500632912 /* GTMBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = 9613EFF51B2BD91500632912 /* GTMBase64.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		9613EFFA1B2BDDB900632912 /* XXTEA.m in Sources */ = {isa = PBXBuildFile; fileRef = 9613EFF91B2BDDB900632912 /* XXTEA.m */; };
+		9613EFFD1B2C00ED00632912 /* RLSecurityPolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9613EFFC1B2C00ED00632912 /* RLSecurityPolicy.m */; };
+		9613EFFF1B2C1E3400632912 /* Test.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9613EFFE1B2C1E3400632912 /* Test.txt */; };
+		9613F0021B2EBAE000632912 /* RLTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9613F0011B2EBAE000632912 /* RLTableViewController.m */; };
 		965D60771B12E28800F076BD /* KeyEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 965D60761B12E28800F076BD /* KeyEntity.m */; };
 		965D607A1B12E28900F076BD /* LockEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 965D60791B12E28900F076BD /* LockEntity.m */; };
 		9689234C1B0F0FAD00B3CBFE /* SubTitleListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9689234B1B0F0FAD00B3CBFE /* SubTitleListCell.m */; };
@@ -987,6 +992,16 @@
 		9613EFE41B2ABC1700632912 /* Voice.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Voice.png; sourceTree = "<group>"; };
 		9613EFE51B2ABC1700632912 /* Voice@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Voice@2x.png"; sourceTree = "<group>"; };
 		9613EFE61B2ABC1700632912 /* Voice@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Voice@3x.png"; sourceTree = "<group>"; };
+		9613EFF41B2BD91500632912 /* GTMBase64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMBase64.h; sourceTree = "<group>"; };
+		9613EFF51B2BD91500632912 /* GTMBase64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMBase64.m; sourceTree = "<group>"; };
+		9613EFF61B2BD91500632912 /* GTMDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMDefines.h; sourceTree = "<group>"; };
+		9613EFF81B2BDDB900632912 /* XXTEA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XXTEA.h; sourceTree = "<group>"; };
+		9613EFF91B2BDDB900632912 /* XXTEA.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XXTEA.m; sourceTree = "<group>"; };
+		9613EFFB1B2C00ED00632912 /* RLSecurityPolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLSecurityPolicy.h; sourceTree = "<group>"; };
+		9613EFFC1B2C00ED00632912 /* RLSecurityPolicy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLSecurityPolicy.m; sourceTree = "<group>"; };
+		9613EFFE1B2C1E3400632912 /* Test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Test.txt; sourceTree = "<group>"; };
+		9613F0001B2EBAE000632912 /* RLTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLTableViewController.h; sourceTree = "<group>"; };
+		9613F0011B2EBAE000632912 /* RLTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLTableViewController.m; sourceTree = "<group>"; };
 		965D60751B12E28800F076BD /* KeyEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyEntity.h; sourceTree = "<group>"; };
 		965D60761B12E28800F076BD /* KeyEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyEntity.m; sourceTree = "<group>"; };
 		965D60781B12E28900F076BD /* LockEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LockEntity.h; sourceTree = "<group>"; };
@@ -2776,6 +2791,20 @@
 			path = AlertLabel;
 			sourceTree = "<group>";
 		};
+		9613EFEA1B2BCC7800632912 /* Security */ = {
+			isa = PBXGroup;
+			children = (
+				9613EFF41B2BD91500632912 /* GTMBase64.h */,
+				9613EFF51B2BD91500632912 /* GTMBase64.m */,
+				9613EFF61B2BD91500632912 /* GTMDefines.h */,
+				9613EFF81B2BDDB900632912 /* XXTEA.h */,
+				9613EFF91B2BDDB900632912 /* XXTEA.m */,
+				9613EFFB1B2C00ED00632912 /* RLSecurityPolicy.h */,
+				9613EFFC1B2C00ED00632912 /* RLSecurityPolicy.m */,
+			);
+			path = Security;
+			sourceTree = "<group>";
+		};
 		9689236B1B1059BE00B3CBFE /* Records */ = {
 			isa = PBXGroup;
 			children = (
@@ -2855,6 +2884,7 @@
 				96BD78E01AAFECDB00CAF7A4 /* InfoPlist.strings */,
 				96BD78E61AAFED4900CAF7A4 /* Localizable.strings */,
 				96EED8561AC138E4000E53C0 /* Prefix.pch */,
+				9613EFFE1B2C1E3400632912 /* Test.txt */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -2901,6 +2931,8 @@
 				96BD78EE1AAFEF9900CAF7A4 /* RLBaseNavigationController.m */,
 				96BD790F1AB40AF700CAF7A4 /* RLBaseTableViewController.h */,
 				96BD79101AB40AF700CAF7A4 /* RLBaseTableViewController.m */,
+				9613F0001B2EBAE000632912 /* RLTableViewController.h */,
+				9613F0011B2EBAE000632912 /* RLTableViewController.m */,
 			);
 			path = RLViewControllers;
 			sourceTree = "<group>";
@@ -3068,6 +3100,7 @@
 		96BD799F1ABFE8D500CAF7A4 /* RLTools */ = {
 			isa = PBXGroup;
 			children = (
+				9613EFEA1B2BCC7800632912 /* Security */,
 				96B43BE11B0D750400E33264 /* Json */,
 				960A23B71AFCB28B002111E3 /* RLDate */,
 				960236F81AEF1E65005996E0 /* CoreData */,
@@ -4427,6 +4460,7 @@
 				96FC5AF81B16C7070076767B /* About.png in Resources */,
 				96002BDE1B16FB4D0072CF05 /* KeyIcon.png in Resources */,
 				96002BF41B1C3F240072CF05 /* DoorOpened.mp3 in Resources */,
+				9613EFFF1B2C1E3400632912 /* Test.txt in Resources */,
 				960237551AF75416005996E0 /* Cupid@2x.png in Resources */,
 				96DA3EB31ACAB82D00FAD340 /* Account@3x.png in Resources */,
 				960237511AF75416005996E0 /* Arrow.png in Resources */,
@@ -4677,7 +4711,9 @@
 				96EED7F41AC13742000E53C0 /* ZXRSSExpandedBlockParsedResult.m in Sources */,
 				96EED7A11AC13742000E53C0 /* ZXURIResultParser.m in Sources */,
 				96EED78B1AC13742000E53C0 /* ZXCalendarParsedResult.m in Sources */,
+				9613F0021B2EBAE000632912 /* RLTableViewController.m in Sources */,
 				96EED84F1AC13742000E53C0 /* ZXMultiFinderPatternFinder.m in Sources */,
+				9613EFFA1B2BDDB900632912 /* XXTEA.m in Sources */,
 				96EED7F71AC13742000E53C0 /* ZXRSSExpandedDecodedInformation.m in Sources */,
 				96DA44961AD8B17C00FAD340 /* RLRegister.m in Sources */,
 				960236C11AEE1627005996E0 /* XMPPvCardAvatarModule.m in Sources */,
@@ -4690,6 +4726,7 @@
 				96EED7A81AC13742000E53C0 /* ZXWifiResultParser.m in Sources */,
 				96EED8191AC13742000E53C0 /* ZXUPCAWriter.m in Sources */,
 				96EED7F61AC13742000E53C0 /* ZXRSSExpandedDecodedChar.m in Sources */,
+				9613EFF71B2BD91500632912 /* GTMBase64.m in Sources */,
 				96EED7AE1AC13742000E53C0 /* ZXWhiteRectangleDetector.m in Sources */,
 				96EED7921AC13742000E53C0 /* ZXGeoResultParser.m in Sources */,
 				96EED8511AC13742000E53C0 /* ZXQRCodeReader.m in Sources */,
@@ -4781,6 +4818,7 @@
 				96EED7C61AC13742000E53C0 /* ZXDimension.m in Sources */,
 				96EED8241AC13742000E53C0 /* ZXPDF417BarcodeValue.m in Sources */,
 				96DA440A1AD6577400FAD340 /* AFNetworkReachabilityManager.m in Sources */,
+				9613EFFD1B2C00ED00632912 /* RLSecurityPolicy.m in Sources */,
 				960236621AEE1627005996E0 /* XMPPDeprecatedDigestAuthentication.m in Sources */,
 				96DA44301AD670EC00FAD340 /* RLLocation.m in Sources */,
 				960236831AEE1627005996E0 /* XMPPResourceMemoryStorageObject.m in Sources */,
@@ -5089,7 +5127,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PROVISIONING_PROFILE = "86a0e64d-5d31-48de-9533-e35149c25fff";
+				PROVISIONING_PROFILE = "fc16101e-ef86-4510-8191-b8ee6d135c17";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -5125,7 +5163,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PROVISIONING_PROFILE = "86a0e64d-5d31-48de-9533-e35149c25fff";
+				PROVISIONING_PROFILE = "fc16101e-ef86-4510-8191-b8ee6d135c17";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -5153,7 +5191,7 @@
 					"$(PROJECT_DIR)/Smartlock/Class/XMPP/Vendor/libidn",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "86a0e64d-5d31-48de-9533-e35149c25fff";
+				PROVISIONING_PROFILE = "fc16101e-ef86-4510-8191-b8ee6d135c17";
 			};
 			name = Debug;
 		};
@@ -5179,7 +5217,7 @@
 					"$(PROJECT_DIR)/Smartlock/Class/XMPP/Vendor/libidn",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "86a0e64d-5d31-48de-9533-e35149c25fff";
+				PROVISIONING_PROFILE = "fc16101e-ef86-4510-8191-b8ee6d135c17";
 			};
 			name = Release;
 		};

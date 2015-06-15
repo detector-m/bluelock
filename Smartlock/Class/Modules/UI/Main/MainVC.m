@@ -119,7 +119,7 @@
 }
 
 - (void)setupBLCentralManaer {
-    self.manager = [RLBluetooth sharedBluetooth];//[RLCentralManager new];
+    self.manager = [RLBluetooth sharedBluetooth];
 }
 
 - (void)setupBackground {
@@ -193,16 +193,9 @@ static NSString *kBannersPage = @"advice.jsp";
 - (void)setupMainView {
     if(!self.scrollView) {
         CGRect frame = self.view.frame;
-//        CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
         CGFloat heightOffset = BannerViewHeight;
         
         self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, heightOffset, frame.size.width, frame.size.height-heightOffset)];
-//        if(screenHeight <= 480) {
-//            self.scrollView.contentSize = CGSizeMake(frame.size.width, self.scrollView.frame.size.height+80);
-//        }
-//        else {
-//
-//        }
         self.scrollView.contentSize = CGSizeMake(frame.size.width, self.scrollView.frame.size.height);
         self.scrollView.showsHorizontalScrollIndicator = NO;
         self.scrollView.showsVerticalScrollIndicator = NO;
@@ -214,7 +207,7 @@ static NSString *kBannersPage = @"advice.jsp";
         frame = self.scrollView.frame;
         
         self.cupidBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.cupidBtn.frame = CGRectMake(frame.size.width/2+60, 10, 80, 80);
+        self.cupidBtn.frame = CGRectMake(frame.size.width/2+60, 5, 80, 80);
         [self.cupidBtn setImage:[UIImage imageNamed:@"Cupid.png"] forState:UIControlStateNormal];
         [self.scrollView addSubview:self.cupidBtn];
         
@@ -227,7 +220,7 @@ static NSString *kBannersPage = @"advice.jsp";
         heightOffset = self.cupidBtn.frame.origin.y + self.cupidBtn.frame.size.height;
         
         self.openLockBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.openLockBtn.frame = CGRectMake(frame.size.width/2-LockSize, heightOffset-7, LockSize, LockSize+20);
+        self.openLockBtn.frame = CGRectMake(frame.size.width/2-LockSize, heightOffset-7, LockSize, LockSize+10);
         [self.openLockBtn setImage:[UIImage imageNamed:@"Lock.png"] forState:UIControlStateNormal];
         [self.openLockBtn setImage:[UIImage imageNamed:@"Unlock.png"] forState:UIControlStateSelected];
         [self.openLockBtn addTarget:self action:@selector(clickOpenLockBtn:) forControlEvents:UIControlEventTouchUpInside];
@@ -318,6 +311,7 @@ static NSString *kBannersPage = @"advice.jsp";
 
 - (void)unlockOpenLockBtn {
     self.openLockBtn.userInteractionEnabled = YES;
+    [self stopTimer];
 }
 
 - (void)cancelPerformSelector {
@@ -327,7 +321,6 @@ static NSString *kBannersPage = @"advice.jsp";
 
 static int retry = 0;
 - (void)clickOpenLockBtn:(UIButton *)button {
-
     if(!self.lockList.count) {
         [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"未检测到钥匙!", nil)];
         return;
@@ -341,7 +334,7 @@ static int retry = 0;
     self.openLockBtn.userInteractionEnabled = NO;
     __weak __typeof(self)weakSelf = self;
     [self cancelPerformSelector];
-    [self performSelector:@selector(unlockOpenLockBtn) withObject:nil afterDelay:8.f];
+    [self performSelector:@selector(unlockOpenLockBtn) withObject:nil afterDelay:6.f];
     [self startOpenLockAnimation1:button];
     
     [[RLBluetooth sharedBluetooth] scanBLPeripheralsWithCompletionBlock:^(NSArray *peripherals) {
@@ -367,9 +360,9 @@ static int retry = 0;
 
             RLPeripheral *peripheral = [[RLBluetooth sharedBluetooth] peripheralForName:key.keyOwner.address];
             if(peripheral) {
+#if 0
                 [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
-                    [weakSelf cancelPerformSelector];
-                    weakSelf.openLockBtn.userInteractionEnabled = YES;
+//                    [weakSelf cancelPerformSelector];
                     RLService *service = [[RLBluetooth sharedBluetooth] serviceForUUIDString:@"1910" withPeripheral:peripheral];
                     RLCharacteristic *characteristic = [[RLBluetooth sharedBluetooth] characteristicForNotifyWithService:service];
                     
@@ -392,7 +385,7 @@ static int retry = 0;
                             else if(cmdResponse.result.result == 0x00) {
                             }
                             else {
-                                [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"管理员实效，请重新配对！", nil)];
+                                [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"管理员失效，请重新配对！", nil)];
                                 return ;
                             }
                             [weakSelf openLockWithCharacteristic:innerCharacteristic withKey:key];
@@ -404,8 +397,7 @@ static int retry = 0;
                         }
                         
                         if(cmdResponse.cmd_code == 0x02) {
-                            if(!button.userInteractionEnabled) return ;
-//                            RLCharacteristic *innerCharacteristic = [[RLBluetooth sharedBluetooth] characteristicForUUIDString:@"fff2" withService:service];
+                            if(button.userInteractionEnabled) return ;
                             [weakSelf updateLockTimeWithCharacteristic:innerCharacteristic withKey:key];
                             [weakSelf openLock:key];
                         }
@@ -413,23 +405,70 @@ static int retry = 0;
                             NSData *data = [NSData dataWithBytes:cmdResponse.data length:cmdResponse.data_len];
                             
                             if(![data isEqualToData:self.dateData]) {
-//                                [weakSelf updateLockTimeWithCharacteristic:innerCharacteristic withKey:key];
                                 if(retry++ < 1) {
                                     [weakSelf updateLockTimeWithCharacteristic:innerCharacteristic withKey:key];
                                 }
                                 [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"时间同步失败！", nil)];
                             }
-//                            DLog(@"datedata == %@ ==========", data);
                         }
                     }];
                 }];
-                
+#else
+                [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
+                    RLService *service = [[RLBluetooth sharedBluetooth] serviceForUUIDString:@"1910" withPeripheral:peripheral];
+                    RLCharacteristic *characteristic = [[RLBluetooth sharedBluetooth] characteristicForNotifyWithService:service];
+                    
+                    [characteristic setNotifyValue:YES completion:^(NSError *error) {
+                        RLCharacteristic *innerCharacteristic = [[RLBluetooth sharedBluetooth] characteristicForUUIDString:@"fff2" withService:service];
+                        [weakSelf openLockWithCharacteristic:innerCharacteristic withKey:key];
+                        
+                    } onUpdate:^(NSData *data, NSError *error) {
+                        
+                        BL_response cmdResponse = responseWithBytes(( Byte *)[data bytes], data.length);
+                        Byte crc = CRCOfCMDBytes((Byte *)[data bytes], data.length);
+                        
+                        DLog(@"%@", data);
+                        RLCharacteristic *innerCharacteristic = [[RLBluetooth sharedBluetooth] characteristicForUUIDString:@"fff2" withService:service];
+                        
+                        if(cmdResponse.cmd_code == 0x03) {
+                            if(cmdResponse.result.result == 0x01) {
+                                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"时间同步失败！", nil)];
+                            }
+                            
+                            return ;
+                        }
+                        
+                        if(![weakSelf isLockResponseDataOK:cmdResponse withCRC:crc]) {
+                            return ;
+                        }
+                        
+                        if(cmdResponse.cmd_code == 0x02) {
+                            if(button.userInteractionEnabled) {
+                                return ;
+                            }
+                            
+                            Byte powerCode = cmdResponse.data[1];
+                            Byte updateTimeCode = cmdResponse.data[0];
+                            if(powerCode == 0x01) {
+                                [RLAlertLabel showInView:self.view withText:NSLocalizedString(@"电池电压过低，请更换电池！", nil) andFrame:CGRectMake(button.frame.origin.x+button.frame.size.width+10, button.frame.origin.y+button.frame.size.height+10, 140, 80)];
+                            }
+                            
+                            if(updateTimeCode == 0x01) {
+                                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"时间同步失败！", nil)];
+                                [weakSelf updateLockTimeWithCharacteristic:innerCharacteristic withKey:key];
+                            }
+                            
+                            [weakSelf openLock:key];
+                        }
+                    }];
+                }];
+#endif
                 return;
             }
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"没有可用的钥匙或设备！", nil)];
+            [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"没有可用的设备或钥匙！", nil)];
             [weakSelf cancelPerformSelector];
             weakSelf.openLockBtn.userInteractionEnabled = YES;
         });
@@ -449,9 +488,9 @@ static int retry = 0;
     button.userInteractionEnabled = NO;
     CGRect orignalFrame = self.arrow.frame;
     __weak __typeof(self)weakSelf = self;
-    [UIView animateKeyframesWithDuration:1.0f delay:0.0f options:UIViewAnimationCurveLinear | UIViewAnimationOptionAllowUserInteraction animations:^{
+    [UIView animateKeyframesWithDuration:0.5f delay:0.0f options:UIViewAnimationCurveLinear | UIViewAnimationOptionAllowUserInteraction animations:^{
         CGRect frame = self.arrow.frame;
-        frame.origin = button.center;//CGPointMake(self.openLockBtn.frame.origin.x, self.openLockBtn.frame.origin.y);
+        frame.origin = button.center;
         frame.origin.x += 10;
         frame.origin.y -= 22;
         weakSelf.arrow.frame = frame;
@@ -462,7 +501,7 @@ static int retry = 0;
             weakSelf.arrow.alpha = 0.0;
             button.selected = !button.selected;
             
-            [UIView animateKeyframesWithDuration:2.0f delay:5.0 options:UIViewAnimationCurveLinear | UIViewAnimationOptionAllowUserInteraction animations:^{
+            [UIView animateKeyframesWithDuration:0.5f delay:2.5f options:UIViewAnimationCurveLinear | UIViewAnimationOptionAllowUserInteraction animations:^{
                 weakSelf.arrow.alpha = 0.95;
             } completion:^(BOOL finished) {
                 weakSelf.arrow.alpha = 1.0;
@@ -595,6 +634,7 @@ static int retry = 0;
 
 #pragma mark - private methods
 - (void)openLock:(KeyModel *)key {
+    [self cancelPerformSelector];
     [self performSelectorOnMainThread:@selector(startOpenLockAnimation:) withObject:self.openLockBtn waitUntilDone:YES];
     if(key.type == kKeyTypeTimes) {
         if(key.validCount > 0) {
@@ -606,9 +646,6 @@ static int retry = 0;
     NSDictionary *record = createOpenLockRecord(key.ID, key.lockID);
     [[MyCoreDataManager sharedManager] insertObjectInObjectTable:record withTablename:NSStringFromClass([OpenLockRecord class])];
     [self updateRecords];
-//    [DeviceManager openLock:openLockRecordToString(record) token:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
-//        [[MyCoreDataManager sharedManager] updateObjectsInObjectTable:record withKey:@"keyID" contains:[NSNumber numberWithLongLong:key.ID] withTablename:NSStringFromClass([OpenLockRecord class])];
-//    }];
 }
 
 - (void)updateRecords {
@@ -633,11 +670,22 @@ static int retry = 0;
  *  @param key            key
  */
 - (void)openLockWithCharacteristic:(RLCharacteristic *)characteristic withKey:(KeyModel *)key {
-//- (void)writeDataToCharacteristic:(RLCharacteristic *)characteristic withKey:(KeyModel *)key {
+    
     int len = 0;
     long long data = key.keyOwner.pwd;
-    DLog(@"key invalid date = %@", key.invalidDate);
-    Byte *dateData = dateToBytes(&len, key.invalidDate.length? key.invalidDate: @"2015-12-18");
+    
+    Byte *dateData = nil;
+    
+    Byte cmdMode = 0x00; //管理员
+    if(key.userType == kUserTypeCommon) {
+        cmdMode = 0x01; //非管理员
+        dateData = dateToBytes(&len, key.invalidDate.length? key.invalidDate: @"2015-12-18");
+    }
+    else {
+        dateData = dateNowToBytes(&len);
+        self.dateData = [NSData dataWithBytes:dateData length:len];
+    }
+    
     int size = sizeof(data)+len;
     Byte *tempData = calloc(size, sizeof(Byte));
     memcpy(tempData, dateData, len);
@@ -650,10 +698,6 @@ static int retry = 0;
     NSData *writeData = [NSData dataWithBytes:tempData length:size];
     free(tempData);
     
-    Byte cmdMode = 0x00; //管理员
-    if(key.userType == kUserTypeCommon) {
-        cmdMode = 0x01; //非管理员
-    }
     [[RLBluetooth sharedBluetooth] writeDataToCharacteristic:characteristic cmdCode:0x02 cmdMode:cmdMode withDatas:writeData];
 }
 
@@ -755,8 +799,6 @@ static int retry = 0;
                         
                     } onUpdate:^(NSData *data, NSError *error) {
                         BL_response cmdResponse = responseWithBytes(( Byte *)[data bytes], data.length);
-//                        Byte crc = CRCOfCMDBytes((Byte *)[data bytes], data.length);
-                        
                         if(cmdResponse.cmd_code == 0x06) {
                             if(cmdResponse.result.result == 0x01) {
                                 [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"电池电压过低，请更换电池！", nil)];

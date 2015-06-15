@@ -43,7 +43,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 static NSString *kXMPPHostName = @"dqcc.com.cn";
 static const NSInteger kXMPPHostPort = 5222;
 static NSString *kXMPPDomain = @"dqcc.com.cn";
-static NSString *kXMPPResource = nil;
+static NSString *kXMPPResource = @"bluelock";
 static NSString *kXMPPAdmin = @"00000000";
 
 #pragma mark -

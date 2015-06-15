@@ -23,7 +23,8 @@
 @implementation ProfileCell
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     if(self = [super initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:reuseIdentifier]) {
-
+        self.textLabel.font = [UIFont systemFontOfSize:18.0f];
+        self.detailTextLabel.font = self.textLabel.font;
     }
     
     return self;

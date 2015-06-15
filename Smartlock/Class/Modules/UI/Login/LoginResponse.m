@@ -17,7 +17,7 @@
 
 - (instancetype)initWithResponseObject:(id)responseObject {
     if(self = [super initWithResponseObject:responseObject]) {
-        
+
     }
     
     return self;

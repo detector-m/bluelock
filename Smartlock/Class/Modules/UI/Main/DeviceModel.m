@@ -8,6 +8,8 @@
 
 #import "DeviceModel.h"
 
+#import "RLSecurityPolicy.h"
+
 @implementation DeviceModel
 - (instancetype)initWithParameters:(NSDictionary *)parameters {
     if(self = [super init]) {
@@ -29,26 +31,26 @@
 
 #pragma mark -
 + (NSDictionary *)lockListParameters:(NSString *)accessToken {
-    return @{@"accessToken":accessToken};
+    return @{@"accessToken":encryptedTokenToBase64(accessToken, [User sharedUser].certificazte)};
 }
 + (NSDictionary *)modifyKeyNameParameters:(NSInteger)keyId gid:(NSString *)gid token:(NSString *)token keyName:(NSString *)keyName {
-    return @{@"id":[RLTypecast integerToString:keyId], @"memberGid":gid, @"lockName":keyName, @"accessToken":token};
+    return @{@"id":[RLTypecast integerToString:keyId], @"memberGid":gid, @"lockName":keyName, @"accessToken":encryptedTokenToBase64(token, [User sharedUser].certificazte)};
 }
 
 + (NSDictionary *)keyListOfAdminParameters:(NSString *)token lockID:(NSUInteger)lockID {
-    return @{@"accessToken":token, @"bleLockId":[RLTypecast integerToString:lockID]};
+    return @{@"accessToken":encryptedTokenToBase64(token, [User sharedUser].certificazte), @"bleLockId":[RLTypecast integerToString:lockID]};
 }
 
 + (NSDictionary *)lockOrUnlockKeyParameters:(NSUInteger)keyID operation:(NSUInteger)operation token:(NSString *)token {
-    return @{@"bleKeyId":[RLTypecast integerToString:keyID], @"flag":[RLTypecast integerToString:operation], @"accessToken":token};
+    return @{@"bleKeyId":[RLTypecast integerToString:keyID], @"flag":[RLTypecast integerToString:operation], @"accessToken":encryptedTokenToBase64(token, [User sharedUser].certificazte)};
 }
 
 + (NSDictionary *)deleteKeyParameters:(NSUInteger)keyID token:(NSString *)token {
-    return @{@"bleKeyId":[RLTypecast integerToString:keyID], @"accessToken":token};
+    return @{@"bleKeyId":[RLTypecast integerToString:keyID], @"accessToken":encryptedTokenToBase64(token, [User sharedUser].certificazte)};
 }
 
 + (NSDictionary *)openLockParameters:(NSString *)recordList token:(NSString *)token {
-    return @{@"dataList":recordList, @"accessToken":token};
+    return @{@"dataList":recordList, @"accessToken":encryptedTokenToBase64(token, [User sharedUser].certificazte)};
 }
 
 @end

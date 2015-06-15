@@ -180,12 +180,12 @@
 //    
 //    [[MyCoreDataManager sharedManager] insertObjectInObjectTable:dict withTablename:NSStringFromClass([Message class])];
     
-    NSArray *messages = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([Message class])];
-    DLog(@"%@", messages);
-    for(Message *message in messages) {
-        DLog(@"%@", message.title);
-        DLog(@"%@", message.content);
-    }
+//    NSArray *messages = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([Message class])];
+//    DLog(@"%@", messages);
+//    for(Message *message in messages) {
+//        DLog(@"%@", message.title);
+//        DLog(@"%@", message.content);
+//    }
 #else
 //    MainVC *vc = [MainVC new];
 //    LoginVC *vc = [LoginVC new];

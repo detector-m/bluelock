@@ -10,6 +10,8 @@
 #import "RLTypecast.h"
 #import "RLUtilitiesMethods.h"
 
+#import "RLSecurityPolicy.h"
+
 @implementation LoginModel
 - (NSDictionary *)toDictionary {
     NSMutableDictionary *parameters = nil;
@@ -26,7 +28,7 @@
 }
 
 + (NSDictionary *)logoutWithToken:(NSString *)token {
-    NSDictionary *parameters = @{@"accessToken":token};
+    NSDictionary *parameters = @{@"accessToken":encryptedTokenToBase64(token, [User sharedUser].certificazte)};
     
     return parameters;
 }
