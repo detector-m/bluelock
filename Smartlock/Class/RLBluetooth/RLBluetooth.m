@@ -12,7 +12,7 @@
 @interface RLBluetooth ()
 @property (nonatomic, readwrite, strong) RLCentralManager *manager;
 
-@property (nonatomic, strong) void (^connectedCallback)();
+@property (atomic, copy) void (^connectedCallback)(NSError *error);
 @end
 
 @implementation RLBluetooth
@@ -75,7 +75,7 @@ static RLBluetooth *_sharedBluetooth = nil;
     [self disconnectAllPeripherals];
 }
 
-- (void)connectPeripheral:(RLPeripheral *)peripheral withConnectedBlock:(void (^)())callback {
+- (void)connectPeripheral:(RLPeripheral *)peripheral withConnectedBlock:(void (^)(NSError *error))callback {
     __weak __typeof(self)weakSelf = self;
     if(callback) {
         self.connectedCallback = nil;
@@ -84,7 +84,7 @@ static RLBluetooth *_sharedBluetooth = nil;
     RLPeripheralConnectionCallback peripheralConnectionCallback = ^(NSError *error) {
         if(error) {
             if(weakSelf.connectedCallback) {
-                weakSelf.connectedCallback();
+                weakSelf.connectedCallback(error);
             }
             self.connectedCallback = nil;
             NSLog(@"error = %@", error);
@@ -135,6 +135,8 @@ static RLBluetooth *_sharedBluetooth = nil;
     
     RLPeripheralDiscoverServicesCallback discoverPeripheralServicesCallback = ^(NSArray *services, NSError *error) {
         if(error) {
+            if(self.connectedCallback)
+                self.connectedCallback(error);
             weakSelf.connectedCallback = nil;
             NSLog(@"error = %@", error);
             
@@ -152,15 +154,16 @@ static RLBluetooth *_sharedBluetooth = nil;
 - (void)discoverServiceCharacteristicsWithService:(RLService *)service {
     RLServiceDiscoverCharacteristicsCallback discoverServiceCharacteristicsCallback = ^(NSArray *characteristics, NSError *error) {
         if(error) {
+            if(self.connectedCallback)
+                self.connectedCallback(error);
             self.connectedCallback = nil;
             NSLog(@"error = %@", error);
             return;
         }
         
         if(self.connectedCallback) {
-            self.connectedCallback();
+            self.connectedCallback(nil);
         }
-        
 //        self.connectedCallback = nil;
     };
     

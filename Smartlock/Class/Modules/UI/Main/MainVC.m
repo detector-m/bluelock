@@ -432,16 +432,33 @@ static int retry = 0;
                     }];
                 }];
 #else
-                [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
+                [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^(NSError *error){
+                    if(error) {
+                        [self cancelPerformSelector];
+                        weakSelf.openLockBtn.userInteractionEnabled = YES;
+                        [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"检查设备是否良好！", nil)];
+                        return ;
+                    }
+                    
                     RLService *service = [[RLBluetooth sharedBluetooth] serviceForUUIDString:@"1910" withPeripheral:peripheral];
                     RLCharacteristic *characteristic = [[RLBluetooth sharedBluetooth] characteristicForNotifyWithService:service];
                     
                     [characteristic setNotifyValue:YES completion:^(NSError *error) {
+                        [peripheral setDisconnectCallbackBlock:^(NSError *error) {
+                            if(error) return ;
+                            weakSelf.openLockBtn.userInteractionEnabled = YES;
+                            [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"连接已断开！", nil)];
+                        }];
                         RLCharacteristic *innerCharacteristic = [[RLBluetooth sharedBluetooth] characteristicForUUIDString:@"fff2" withService:service];
                         [weakSelf openLockWithCharacteristic:innerCharacteristic withKey:key];
                         
                     } onUpdate:^(NSData *data, NSError *error) {
-                        
+                        if(data.length == 0 || error) {
+                            [self cancelPerformSelector];
+                            weakSelf.openLockBtn.userInteractionEnabled = YES;
+                            [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"检查设备是否良好！", nil)];
+                            return ;
+                        }
                         BL_response cmdResponse = responseWithBytes(( Byte *)[data bytes], data.length);
                         Byte crc = CRCOfCMDBytes((Byte *)[data bytes], data.length);
                         
@@ -464,6 +481,7 @@ static int retry = 0;
                         }
                         
                         if(cmdResponse.cmd_code == 0x02) {
+                            [peripheral setDisconnectCallbackBlock:nil];
                             if(button.userInteractionEnabled) {
                                 return ;
                             }
@@ -505,6 +523,8 @@ static int retry = 0;
     if(![User getVoiceSwitch]) {
         [[SoundManager sharedManager] playSound:@"DoorOpened.mp3" looping:NO];
     }
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+
     button.userInteractionEnabled = NO;
     CGRect orignalFrame = self.arrow.frame;
     __weak __typeof(self)weakSelf = self;
@@ -813,7 +833,11 @@ static int retry = 0;
             
             RLPeripheral *peripheral = [[RLBluetooth sharedBluetooth] peripheralForName:key.keyOwner.address];
             if(peripheral) {
-                [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
+                [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^(NSError *error){
+                    if(error) {
+                        [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"检查设备是否良好！", nil)];
+                        return ;
+                    }
                     RLService *service = [[RLBluetooth sharedBluetooth] serviceForUUIDString:@"1910" withPeripheral:peripheral];
                     RLCharacteristic *characteristic = [[RLBluetooth sharedBluetooth] characteristicForNotifyWithService:service];
                     

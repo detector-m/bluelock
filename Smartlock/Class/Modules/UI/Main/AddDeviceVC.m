@@ -146,7 +146,11 @@
     if(peripheral == nil)
         return;
     __weak __typeof(self)weakSelf = self;
-    [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
+    [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^(NSError *error) {
+        if(error) {
+            [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"检查设备是否良好！", nil)];
+            return ;
+        }
         RLService *service = [[RLBluetooth sharedBluetooth] serviceForUUIDString:@"1910" withPeripheral:peripheral];
         RLCharacteristic *characteristic = [[RLBluetooth sharedBluetooth] characteristicForNotifyWithService:service];
         

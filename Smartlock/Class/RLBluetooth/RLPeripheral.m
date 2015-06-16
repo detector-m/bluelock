@@ -201,6 +201,11 @@ NSString * const kConnectionMissingErrorMessage = @"BLE Device is not connected"
     
     return wrapper;
 }
+
+#pragma mark -
+- (void)setDisconnectCallbackBlock:(RLPeripheralConnectionCallback)block {
+    self.disconnectBlock = block;
+}
 /*----------------------------------------------------*/
 #pragma mark - CBPeripheral Delegate -
 /*----------------------------------------------------*/

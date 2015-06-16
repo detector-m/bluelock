@@ -27,7 +27,7 @@
 - (void)scanBLPeripheralsWithCompletionBlock:(void (^)(NSArray *peripherals))completionCallback;
 - (void)removeBLPeripherals;
 
-- (void)connectPeripheral:(RLPeripheral *)peripheral withConnectedBlock:(void (^)())callback;
+- (void)connectPeripheral:(RLPeripheral *)peripheral withConnectedBlock:(void (^)(NSError *error))callback;
 - (void)disconnectAllPeripherals;
 - (void)disconnectPeripheral:(RLPeripheral *)peripheral;
 

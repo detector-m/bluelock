@@ -42,7 +42,7 @@
     self.title = NSLocalizedString(@"消息", nil);
     self.table.tableView.rowHeight = 66.0f;
     NSArray *messages = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([Message class])];
-    [self.table addObjectFromArray:messages];
+    [self.table addObjectFromArray:[self reverseArray:messages]];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage) name:(NSString *)kReceiveMessage object:nil];
 }
@@ -54,12 +54,17 @@
 
     NSArray *messages = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([Message class])];
     
-    [self.table.datas addObjectsFromArray:messages];
+    [self.table.datas addObjectsFromArray:[self reverseArray:messages]];
     
     __weak typeof(self)weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         [weakSelf.table.tableView reloadData];
     });
+}
+
+#pragma mark -
+- (NSArray *)reverseArray:(NSArray *)array {
+    return [[array reverseObjectEnumerator] allObjects];
 }
 
 #pragma mark -

@@ -157,7 +157,7 @@
     if(!wrapper) {
         wrapper = [[RLPeripheral alloc] initWithPeripheral:peripheral manager:self];
         [self.scannedPeripherals addObject:wrapper];
-        NSLog(@"------------------ \r\n 发现设备:%@",self.scannedPeripherals);
+        NSLog(@"-- \r\n 发现设备:uuids = %@ --",self.scannedPeripherals);
     }
     
     return wrapper;
@@ -208,7 +208,7 @@
 //连接外设成功
 - (void)centralManager:(CBCentralManager *)central
   didConnectPeripheral:(CBPeripheral *)peripheral {
-    NSLog(@"Did connect toperipheral: %@", peripheral);
+    NSLog(@"Did connect toperipheral: %@ name = %@", peripheral, peripheral.name);
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [[self wrapperByPeripheral:peripheral] handleConnectionWithError:nil];
@@ -227,11 +227,12 @@ didFailToConnectPeripheral:(CBPeripheral *)peripheral
 
 //断开连接
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
-    NSLog(@"did disconnect peripheral %@", peripheral);
+    NSLog(@"did disconnect peripheral %@ name = %@", peripheral, peripheral.name);
+    __weak __typeof(self)weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
-        RLPeripheral *rlPeripheral = [self wrapperByPeripheral:peripheral];
+        RLPeripheral *rlPeripheral = [weakSelf wrapperByPeripheral:peripheral];
         [rlPeripheral handleDisconnectWithError:error];
-        [self.scannedPeripherals removeObject:rlPeripheral];
+        [weakSelf.scannedPeripherals removeObject:rlPeripheral];
     });
 }
 @end

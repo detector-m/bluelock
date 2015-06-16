@@ -56,4 +56,7 @@ typedef void (^RLperipheralRSSIValueCallback)(NSNumber *RSSI, NSError *error);;
 - (void)handleConnectionWithError:(NSError *)error;
 - (void)handleDisconnectWithError:(NSError *)error;
 /*----------------------------------------------------*/
+
+#pragma mark -
+- (void)setDisconnectCallbackBlock:(RLPeripheralConnectionCallback)block;
 @end
