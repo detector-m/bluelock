@@ -19,4 +19,6 @@
 - (void)removeKey:(KeyModel *)key;
 
 - (void)loadLockList;
+
+- (NSArray *)locks;
 @end

@@ -33,6 +33,8 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
+    [self.table.datas removeAllObjects];
+    [self.table addObjectFromArray:[self.mainVC locks]];
     [self.table.tableView reloadData];
 }
 

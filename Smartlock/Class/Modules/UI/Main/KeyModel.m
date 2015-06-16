@@ -19,7 +19,8 @@ static NSString *kInvalidDateString = @"1970-01-01";
     if(self = [super initWithParameters:parameters]) {
         self.keyStatus = self.status;
         self.type = [parameters[@"keyType"] integerValue];
-        self.userType = [parameters[@"userType"] integerValue];        self.name = [parameters objectForKey:@"lockName"];
+        self.userType = [parameters[@"userType"] integerValue];
+        self.name = [parameters objectForKey:@"lockName"];
         if(self.type == kKeyTypeForever) {
             self.invalidDate = kForeverDateString;
         }

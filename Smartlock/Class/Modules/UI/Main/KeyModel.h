@@ -16,7 +16,6 @@ typedef NS_ENUM(NSInteger, KeyStatus) {
 };
 
 typedef NS_ENUM(NSInteger, UserType) {
-    kUserTypeNone,
     kUserTypeAdmin = 0,
     kUserTypeCommon,
 };

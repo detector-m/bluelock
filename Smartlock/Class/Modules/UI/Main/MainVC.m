@@ -281,13 +281,29 @@ static NSString *kBannersPage = @"advice.jsp";
     return button;
 }
 
+- (NSArray *)sortLockForList:(NSArray *)list {
+    return [list sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        KeyModel *key1 = obj1;
+        KeyModel *key2 = obj2;
+        if(key1.userType < key2.userType)
+            return NSOrderedAscending;
+        else if (key1.userType > key2.userType)
+            return NSOrderedDescending;
+        return NSOrderedSame;
+    }];
+}
+
 - (void)loadLockList {
     __weak __typeof(self)weakSelf = self;
     [weakSelf.lockList removeAllObjects];
     NSArray *array = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([KeyEntity class])];
+    NSMutableArray *tempList = [NSMutableArray array];
     for(KeyEntity *key in array) {
-        [weakSelf.lockList addObject:[[KeyModel alloc] initWithKeyEntity:key]];
+        [tempList addObject:[[KeyModel alloc] initWithKeyEntity:key]];
     }
+    
+    NSArray *list = [self sortLockForList:tempList];
+    [weakSelf.lockList addObjectsFromArray:list];
     [self loadLockListFromNet];
 }
 
@@ -300,8 +316,10 @@ static NSString *kBannersPage = @"advice.jsp";
         self.isLockListLoading = NO;
         if(error || !response.list.count) return;
 
+        NSArray *list = [weakSelf sortLockForList:response.list];
         [weakSelf.lockList removeAllObjects];
-        [weakSelf.lockList addObjectsFromArray:response.list];
+        [weakSelf.lockList addObjectsFromArray:list];
+        
         [[MyCoreDataManager sharedManager] deleteAllTableObjectInTable:NSStringFromClass([KeyEntity class])];
         for(KeyModel *key in weakSelf.lockList) {
             [[MyCoreDataManager sharedManager] insertUpdateObjectInObjectTable:keyEntityDictionaryFromKeyModel(key) updateOnExistKey:@"keyID" withTablename:NSStringFromClass([KeyEntity class])];
@@ -427,11 +445,14 @@ static int retry = 0;
                         BL_response cmdResponse = responseWithBytes(( Byte *)[data bytes], data.length);
                         Byte crc = CRCOfCMDBytes((Byte *)[data bytes], data.length);
                         
-                        DLog(@"%@", data);
+//                        DLog(@"%@", data);
                         RLCharacteristic *innerCharacteristic = [[RLBluetooth sharedBluetooth] characteristicForUUIDString:@"fff2" withService:service];
                         
                         if(cmdResponse.cmd_code == 0x03) {
-                            if(cmdResponse.result.result == 0x01) {
+                            NSData *data = [NSData dataWithBytes:cmdResponse.data length:cmdResponse.data_len];
+                            
+                            if(![data isEqualToData:self.dateData]) {
+//                            if(cmdResponse.result.result == 0x01) {
                                 [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"时间同步失败！", nil)];
                             }
                             
@@ -454,7 +475,6 @@ static int retry = 0;
                             }
                             
                             if(updateTimeCode == 0x01) {
-                                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"时间同步失败！", nil)];
                                 [weakSelf updateLockTimeWithCharacteristic:innerCharacteristic withKey:key];
                             }
                             
@@ -501,7 +521,7 @@ static int retry = 0;
             weakSelf.arrow.alpha = 0.0;
             button.selected = !button.selected;
             
-            [UIView animateKeyframesWithDuration:0.5f delay:2.5f options:UIViewAnimationCurveLinear | UIViewAnimationOptionAllowUserInteraction animations:^{
+            [UIView animateKeyframesWithDuration:0.5f delay:3.5f options:UIViewAnimationCurveLinear | UIViewAnimationOptionAllowUserInteraction animations:^{
                 weakSelf.arrow.alpha = 0.95;
             } completion:^(BOOL finished) {
                 weakSelf.arrow.alpha = 1.0;
@@ -538,7 +558,7 @@ static int retry = 0;
 - (void)clickMyDeviceBtn:(UIButton *)button {
     LockDevicesVC *vc = [LockDevicesVC new];
     vc.mainVC = self;
-    [vc.table addObjectFromArray:self.lockList];
+//    [vc.table addObjectFromArray:self.lockList];
     [self.navigationController pushViewController:vc animated:YES];
 }
 
@@ -630,6 +650,10 @@ static int retry = 0;
     
     self.messageBadgeLabel.hidden = NO;
     self.messageBadgeLabel.text = [NSString stringWithFormat:@"%li", (long)messageBadgeNumber];
+}
+
+- (NSArray *)locks {
+    return self.lockList;
 }
 
 #pragma mark - private methods

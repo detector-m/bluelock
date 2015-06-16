@@ -63,10 +63,16 @@
     
     [[RLBluetooth sharedBluetooth] scanBLPeripheralsWithCompletionBlock:^(NSArray *peripherals) {
         [self.table.datas removeAllObjects];
-        if(!peripherals.count) return ;
+        if(!peripherals.count) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf.table.tableView reloadData];
+            });
+            return ;
+        }
         for(RLPeripheral *peripheral in peripherals) {
             if(peripheral.name.length == 0)
                 continue;
+            if(![peripheral.name hasPrefix:PeripheralPreStr]) continue;
             [weakSelf.table.datas addObject:peripheral];
         }
         
@@ -129,12 +135,16 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSInteger index = [self indexForData:indexPath];
     [self deselectRow];
+    if(!self.table.datas.count) return;
     RLPeripheral *peripheral = [self.table.datas objectAtIndex:index];
     [self connectPeripheral:peripheral];
     [RLHUD hudProgressWithBody:NSLocalizedString(@"正在配对...", nil) onView:self.view.superview timeout:6.0f];
 }
 
+#pragma mark -
 - (void)connectPeripheral:(RLPeripheral *)peripheral {
+    if(peripheral == nil)
+        return;
     __weak __typeof(self)weakSelf = self;
     [[RLBluetooth sharedBluetooth] connectPeripheral:peripheral withConnectedBlock:^{
         RLService *service = [[RLBluetooth sharedBluetooth] serviceForUUIDString:@"1910" withPeripheral:peripheral];

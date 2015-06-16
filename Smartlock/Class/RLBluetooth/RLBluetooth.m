@@ -216,7 +216,6 @@ static RLBluetooth *_sharedBluetooth = nil;
 #pragma mark - 
 - (RLPeripheral *)peripheralForName:(NSString *)name {
     for(RLPeripheral *peripheral in self.peripherals) {
-        DLog(@"%@", peripheral.name);
         if([peripheral.name isEqualToString:name]) {
             return peripheral;
         }

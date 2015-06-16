@@ -10,6 +10,8 @@
 
 #import "RLService.h"
 #import "RLCharacteristic.h"
+
+#define PeripheralPreStr @"YJLOCK"
 /*----------------------------------------------------*/
 #pragma mark - Callback types 
 typedef void (^RLPeripheralConnectionCallback)(NSError *error);

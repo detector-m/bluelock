@@ -89,7 +89,7 @@
             return ;
         }
         
-        [RLHUD hudAlertSuccessWithBody:NSLocalizedString(@"秘密更改成功", nil) dimissBlock:^{
+        [RLHUD hudAlertSuccessWithBody:NSLocalizedString(@"密码更改成功", nil) dimissBlock:^{
             [Login logout];
         }];
     }];
