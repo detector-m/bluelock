@@ -104,7 +104,10 @@
     NotificationMessageCell *cell = [tableView dequeueReusableCellWithIdentifier:(NSString *)kCellIdentifier forIndexPath:indexPath];
     NSInteger index = [self indexForData:indexPath];
     Message *message = [self.table.datas objectAtIndex:index];
-    cell.textLabel.text = NSLocalizedString(@"永家科技", nil); //message.from;//[self.table.datas objectAtIndex:index];
+
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    NSString *displayname = [infoDictionary objectForKey:@"CFBundleDisplayName"];
+    cell.textLabel.text = displayname;//NSLocalizedString(@"永家科技", nil);
     cell.imageView.image = [UIImage imageNamed:@"MessageAvater.png"];
     cell.detailTextLabel.text = message.content;
     cell.timeLabel.text = timeStringWithTimestamp([message.timestamp longLongValue]);

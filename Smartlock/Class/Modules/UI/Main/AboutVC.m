@@ -111,7 +111,9 @@
         cell.accessoryType = UITableViewCellAccessoryNone;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        cell.detailTextLabel.text = NSLocalizedString(@"永家科技", nil);
+        NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+        NSString *displayname = [infoDictionary objectForKey:@"CFBundleDisplayName"];
+        cell.detailTextLabel.text = displayname;
     }
     return cell;
 }
