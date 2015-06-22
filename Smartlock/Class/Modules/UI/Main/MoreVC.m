@@ -33,12 +33,12 @@ static NSString *kSetupWebPage = @"help.jsp";
     [self.table.datas addObject:@"声音🔊"];
     [self.table.datas addObject:@"关于公司"];
     [self.table.datas addObject:@"帮助"];
-    [self.table.datas addObject:@"安装教程"];
+//    [self.table.datas addObject:@"安装教程"];
     
     [self->imageArray addObject:@"Voice.png"];
     [self->imageArray addObject:@"About.png"];
     [self->imageArray addObject:@"Help.png"];
-    [self->imageArray addObject:@"SetupNav.png"];
+//    [self->imageArray addObject:@"SetupNav.png"];
 }
 
 #pragma mark -
@@ -113,11 +113,11 @@ static NSString *kSetupWebPage = @"help.jsp";
             vc.title = NSLocalizedString(@"帮助", nil);
         }
             break;
-        case 3: {
-            vc.url = [kRLHTTPMobileBaseURLString stringByAppendingString:kSetupWebPage];;
-            vc.title = NSLocalizedString(@"安装教程", nil);
-        }
-            break;
+//        case 3: {
+//            vc.url = [kRLHTTPMobileBaseURLString stringByAppendingString:kSetupWebPage];;
+//            vc.title = NSLocalizedString(@"安装教程", nil);
+//        }
+//            break;
             
         default:
             return;

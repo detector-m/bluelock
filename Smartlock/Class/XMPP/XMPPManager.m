@@ -447,19 +447,11 @@ void postNotificationWithNone(const NSString *notificationName) {
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
     DDLogVerbose(@"message = %@", message);
     
-    if([message.type isEqualToString:@"chat"] || ![message.from.user isEqualToString:kXMPPAdmin] || ![message.from.domain isEqualToString:kXMPPDomain] || ![message.from.user isEqualToString:kXMPPResource]) {
+    if([message.type isEqualToString:@"chat"] || ![message.from.user isEqualToString:kXMPPAdmin] || ![message.from.domain isEqualToString:kXMPPDomain] || ![message.from.resource hasPrefix:kXMPPResource]) {
         return;
     }
-#if 0
-//    SystemSoundID soundID;
-    NSString *strSoundFile = [[NSBundle mainBundle] pathForResource:@"alertsound" ofType:@"wav"];
-//    AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:strSoundFile],&soundID);
-//    AudioServicesPlaySystemSound(soundID);
-//    [[SoundManager sharedManager] playSound:strSoundFile];
-#endif
     
     if([Message messageTypeWithXMPPMessage:message] == 101) {
-//        [Login hudAlertLogout];
         return;
     }
     else if([Message messageTypeWithXMPPMessage:message] == 105) {

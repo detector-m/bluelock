@@ -887,6 +887,19 @@ static int retry = 0;
 #endif
 
 #pragma mark - UIWebViewDelegate
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    //判断是否是单击
+    if (navigationType == UIWebViewNavigationTypeLinkClicked) {
+        NSURL *url = [request URL];
+        if([[UIApplication sharedApplication]canOpenURL:url]) {
+            [[UIApplication sharedApplication]openURL:url];
+            
+            return NO;
+        }
+    }
+    return YES;
+}
+
 - (void)webViewDidStartLoad:(UIWebView *)webView {
     self.isBannersLoaded = NO;
     self.isBannersLoading = YES;
