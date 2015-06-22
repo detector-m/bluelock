@@ -128,18 +128,22 @@ BOOL freeBLCMDData(const Byte *data) {
 //}
 
 static Byte date[6] = {0};
+void fillDateDatas(Byte *dateDatas, int len, NSDateComponents *dateComponents) {
+    int i = 0;
+    dateDatas[i++] = dateComponents.year - 2000;
+    dateDatas[i++] = dateComponents.month;
+    dateDatas[i++] = dateComponents.day;
+    dateDatas[i++] = dateComponents.hour;
+    dateDatas[i++] = dateComponents.minute;
+    dateDatas[i] = dateComponents.second;
+}
+
 Byte *dateToBytes(int * const len, NSString * const dateString) {
     if(!len || !dateString || dateString.length == 0)
         return NULL;
     NSDateComponents *dateComponents = [RLDate dateComponentsWithDate:[RLDate dateFromString:dateString]];
     *len = sizeof(date);
-    int i = 0;
-    date[i++] = dateComponents.year - 2000;
-    date[i++] = dateComponents.month;
-    date[i++] = dateComponents.day;
-    date[i++] = dateComponents.hour;
-    date[i++] = dateComponents.minute;
-    date[i] = dateComponents.second;
+    fillDateDatas(date, *len, dateComponents);
     
     return date;
 }
@@ -149,16 +153,13 @@ Byte *dateNowToBytes(int * const len) {
         return NULL;
     NSDateComponents *dateComponents = [RLDate dateComponentsNow];
     *len = sizeof(date);
-    int i = 0;
-    date[i++] = dateComponents.year - 2000;
-    date[i++] = dateComponents.month;
-    date[i++] = dateComponents.day;
-    date[i++] = dateComponents.hour;
-    date[i++] = dateComponents.minute;
-    date[i] = dateComponents.second;
+    
+    fillDateDatas(date, *len, dateComponents);
     
     return date;
 }
+
+#pragma mark -
 //cmd response
 static Byte BL_responseData[240] = {0};
 BL_response responseWithBytes(Byte *bytes, NSInteger length) {

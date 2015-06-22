@@ -12,7 +12,8 @@
 #import "LockDevicesVC.h"
 #import "SendKeyVC.h"
 #import "ProfileVC.h"
-#import "BuyVC.h"
+//#import "BuyVC.h"
+#import "AboutVC.h"
 #import "NotificationMessageVC.h"
 #import "MoreVC.h"
 
@@ -31,6 +32,9 @@
 
 #import "DeviceManager.h"
 
+#pragma mark -
+#import "RLSecurityPolicy.h"
+
 @interface MainVC () <UIWebViewDelegate> //<RLCycleScrollViewDelegate>
 
 #pragma mark -
@@ -46,7 +50,8 @@
 @property (nonatomic, strong) UIButton *myDeviceBtn;
 @property (nonatomic, strong) UIButton *sendKeyBtn;
 @property (nonatomic, strong) UIButton *profileBtn;
-@property (nonatomic, strong) UIButton *buyBtn;
+//@property (nonatomic, strong) UIButton *buyBtn;
+@property (nonatomic, strong) UIButton *aboutBtn;
 @property (nonatomic, strong) UIButton *messageBtn;
 @property (nonatomic, strong) UIButton *moreBtn;
 
@@ -162,7 +167,7 @@
 }
 
 static CGFloat BannerViewHeight = 120.0f;
-static NSString *kBannersPage = @"advice.jsp";
+static NSString *kBannersPage = @"/bleLock/advice.jhtml";
 - (void)loadBannersRequest {
     if(!self.isBannersLoaded && !self.isBannersLoading) {
         self.isBannersLoading = YES;
@@ -172,6 +177,7 @@ static NSString *kBannersPage = @"advice.jsp";
 
 - (NSURLRequest *)requestForBanners:(NSString *)aUrl {
     DLog(@"%@", aUrl);
+    aUrl = [aUrl stringByAppendingString:[NSString stringWithFormat:@"?accessToken=%@", encryptedTokenToBase64([User sharedUser].sessionToken, [User sharedUser].certificazte)]];
     NSURL *newsUrl = [NSURL URLWithString:[aUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     NSURLRequest *request = [[NSURLRequest alloc] initWithURL:newsUrl];
     return request;
@@ -179,7 +185,7 @@ static NSString *kBannersPage = @"advice.jsp";
 
 - (void)setupBanners {
     CGFloat ratio = (3.0/1.0);
-    self.bannersUrl = [kRLHTTPMobileBaseURLString stringByAppendingString:kBannersPage];
+    self.bannersUrl = [kRLHTTPAPIBaseURLString stringByAppendingString:kBannersPage];
     CGRect frame = self.view.frame;
     BannerViewHeight = frame.size.width/ratio;
     self.bannersView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, BannerViewHeight)];
@@ -245,8 +251,11 @@ static NSString *kBannersPage = @"advice.jsp";
         
         heightOffset += btnHeight + 5;
         btnWidthOffset = 15;
-        self.buyBtn = [self buttonWithTitle:NSLocalizedString(@"购买", nil) selector:@selector(clickBuyBtn:) frame:CGRectMake(btnWidthOffset, heightOffset, btnWidth, btnHeight)];
-        [self.scrollView addSubview:self.buyBtn];
+//        self.buyBtn = [self buttonWithTitle:NSLocalizedString(@"购买", nil) selector:@selector(clickBuyBtn:) frame:CGRectMake(btnWidthOffset, heightOffset, btnWidth, btnHeight)];
+//        [self.scrollView addSubview:self.buyBtn];
+        
+        self.aboutBtn = [self buttonWithTitle:NSLocalizedString(@"关于", nil) selector:@selector(clickAboutBtn:) frame:CGRectMake(btnWidthOffset, heightOffset, btnWidth, btnHeight)];
+        [self.scrollView addSubview:self.aboutBtn];
     
         btnWidthOffset += 5+btnWidth;
         self.messageBtn = [self buttonWithTitle:NSLocalizedString(@"消息", nil) selector:@selector(clickMessageBtn:) frame:CGRectMake(btnWidthOffset, heightOffset, btnWidth, btnHeight)];
@@ -475,6 +484,11 @@ static int retry = 0;
                             
                             return ;
                         }
+                        if(cmdResponse.result.result == 0x02) {
+                            [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"请重新设置管理员！", nil)];
+                            [peripheral setDisconnectCallbackBlock:nil];
+                            return;
+                        }
                         
                         if(![weakSelf isLockResponseDataOK:cmdResponse withCRC:crc]) {
                             return ;
@@ -605,9 +619,14 @@ static int retry = 0;
     [self.navigationController pushViewController:vc animated:YES];
 }
 
-- (void)clickBuyBtn:(UIButton *)button {
-    BuyVC *vc = [[BuyVC alloc] init];
-    vc.title = NSLocalizedString(@"购买", nil);
+//- (void)clickBuyBtn:(UIButton *)button {
+//    BuyVC *vc = [[BuyVC alloc] init];
+//    vc.title = NSLocalizedString(@"购买", nil);
+//    [self.navigationController pushViewController:vc animated:YES];
+//}
+
+- (void)clickAboutBtn:(UIButton *)button {
+    AboutVC *vc = [[AboutVC alloc] init];
     [self.navigationController pushViewController:vc animated:YES];
 }
 

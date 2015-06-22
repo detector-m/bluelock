@@ -119,7 +119,7 @@
                 [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"找回密码失败！", nil)];
             }
             else {
-                [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"成功找回", nil) dimissBlock:^{
+                [RLHUD hudAlertSuccessWithBody:NSLocalizedString(@"成功找回", nil) dimissBlock:^{
                     [weakSelf.navigationController popToRootViewControllerAnimated:YES];
                 }];
             }

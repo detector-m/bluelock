@@ -11,4 +11,6 @@ extern NSString * const kRLHTTPAPIBaseURLString;
 extern NSString * const kRLHTTPMobileBaseURLString;
 @interface RLHTTPAPIClient : AFHTTPSessionManager
 + (instancetype)sharedClient;
+
+//+ (NSString *)webUrlWithParameters;
 @end

@@ -85,6 +85,7 @@
 }
 
 - (void)clickedAuthcodeButton {
+    [self endEditing];
     if(![self.phoneTextField.textField.text isMobile]) {
         [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"手机号码有误！", nil)];
         return;
@@ -108,7 +109,7 @@
             if(response.status) {
                 DLog(@"验证码获取出错");
                 
-                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"手机号码已被用！", nil)];
+                [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"手机号码已被占用！", nil)];
             }
             else {
                 [Register getAuthcode:self.phoneTextField.textField.text withBlock:verifyBlock];

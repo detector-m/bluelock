@@ -46,7 +46,7 @@
         return originalImage;
     }
     
-    ratio = fabsf(ratio);
+    ratio = fabs(ratio);
     
     CGSize oriImgSize = originalImage.size;
     CGSize contextSize = CGSizeMake(oriImgSize.width*ratio, oriImgSize.height*ratio);
@@ -66,7 +66,7 @@
         return originalImage;
     }
     
-    size = CGSizeMake(fabsf(size.width), fabsf(size.height));
+    size = CGSizeMake(fabs(size.width), fabs(size.height));
     
     UIGraphicsBeginImageContext(size);
     [originalImage drawInRect:CGRectMake(0, 0, size.width, size.height)];

@@ -53,7 +53,10 @@
                                                 attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:TextFontSize], NSParagraphStyleAttributeName:paragraphStyle} context:nil].size;
     }
     else {
+#ifdef __IPHONE_7_0
+#else
         retSize = [self.message.content sizeWithFont:[UIFont systemFontOfSize:TextFontSize] constrainedToSize:textBlockMinSize lineBreakMode:NSLineBreakByCharWrapping];
+#endif
     }
     
     CGFloat height = 40;
@@ -88,7 +91,11 @@
         size = [object.content boundingRectWithSize:textBlockMinSize options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:TextFontSize], NSParagraphStyleAttributeName:paragraphStyle} context:nil].size;
     }
     else {
+#ifdef __IPHONE_7_0
+#else
         size = [object.content sizeWithFont:[UIFont systemFontOfSize:TextFontSize] constrainedToSize:textBlockMinSize lineBreakMode:NSLineBreakByCharWrapping];
+#endif
+
     }
     
     return 2*BubbleViewPadding + size.height;

@@ -345,11 +345,7 @@ void postNotificationWithNone(const NSString *notificationName) {
     if(isXmppConnected || [self isXmppConnecting])
         return YES;
     if (![xmppStream connectWithTimeout:XMPPStreamTimeoutNone error:&error]) {
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error connecting"
-                                                            message:@"See console for error details."
-                                                           delegate:nil
-                                                  cancelButtonTitle:@"Ok"
-                                                  otherButtonTitles:nil];
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error connecting" message:@"See console for error details." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alertView show];
         
         DDLogError(@"Error connecting: %@", error);
@@ -451,7 +447,7 @@ void postNotificationWithNone(const NSString *notificationName) {
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
     DDLogVerbose(@"message = %@", message);
     
-    if([message.type isEqualToString:@"chat"] || ![message.from.user isEqualToString:kXMPPAdmin] || ![message.from.domain isEqualToString:kXMPPDomain]) {
+    if([message.type isEqualToString:@"chat"] || ![message.from.user isEqualToString:kXMPPAdmin] || ![message.from.domain isEqualToString:kXMPPDomain] || ![message.from.user isEqualToString:kXMPPResource]) {
         return;
     }
 #if 0

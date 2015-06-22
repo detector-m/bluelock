@@ -138,7 +138,9 @@
     if(!self.table.datas.count) return;
     RLPeripheral *peripheral = [self.table.datas objectAtIndex:index];
     [self connectPeripheral:peripheral];
-    [RLHUD hudProgressWithBody:NSLocalizedString(@"正在配对...", nil) onView:self.view.superview timeout:6.0f];
+    [RLHUD hudProgressWithBody:NSLocalizedString(@"正在配对...", nil) onView:self.view.superview timeout:6.0f withTimeoutBlock:^{
+        [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"配对超时，请重新再试！", nil)];
+    }];
 }
 
 #pragma mark -
@@ -182,6 +184,10 @@
                     [[weakSelf lockDevicesVC].mainVC loadLockList];
                     [RLHUD hudAlertSuccessWithBody:NSLocalizedString(@"配对成功", nil)];
                 }];
+            }
+            else if(cmdResponse.result.result == 0x06){
+                [RLHUD hideProgress];
+                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"设置管理员按键未按下!", nil)];
             }
             else {
                 [RLHUD hideProgress];

@@ -34,6 +34,7 @@
 + (void)hudAlertWaitingWithBody:(NSString *)body;
 
 #pragma mark - ProgressHUD
++ (void)hudProgressWithBody:(NSString *)body onView:(UIView *)view timeout:(NSTimeInterval)timeout withTimeoutBlock:(void (^)())block;
 + (void)hudProgressWithBody:(NSString *)body onView:(UIView *)view timeout:(NSTimeInterval)timeout;
 + (void)hideProgress;
 

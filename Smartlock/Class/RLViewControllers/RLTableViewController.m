@@ -44,7 +44,7 @@
 #pragma mark -
 - (void)setTableViewProperties {
     if(self.table.tableView == nil) {
-        self.table.tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+        self.table.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) style:UITableViewStylePlain];
         self.table.tableView.dataSource = self;
         self.table.tableView.delegate = self;
         [self.view addSubview:self.table.tableView];
@@ -76,6 +76,7 @@
 
 #pragma mark -
 - (void)deselectRow {
+    self.table.tableView.userInteractionEnabled = NO;
     [self performSelector:@selector(deselectRow:) withObject:self.table.tableView afterDelay:0.5];
 }
 

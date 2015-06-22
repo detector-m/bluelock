@@ -58,7 +58,11 @@
     vc.lockDevicesVC = self;
     [self.navigationController pushViewController:vc animated:YES];
 #endif
-    
+    if(![[RLBluetooth sharedBluetooth] bluetoothIsReady]) {
+        [RLHUD hudAlertWaitingWithBody:NSLocalizedString(@"未开启蓝牙，请先开启蓝牙", nil)];
+        
+        return;
+    }
     AddDeviceVC *vc = [AddDeviceVC new];
     vc.lockDevicesVC = self;
     [self.navigationController pushViewController:vc animated:YES];

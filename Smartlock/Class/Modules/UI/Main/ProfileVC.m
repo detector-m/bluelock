@@ -109,6 +109,7 @@
         }
         else {
             cell.detailTextLabel.text = [User sharedUser].phone;
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
         }
     }
     
@@ -116,6 +117,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self deselectRow];
     NSInteger index = [self indexForData:indexPath];
     
     switch (indexPath.section) {

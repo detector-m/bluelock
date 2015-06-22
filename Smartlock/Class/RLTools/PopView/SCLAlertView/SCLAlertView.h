@@ -75,19 +75,19 @@ typedef NS_ENUM(NSInteger, SCLAlertViewBackground)
  *
  * The text displayed as title.
  */
-@property UILabel *labelTitle;
+@property (strong) UILabel *labelTitle;
 
 /** Text view with the body message
  *
  * Holds the textview.
  */
-@property UITextView *viewText;
+@property (strong) UITextView *viewText;
 
 /** Activity Indicator
  *
  * Holds the activityIndicator.
  */
-@property UIActivityIndicatorView *activityIndicatorView;
+@property (strong) UIActivityIndicatorView *activityIndicatorView;
 
 /** Dismiss on tap outside
  *

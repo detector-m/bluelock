@@ -42,9 +42,20 @@
     self.title = NSLocalizedString(@"消息", nil);
     self.table.tableView.rowHeight = 66.0f;
     NSArray *messages = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([Message class])];
+    if(!messages.count) self.navigationItem.rightBarButtonItem.enabled = NO;
     [self.table addObjectFromArray:[self reverseArray:messages]];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage) name:(NSString *)kReceiveMessage object:nil];
+}
+
+#pragma mark -
+- (void)clickedClearBtn:(UIBarButtonItem *)btn {
+    [[MyCoreDataManager sharedManager]  deleteAllTableObjectInTable:NSStringFromClass([Message class])];
+    [self.table.datas removeAllObjects];
+    [self.table.tableView reloadData];
+}
+- (void)setupRightItem {
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(clickedClearBtn:)];
 }
 
 #pragma mark -
@@ -54,6 +65,13 @@
 
     NSArray *messages = [[MyCoreDataManager sharedManager] objectsSortByAttribute:nil withTablename:NSStringFromClass([Message class])];
     
+    if(!messages.count) {
+        self.navigationItem.rightBarButtonItem.enabled = NO;
+    }
+    else {
+        self.navigationItem.rightBarButtonItem.enabled = YES;
+    }
+
     [self.table.datas addObjectsFromArray:[self reverseArray:messages]];
     
     __weak typeof(self)weakSelf = self;
@@ -68,10 +86,6 @@
 }
 
 #pragma mark -
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.table.datas.count;
 }

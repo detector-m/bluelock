@@ -149,8 +149,10 @@ NSString * const kWaitingTitle = @"Waiting... ⌛️";
 
 #pragma mark - 
 static MBProgressHUD *hudProgress = nil;
-+ (void)hudProgressWithBody:(NSString *)body onView:(UIView *)view timeout:(NSTimeInterval)timeout {
+static void (^timeoutblock)() = nil;
++ (void)hudProgressWithBody:(NSString *)body onView:(UIView *)view timeout:(NSTimeInterval)timeout withTimeoutBlock:(void (^)())block {
     if(hudProgress) {
+        timeoutblock = nil;
         [hudProgress setHidden:YES];
         [hudProgress removeFromSuperview];
         hudProgress = nil;
@@ -160,16 +162,25 @@ static MBProgressHUD *hudProgress = nil;
         [view addSubview:hudProgress];
         hudProgress.labelText = body;
     }
+    
+    timeoutblock = block;
 
     __weak typeof(self)weakSelf = self;
     [hudProgress showAnimated:YES whileExecutingBlock:^{
         [weakSelf timeout:timeout];
     } completionBlock:^{
+        if(timeoutblock) {
+            timeoutblock();
+        }
         if(hudProgress) {
             [hudProgress removeFromSuperview];
             hudProgress = nil;
         }
     }];
+}
+
++ (void)hudProgressWithBody:(NSString *)body onView:(UIView *)view timeout:(NSTimeInterval)timeout {
+    [self hudProgressWithBody:body onView:view timeout:timeout withTimeoutBlock:nil];
 }
 
 + (void)timeout:(NSTimeInterval)timeout {
@@ -181,8 +192,12 @@ static MBProgressHUD *hudProgress = nil;
     if(hudProgress) {
 //        [hudProgress setHidden:YES];
 //        [hudProgress removeFromSuperview];
-        [hudProgress hide:YES afterDelay:1.0f];
+        [hudProgress hide:YES afterDelay:0.0f];
 //        hudProgress = nil;
+    }
+    
+    if(timeoutblock) {
+        timeoutblock = nil;
     }
 }
 

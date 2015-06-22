@@ -69,6 +69,7 @@
 
 #pragma mark -
 - (void)deselectRow {
+    self.table.tableView.userInteractionEnabled = NO;
     [self performSelector:@selector(deselectRow:) withObject:self.table.tableView afterDelay:0.5];
 }
 

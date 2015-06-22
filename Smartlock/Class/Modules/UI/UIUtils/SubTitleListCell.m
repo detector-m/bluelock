@@ -100,7 +100,7 @@
 #pragma mark -
 - (void)setDefaultProperties {
     self.textLabel.font = [UIFont systemFontOfSize:18.0f];
-    self.detailTextLabel.font = [UIFont systemFontOfSize:16.0f];
+    self.detailTextLabel.font = [UIFont systemFontOfSize:14.0f];
 }
 
 - (void)layoutSubviews {

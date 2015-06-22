@@ -8,7 +8,10 @@
 
 #import "WebViewVC.h"
 #import "AFNetworkReachabilityManager.h"
+#import "CustomURLCache.h"
 
+@interface WebViewVC ()
+@end
 @implementation WebViewVC
 
 - (void)dealloc {
@@ -31,10 +34,10 @@
 
 - (void)setupWebView {
     CGRect frame = self.view.frame;
-
+    
     self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
     self.webView.delegate = self;
-    self.webView.scrollView.bounces = NO;
+    self.webView.scrollView.bounces = YES;
     [self.view addSubview:self.webView];
     [self loadRequest];
 }
@@ -48,8 +51,9 @@
 
 - (NSURLRequest *)requestForWebContent:(NSString *)aUrl {
     DLog(@"%@", aUrl);
-    NSURL *newsUrl = [NSURL URLWithString:[aUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:newsUrl];
+//    aUrl = @"http://www.baidu.com";
+    NSURL *destUrl = [NSURL URLWithString:[aUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:destUrl];
     return request;
 }
 

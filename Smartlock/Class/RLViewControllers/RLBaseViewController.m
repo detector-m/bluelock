@@ -18,6 +18,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    if([UIDevice currentDevice].systemVersion.floatValue >= 7.0) {
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+        if(self.navigationController) {
+            CGRect frame = self.view.frame;
+            self.view.frame = CGRectMake(0, 0, frame.size.width, frame.size.height-64);
+        }
+    }
+    
     self.view.backgroundColor = [UIColor whiteColor];
     [self setupForDismissKeyboard];
 }

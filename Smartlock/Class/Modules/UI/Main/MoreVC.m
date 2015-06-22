@@ -31,7 +31,7 @@ static NSString *kSetupWebPage = @"help.jsp";
     self.table.tableView.rowHeight = 60.0f;
     self->imageArray = [NSMutableArray array];
     [self.table.datas addObject:@"声音🔊"];
-    [self.table.datas addObject:@"关于"];
+    [self.table.datas addObject:@"关于公司"];
     [self.table.datas addObject:@"帮助"];
     [self.table.datas addObject:@"安装教程"];
     
@@ -105,7 +105,7 @@ static NSString *kSetupWebPage = @"help.jsp";
     switch (indexPath.row) {
         case 1: {
             vc.url = [kRLHTTPMobileBaseURLString stringByAppendingString:kAboutWebPage];//kAboutWebUrl;
-            vc.title = NSLocalizedString(@"关于", nil);
+            vc.title = NSLocalizedString(@"关于公司", nil);
         }
             break;
         case 2: {

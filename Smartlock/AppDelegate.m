@@ -23,6 +23,9 @@
 
 #import "RLUtilitiesMethods.h"
 
+#pragma mark -
+#import "CustomURLCache.h"
+
 /************** Test *****************/
 #import "ViewController.h"
 #import "TestViewController.h"
@@ -125,7 +128,10 @@
     
 #pragma mark - Test
 //    [self test];
-    
+
+#pragma mark - webview url cache
+    CustomURLCache *urlCache = [[CustomURLCache alloc] initWithMemoryCapacity:20 * 1024 * 1024 diskCapacity:200 * 1024 * 1024 diskPath:nil cacheTime:60*24*60*7];
+    [CustomURLCache setSharedURLCache:urlCache];
 #pragma mark - Location
 
 #pragma mark - SoundManager

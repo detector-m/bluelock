@@ -26,6 +26,9 @@
         if(block) {
             DLog(@"%@", error);
             block(@"Error", error);
+            if(error.code == NSURLErrorNotConnectedToInternet) {
+                return ;
+            }
             [RLHUD hudAlertErrorWithBody:@"网络有问题！请检查网络"];
         }
     }];

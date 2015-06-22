@@ -12,6 +12,7 @@
 
 #import "RLSecurityPolicy.h"
 
+#define PlatFormFlag (21)
 @implementation LoginModel
 - (NSDictionary *)toDictionary {
     NSMutableDictionary *parameters = nil;
@@ -24,6 +25,8 @@
     [parameters setObject:[RLTypecast doubleToString:self.location.latitude] forKey:@"latitude"];
     [parameters setObject:[RLTypecast doubleToString:self.location.longitude] forKey:@"longitude"];
     [parameters setObject:self.location.city forKey:@"registeredCity"];
+    
+    [parameters setObject:[NSNumber numberWithInteger:PlatFormFlag] forKey:@"platFormFlag"];
     return parameters;
 }
 

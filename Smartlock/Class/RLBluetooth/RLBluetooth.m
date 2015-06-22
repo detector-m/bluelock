@@ -60,7 +60,7 @@ static RLBluetooth *_sharedBluetooth = nil;
         if(completionCallback) {
             completionCallback(nil);
         }
-        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"蓝牙未开启！", nil)];
+        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"未开启蓝牙！请先开启蓝牙！", nil)];
         return;
     }
     [self disconnectAllPeripherals];
@@ -203,14 +203,15 @@ static RLBluetooth *_sharedBluetooth = nil;
 //            [characteristic writeValue:[NSData dataWithBytes:&bytes[i] length:1] completion:nil];
 //            [NSThread sleepForTimeInterval:0.05];
         }
-
+#if 0
         NSInteger packages = len/BluetoothPackageSize + (len%BluetoothPackageSize ? 1 : 0);
-        
         for(i = 0; i<packages; i++) {
             [characteristic writeValue:[NSData dataWithBytes:&bytes[i*BluetoothPackageSize] length:i+1<packages? BluetoothPackageSize : len-i*BluetoothPackageSize] completion:nil];
-            [NSThread sleepForTimeInterval:0.05];
+//            [NSThread sleepForTimeInterval:0.05];
         }
-        
+#else
+        [characteristic writeValue:[NSData dataWithBytes:bytes length:len] completion:nil];
+#endif
         free((void *)bytes);
         DLog(@"str = %@", str);
     }
