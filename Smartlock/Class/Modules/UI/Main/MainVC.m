@@ -84,6 +84,9 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self setBackButtonHide:YES];
+    
+#pragma mark -
+    self.navigationController.navigationBarHidden = YES;
 
     self.messageBadgeNumber = [[MyCoreDataManager sharedManager] objectsCountWithKey:@"isRead" contains:@NO withTablename:NSStringFromClass([Message class])];
 }
@@ -96,7 +99,7 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    
+    self.navigationController.navigationBarHidden = NO;
     [self stopTimer];
     
     [self setBackButtonHide:NO];
@@ -115,8 +118,13 @@
     [[SoundManager sharedManager] prepareToPlay];
     
     [self setupBackground];
+#pragma mark -
+    self.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height + 64);
+    self.backgroundImage.frame = self.view.frame;
     [self setupBanners];
     [self setupMainView];
+//    [self setupBanners];
+//    [self setupMainView];
     
     [self setupLockList];
     
@@ -128,8 +136,9 @@
 }
 
 - (void)setupBackground {
+    self.view.backgroundColor = [RLColor colorWithHex:0x253640];
     self.backgroundImage.image = [UIImage imageNamed:@"MainBackground.jpeg"];
-//    self.view.backgroundColor = [RLColor colorWithHex:/*0x167CB0*/0x253640];//0xF2DF9B];
+//    self.view.backgroundColor = [RLColor colorWithHex:0x253640];//0xF2DF9B];
 }
 
 - (void)setupLockList {
@@ -184,11 +193,14 @@ static NSString *kBannersPage = @"/bleLock/advice.jhtml";
 }
 
 - (void)setupBanners {
+    if(self.bannersView)
+        return;
     CGFloat ratio = (3.0/1.0);
     self.bannersUrl = [kRLHTTPAPIBaseURLString stringByAppendingString:kBannersPage];
     CGRect frame = self.view.frame;
     BannerViewHeight = frame.size.width/ratio;
-    self.bannersView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, BannerViewHeight)];
+    self.bannersView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 20, frame.size.width, BannerViewHeight)];
+    self.bannersView.backgroundColor = [UIColor lightGrayColor];
     self.bannersView.delegate = self;
     self.bannersView.scrollView.bounces = NO;
     [self.view addSubview:self.bannersView];
@@ -199,7 +211,7 @@ static NSString *kBannersPage = @"/bleLock/advice.jhtml";
 - (void)setupMainView {
     if(!self.scrollView) {
         CGRect frame = self.view.frame;
-        CGFloat heightOffset = BannerViewHeight;
+        CGFloat heightOffset = BannerViewHeight+self.bannersView.frame.origin.y+22;
         
         self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, heightOffset, frame.size.width, frame.size.height-heightOffset)];
         self.scrollView.contentSize = CGSizeMake(frame.size.width, self.scrollView.frame.size.height);

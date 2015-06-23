@@ -12,6 +12,7 @@
 #pragma mark -
 #import "SCLAlertView.h"
 
+#define HUDAlertViewDuration (6.0f)
 @interface RLHUD : NSObject
 //+ (MBHUDView*)hudAlertWithBody:(NSString*)body type:(MBAlertViewHUDType)type hidesAfter:(float)delay show:(BOOL)show;
 
@@ -21,7 +22,6 @@
 + (void)hudAlertWarningWithBody:(NSString *)body dimissBlock:(DismissBlock)block;
 + (void)hudAlertInfoWithBody:(NSString *)body dimissBlock:(DismissBlock)block;
 + (void)hudAlertEditWithBody:(NSString *)body dimissBlock:(DismissBlock)block;
-+ (void)hudAlertCustomWithBody:(NSString *)body dimissBlock:(DismissBlock)block;
 + (void)hudAlertWaitingWithBody:(NSString *)body dimissBlock:(DismissBlock)block;
 
 + (void)hudAlertSuccessWithBody:(NSString *)body;
@@ -30,7 +30,6 @@
 + (void)hudAlertWarningWithBody:(NSString *)body;
 + (void)hudAlertInfoWithBody:(NSString *)body;
 + (void)hudAlertEditWithBody:(NSString *)body;
-+ (void)hudAlertCustomWithBody:(NSString *)body;
 + (void)hudAlertWaitingWithBody:(NSString *)body;
 
 #pragma mark - ProgressHUD

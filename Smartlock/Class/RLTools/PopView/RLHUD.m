@@ -8,7 +8,7 @@
 
 #import "RLHUD.h"
 
-static const float kPopViewDuration  = 5.0f;
+static const float kPopViewDuration  = 4.0f;
 
 NSString * const kSuccessTitle = @"Congratulations 😊";
 NSString * const kErrorTitle = @"Error 😭";
@@ -18,24 +18,169 @@ NSString * const kInfoTitle = @"Info";
 NSString * const kWaitingTitle = @"Waiting... ⌛️";
 
 @implementation RLHUD
-//+ (MBHUDView *)hudAlertWithBody:(NSString *)body type:(MBAlertViewHUDType)type hidesAfter:(float)delay show:(BOOL)show {
-//    return [MBHUDView hudWithBody:body type:MBAlertViewHUDTypeDefault hidesAfter:2.0f show:YES];
-//}
-+ (SCLAlertView *)alertViewOnScreenHide {
-    for(UIViewController *vc in [UIApplication sharedApplication].keyWindow.rootViewController.childViewControllers) {
-        if([vc isKindOfClass:[SCLAlertView class]]) {
-            [(SCLAlertView *)vc hideView];
-//            return (SCLAlertView *)vc;
-        }
-    }
-    
-    return nil;
++ (void)hideAllOldAlertHUD {
+    [MBProgressHUD hideAllHUDsForView:[UIApplication sharedApplication].keyWindow animated:NO];
 }
 
++ (MBProgressHUD *)getMBAlertHUDWithTitle:(NSString *)title andDetails:(NSString *)details {
+    UIView *view = [UIApplication sharedApplication].keyWindow;
+    MBProgressHUD *HUD = [[MBProgressHUD alloc] initWithView:view];
+    HUD.removeFromSuperViewOnHide = YES;
+    [view addSubview:HUD];
+    HUD.labelText = title;
+    HUD.detailsLabelText = details;
+//    HUD.margin = 2.f;
+    
+    return HUD;
+}
+
++ (void)HUDAlertTask {
+    sleep(kPopViewDuration);
+}
 #pragma mark -
 + (void)hudAlertSuccessWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self alertViewOnScreenHide];
+        [self hideAllOldAlertHUD];
+        
+        __block MBProgressHUD *HUD = [self getMBAlertHUDWithTitle:nil andDetails:body];
+        
+        HUD.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"HUDCheckmark.png"]];
+        
+        // Set custom view mode
+        HUD.mode = MBProgressHUDModeCustomView;
+        HUD.square = YES;
+        
+        [HUD showAnimated:YES whileExecutingBlock:^{
+            [self HUDAlertTask];
+        } completionBlock:^{
+            if(block) {
+                block();
+            }
+            HUD = nil;
+        }];
+//        [HUD show:YES];
+//        [HUD hide:YES afterDelay:3];
+    });
+}
++ (void)hudAlertErrorWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self hideAllOldAlertHUD];
+        
+        __block MBProgressHUD *HUD = [self getMBAlertHUDWithTitle:nil andDetails:body];
+        
+        HUD.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"HUDErrormark.png"]];
+        
+        // Set custom view mode
+        HUD.mode = MBProgressHUDModeCustomView;
+        
+        [HUD showAnimated:YES whileExecutingBlock:^{
+            [self HUDAlertTask];
+        } completionBlock:^{
+            if(block) {
+                block();
+//                block = nil;
+            }
+            HUD = nil;
+        }];
+    });
+}
++ (void)hudAlertNoticeWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self hideAllOldAlertHUD];
+
+        __block MBProgressHUD *HUD = [self getMBAlertHUDWithTitle:kNoticeTitle andDetails:body];
+        HUD.mode = MBProgressHUDModeText;
+        [HUD showAnimated:YES whileExecutingBlock:^{
+            [self HUDAlertTask];
+        } completionBlock:^{
+            if(HUD == nil)
+                return ;
+            if(block) {
+                block();
+            }
+            HUD = nil;
+        }];
+    });
+    
+}
++ (void)hudAlertWarningWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self hideAllOldAlertHUD];
+        
+        __block MBProgressHUD *HUD = [self getMBAlertHUDWithTitle:kWaitingTitle andDetails:body];
+        HUD.mode = MBProgressHUDModeText;
+        [HUD showAnimated:YES whileExecutingBlock:^{
+            [self HUDAlertTask];
+        } completionBlock:^{
+            if(block) {
+                block();
+            }
+            HUD = nil;
+        }];
+
+    });
+}
++ (void)hudAlertInfoWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self hideAllOldAlertHUD];
+        
+        __block MBProgressHUD *HUD = [self getMBAlertHUDWithTitle:kWaitingTitle andDetails:body];
+        HUD.mode = MBProgressHUDModeText;
+        [HUD showAnimated:YES whileExecutingBlock:^{
+            [self HUDAlertTask];
+        } completionBlock:^{
+            if(block) {
+                block();
+            }
+            HUD = nil;
+        }];
+
+    });
+}
++ (void)hudAlertEditWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            SCLAlertView *alert = [[SCLAlertView alloc] init];
+            if(block) {
+                [alert alertIsDismissed:block];
+            }
+            [alert showEdit:[UIApplication sharedApplication].keyWindow.rootViewController title:body
+                   subTitle:nil
+           closeButtonTitle:NSLocalizedString(@"确定", nil) duration:kPopViewDuration];
+        });
+    });
+}
+
++ (void)hudAlertWaitingWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self hideAllOldAlertHUD];
+        
+        __block MBProgressHUD *HUD = [self getMBAlertHUDWithTitle:kWaitingTitle andDetails:body];
+        HUD.mode = MBProgressHUDModeText;
+        [HUD showAnimated:YES whileExecutingBlock:^{
+            [self HUDAlertTask];
+        } completionBlock:^{
+            if(block) {
+                block();
+            }
+            HUD = nil;
+        }];
+    });
+}
+
+
+#if 0
++ (void)alertViewOnScreenHide {
+    for(UIViewController *vc in [UIApplication sharedApplication].keyWindow.rootViewController.childViewControllers) {
+        if([vc isKindOfClass:[SCLAlertView class]]) {
+            [(SCLAlertView *)vc hideView];
+        }
+    }
+}
+
++ (void)hudAlertSuccessWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self hideAllOldAlertView];
         SCLAlertView *alert = [[SCLAlertView alloc] init];
         if(block) {
             [alert alertIsDismissed:block];
@@ -47,7 +192,7 @@ NSString * const kWaitingTitle = @"Waiting... ⌛️";
 }
 + (void)hudAlertErrorWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self alertViewOnScreenHide];
+        [self hideAllOldAlertView];
         SCLAlertView *alert = [[SCLAlertView alloc] init];
         if(block) {
             [alert alertIsDismissed:block];
@@ -106,8 +251,7 @@ NSString * const kWaitingTitle = @"Waiting... ⌛️";
          closeButtonTitle:NSLocalizedString(@"确定", nil) duration:kPopViewDuration];
     });
 }
-+ (void)hudAlertCustomWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
-}
+
 + (void)hudAlertWaitingWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self alertViewOnScreenHide];
@@ -120,6 +264,7 @@ NSString * const kWaitingTitle = @"Waiting... ⌛️";
          closeButtonTitle:NSLocalizedString(@"确定", nil) duration:kPopViewDuration];
     });
 }
+#endif
 
 + (void)hudAlertSuccessWithBody:(NSString *)body {
     [self hudAlertSuccessWithBody:body dimissBlock:nil];
@@ -138,9 +283,6 @@ NSString * const kWaitingTitle = @"Waiting... ⌛️";
 }
 + (void)hudAlertEditWithBody:(NSString *)body {
     [self hudAlertErrorWithBody:body dimissBlock:nil];
-}
-+ (void)hudAlertCustomWithBody:(NSString *)body {
-
 }
 + (void)hudAlertWaitingWithBody:(NSString *)body {
     [self hudAlertWarningWithBody:body dimissBlock:nil];
@@ -161,6 +303,7 @@ static void (^timeoutblock)() = nil;
         hudProgress = [[MBProgressHUD alloc] initWithView:view];
         [view addSubview:hudProgress];
         hudProgress.labelText = body;
+        hudProgress.removeFromSuperViewOnHide = YES;
     }
     
     timeoutblock = block;
@@ -173,6 +316,7 @@ static void (^timeoutblock)() = nil;
             timeoutblock();
         }
         if(hudProgress) {
+//            [hudProgress hide:NO];
             [hudProgress removeFromSuperview];
             hudProgress = nil;
         }
