@@ -8,7 +8,7 @@
 
 #import "RLHUD.h"
 
-static const float kPopViewDuration  = 4.0f;
+static const float kPopViewDuration  = 2.f;
 
 NSString * const kSuccessTitle = @"Congratulations 😊";
 NSString * const kErrorTitle = @"Error 😭";
@@ -36,6 +36,7 @@ NSString * const kWaitingTitle = @"Waiting... ⌛️";
 
 + (void)HUDAlertTask {
     sleep(kPopViewDuration);
+//    usleep(3000000);
 }
 #pragma mark -
 + (void)hudAlertSuccessWithBody:(NSString *)body dimissBlock:(DismissBlock)block {
@@ -107,7 +108,7 @@ NSString * const kWaitingTitle = @"Waiting... ⌛️";
     dispatch_async(dispatch_get_main_queue(), ^{
         [self hideAllOldAlertHUD];
         
-        __block MBProgressHUD *HUD = [self getMBAlertHUDWithTitle:kWaitingTitle andDetails:body];
+        __block MBProgressHUD *HUD = [self getMBAlertHUDWithTitle:kWarningTitle andDetails:body];
         HUD.mode = MBProgressHUDModeText;
         [HUD showAnimated:YES whileExecutingBlock:^{
             [self HUDAlertTask];

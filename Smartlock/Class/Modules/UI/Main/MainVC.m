@@ -915,7 +915,7 @@ static int retry = 0;
 - (void)webViewDidStartLoad:(UIWebView *)webView {
     self.isBannersLoaded = NO;
     self.isBannersLoading = YES;
-    [RLHUD hudProgressWithBody:nil onView:webView timeout:5.0f];
+    [RLHUD hudProgressWithBody:nil onView:webView timeout:4.0f];
 }
 - (void)webViewDidFinishLoad:(UIWebView *)webView{
     self.isBannersLoaded = YES;

@@ -12,7 +12,7 @@
 #pragma mark -
 #import "SCLAlertView.h"
 
-#define HUDAlertViewDuration (6.0f)
+#define HUDAlertViewDuration (2.0f)
 @interface RLHUD : NSObject
 //+ (MBHUDView*)hudAlertWithBody:(NSString*)body type:(MBAlertViewHUDType)type hidesAfter:(float)delay show:(BOOL)show;
 
