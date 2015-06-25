@@ -18,7 +18,7 @@ static NSString *kHelpWebPage = @"help.jsp";
 static NSString *kSetupWebPage = @"help.jsp";
 
 @interface MoreVC ()
-@property (nonatomic, strong) UISwitch *voiceSwitch;
+
 @end
 
 @implementation MoreVC {
@@ -42,25 +42,6 @@ static NSString *kSetupWebPage = @"help.jsp";
 //    [self->imageArray addObject:@"SetupNav.png"];
 }
 
-#pragma mark -
-- (UISwitch *)voiceSwitch {
-    if(_voiceSwitch) {
-        return _voiceSwitch;
-    }
-    
-    _voiceSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(self.view.frame.size.width-70, 15, 60, 30)];
-    BOOL bBoice = [User getVoiceSwitch];
-    [_voiceSwitch setSelected:bBoice];
-    _voiceSwitch.on = !bBoice;
-    [_voiceSwitch addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
-    
-    return _voiceSwitch;
-}
-
-- (void)switchChanged:(UISwitch *)voiceSwitch {
-    BOOL bBoice = !_voiceSwitch.selected;
-    [User setVoiceSwitch:bBoice];
-}
 #pragma mark -
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
