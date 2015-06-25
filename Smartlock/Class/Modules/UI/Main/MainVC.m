@@ -71,6 +71,10 @@
 
 #pragma mark -
 @property (nonatomic, strong) NSTimer *animationTimer;
+
+#pragma mark - 
+@property (nonatomic, strong) NSTimer *autoOpenlockTimer;
+@property (nonatomic, assign) BOOL isMainVC;
 @end
 
 @implementation MainVC
@@ -95,6 +99,9 @@
     [super viewDidAppear:animated];
     
     [self setBackButtonHide:YES];
+    
+    [self createAndScheduleAutoOpenlockTimer];
+    self.isMainVC = YES;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -105,6 +112,9 @@
     [self setBackButtonHide:NO];
     [self.bannersView stopLoading];
     self.bannersView.delegate = nil;
+    
+    [self cancelAutoOpenlockTimer];
+    self.isMainVC = NO;
 }
 
 - (void)viewDidLoad {
@@ -149,14 +159,36 @@
 }
 
 - (void)setupNotification {
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applictionWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applictionWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applictionDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applictionDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applictionWillResignActive) name:UIApplicationWillResignActiveNotification object:nil];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage) name:(NSString *)kReceiveMessage object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkReachable:) name:AFNetworkingReachabilityDidChangeNotification object:nil];
 }
 
-//- (void)applictionWillEnterForeground:(id)sender {
-//    [self readLockPower];
-//}
+#pragma mark -
+- (void)applictionWillEnterForeground:(id)sender {
+//    if(self.isMainVC)
+//        [self createAndScheduleAutoOpenlockTimer];
+}
+
+- (void)applictionDidEnterBackground:(id)sender {
+//    [self cancelAutoOpenlockTimer];
+}
+
+- (void)applictionDidBecomeActive {
+    if(self.isMainVC)
+        [self createAndScheduleAutoOpenlockTimer];
+
+}
+
+- (void)applictionWillResignActive {
+    [self cancelAutoOpenlockTimer];
+
+}
 
 #pragma mark ----------- network status changed
 - (void)networkReachable:(id)sender {
@@ -360,15 +392,20 @@ static NSString *kBannersPage = @"/bleLock/advice.jhtml";
 
 static int retry = 0;
 - (void)clickOpenLockBtn:(UIButton *)button {
+    button = self.openLockBtn;
     if(!self.lockList.count) {
-        [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"未检测到钥匙!", nil)];
+        if([User getAutoOpenLockSwitch])
+            [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"未检测到钥匙!", nil)];
         return;
     }
     retry = 0;
     if(![User getVoiceSwitch]) {
-        [[SoundManager sharedManager] playSound:@"SoundOperator.mp3" looping:NO];
+        if([User getAutoOpenLockSwitch])
+            [[SoundManager sharedManager] playSound:@"SoundOperator.mp3" looping:NO];
     }
-    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    
+    if([User getAutoOpenLockSwitch])
+        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
 
     self.openLockBtn.userInteractionEnabled = NO;
     __weak __typeof(self)weakSelf = self;
@@ -385,7 +422,8 @@ static int retry = 0;
         
         if(!peripherals.count) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"未找到设备,请检查蓝牙设备!", nil)];
+                if([User getAutoOpenLockSwitch])
+                    [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"未找到设备,请检查蓝牙设备!", nil)];
             });
             weakSelf.openLockBtn.userInteractionEnabled = YES;
             [weakSelf stopTimer];
@@ -468,7 +506,8 @@ static int retry = 0;
                         [peripheral setDisconnectCallbackBlock:^(NSError *error) {
                             if(error) return ;
                             weakSelf.openLockBtn.userInteractionEnabled = YES;
-                            [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"连接已断开！", nil)];
+                            if([User getAutoOpenLockSwitch])
+                                [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"连接已断开！", nil)];
                         }];
                         RLCharacteristic *innerCharacteristic = [[RLBluetooth sharedBluetooth] characteristicForUUIDString:@"fff2" withService:service];
                         [weakSelf openLockWithCharacteristic:innerCharacteristic withKey:key];
@@ -515,7 +554,7 @@ static int retry = 0;
                             Byte powerCode = cmdResponse.data[1];
                             Byte updateTimeCode = cmdResponse.data[0];
                             if(powerCode == 0x01) {
-                                [RLAlertLabel showInView:self.view withText:NSLocalizedString(@"电池电压过低，请更换电池！", nil) andFrame:CGRectMake(button.frame.origin.x+button.frame.size.width+10, button.frame.origin.y+button.frame.size.height+10, 140, 80)];
+                                [RLAlertLabel showInView:weakSelf.scrollView withText:NSLocalizedString(@"电池电压过低，请更换电池！", nil) andFrame:CGRectMake(weakSelf.openLockBtn.frame.origin.x+self.openLockBtn.frame.size.width+10, weakSelf.openLockBtn.frame.origin.y+25, 140, 80)];
                             }
                             
                             if(updateTimeCode == 0x01) {
@@ -532,7 +571,8 @@ static int retry = 0;
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"没有可用的设备或钥匙！", nil)];
+            if([User getAutoOpenLockSwitch])
+                [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"没有可用的设备或钥匙！", nil)];
             [weakSelf cancelPerformSelector];
             weakSelf.openLockBtn.userInteractionEnabled = YES;
         });
@@ -549,10 +589,13 @@ static int retry = 0;
     if(![User getVoiceSwitch]) {
         [[SoundManager sharedManager] playSound:@"DoorOpened.mp3" looping:NO];
     }
-    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    
+    if([User getAutoOpenLockSwitch])
+        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
 
     button.userInteractionEnabled = NO;
-    CGRect orignalFrame = self.arrow.frame;
+    CGRect frame = self.cupidBtn.frame;
+    CGRect orignalFrame = CGRectMake(frame.origin.x+3, frame.origin.y+46, frame.size.width/2, frame.size.height/2);// self.arrow.frame;
     __weak __typeof(self)weakSelf = self;
     [UIView animateKeyframesWithDuration:0.5f delay:0.0f options:UIViewAnimationCurveLinear | UIViewAnimationOptionAllowUserInteraction animations:^{
         CGRect frame = self.arrow.frame;
@@ -710,7 +753,7 @@ static int retry = 0;
 #pragma mark - private methods
 - (void)openLock:(KeyModel *)key {
     [self cancelPerformSelector];
-    [self performSelectorOnMainThread:@selector(startOpenLockAnimation:) withObject:self.openLockBtn waitUntilDone:YES];
+    [self performSelectorOnMainThread:@selector(startOpenLockAnimation:) withObject:self.openLockBtn waitUntilDone:NO];
     if(key.type == kKeyTypeTimes) {
         if(key.validCount > 0) {
             --key.validCount;
@@ -721,6 +764,25 @@ static int retry = 0;
     NSDictionary *record = createOpenLockRecord(key.ID, key.lockID);
     [[MyCoreDataManager sharedManager] insertObjectInObjectTable:record withTablename:NSStringFromClass([OpenLockRecord class])];
     [self updateRecords];
+}
+
+/**
+ *  自动开锁
+ */
+- (void)createAndScheduleAutoOpenlockTimer {
+    if([User getAutoOpenLockSwitch]) return;
+    if(self.autoOpenlockTimer) {
+        return;
+    }
+    
+    self.autoOpenlockTimer = [NSTimer scheduledTimerWithTimeInterval:7 target:self selector:@selector(clickOpenLockBtn:) userInfo:nil repeats:YES];
+    [self clickOpenLockBtn:self.openLockBtn];
+}
+
+- (void)cancelAutoOpenlockTimer {
+    if(self.autoOpenlockTimer) {
+        [self.autoOpenlockTimer invalidate], self.autoOpenlockTimer = nil;
+    }
 }
 
 - (void)updateRecords {
@@ -917,7 +979,7 @@ static int retry = 0;
     self.isBannersLoading = YES;
     [RLHUD hudProgressWithBody:nil onView:webView timeout:4.0f];
 }
-- (void)webViewDidFinishLoad:(UIWebView *)webView{
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
     self.isBannersLoaded = YES;
     self.isBannersLoading = NO;
     [RLHUD hideProgress];

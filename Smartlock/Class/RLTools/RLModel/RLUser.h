@@ -40,4 +40,7 @@ typedef NS_ENUM(NSInteger, GenderType) {
 #pragma mark -
 + (BOOL)getVoiceSwitch;
 + (void)setVoiceSwitch:(BOOL)on;
+
++ (BOOL)getAutoOpenLockSwitch;
++ (void)setAutoOpenLockSwitch:(BOOL)on;
 @end

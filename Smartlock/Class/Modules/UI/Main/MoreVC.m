@@ -9,6 +9,7 @@
 #import "MoreVC.h"
 
 #import "MoreDetailVC.h"
+#import "SystemSettingVC.h"
 
 #import "RLHTTPAPIClient.h"
 
@@ -30,12 +31,12 @@ static NSString *kSetupWebPage = @"help.jsp";
     
     self.table.tableView.rowHeight = 60.0f;
     self->imageArray = [NSMutableArray array];
-    [self.table.datas addObject:@"声音🔊"];
+    [self.table.datas addObject:@"设置"];
     [self.table.datas addObject:@"关于公司"];
     [self.table.datas addObject:@"帮助"];
 //    [self.table.datas addObject:@"安装教程"];
     
-    [self->imageArray addObject:@"Voice.png"];
+    [self->imageArray addObject:@"Settings.png"];
     [self->imageArray addObject:@"About.png"];
     [self->imageArray addObject:@"Help.png"];
 //    [self->imageArray addObject:@"SetupNav.png"];
@@ -87,30 +88,31 @@ static NSString *kSetupWebPage = @"help.jsp";
 
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     cell.selectionStyle = UITableViewCellSelectionStyleDefault;
-    if(indexPath.row == 0) {
-        [self.voiceSwitch removeFromSuperview];
-        cell.accessoryType = UITableViewCellAccessoryNone;
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        [cell.contentView addSubview:self.voiceSwitch];
-    }
     
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(!indexPath.row) {
-        return;
-    }
-    MoreDetailVC *vc = [MoreDetailVC new];
+    [self deselectRow];
+    
     switch (indexPath.row) {
+        case 0:{
+            SystemSettingVC *vc = [SystemSettingVC new];
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+            break;
         case 1: {
+            MoreDetailVC *vc = [MoreDetailVC new];
             vc.url = [kRLHTTPMobileBaseURLString stringByAppendingString:kAboutWebPage];//kAboutWebUrl;
             vc.title = NSLocalizedString(@"关于公司", nil);
+            [self.navigationController pushViewController:vc animated:YES];
         }
             break;
         case 2: {
+            MoreDetailVC *vc = [MoreDetailVC new];
             vc.url = [kRLHTTPMobileBaseURLString stringByAppendingString:kHelpWebPage];;
             vc.title = NSLocalizedString(@"帮助", nil);
+            [self.navigationController pushViewController:vc animated:YES];
         }
             break;
 //        case 3: {
@@ -124,7 +126,6 @@ static NSString *kSetupWebPage = @"help.jsp";
             break;
     }
     
-    [self.navigationController pushViewController:vc animated:YES];
 }
 
 @end

@@ -345,8 +345,10 @@ void postNotificationWithNone(const NSString *notificationName) {
     if(isXmppConnected || [self isXmppConnecting])
         return YES;
     if (![xmppStream connectWithTimeout:XMPPStreamTimeoutNone error:&error]) {
+#ifdef DEBUG
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error connecting" message:@"See console for error details." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alertView show];
+#endif
         
         DDLogError(@"Error connecting: %@", error);
         

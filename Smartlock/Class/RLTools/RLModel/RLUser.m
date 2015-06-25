@@ -10,6 +10,7 @@
 #import "RLUtilitiesMethods.h"
 
 NSString *kVoiceSwitchKey = @"voiceSwitchKey";
+NSString *kAutoOpenlockSwitchKey = @"autoOpenlockSwitchKey";
 
 #pragma mark -
 
@@ -144,6 +145,27 @@ NSString *kVoiceSwitchKey = @"voiceSwitchKey";
         return;
     
     [userDefault setObject:[NSNumber numberWithBool:on] forKey:kVoiceSwitchKey];
+    [userDefault synchronize];
+}
+
++ (BOOL)getAutoOpenLockSwitch {
+    NSUserDefaults *userDefault = [NSUserDefaults standardUserDefaults];
+    NSNumber *aSwitch = [userDefault objectForKey:kAutoOpenlockSwitchKey];
+    if(aSwitch == nil)
+        return NO;
+    
+    return aSwitch.boolValue;
+}
+
++ (void)setAutoOpenLockSwitch:(BOOL)on {
+    NSUserDefaults *userDefault = [NSUserDefaults standardUserDefaults];
+    NSNumber *aSwitch = [userDefault objectForKey:kAutoOpenlockSwitchKey];
+    if(aSwitch == nil) {
+    }
+    else if(on == aSwitch.boolValue)
+        return;
+    
+    [userDefault setObject:[NSNumber numberWithBool:on] forKey:kAutoOpenlockSwitchKey];
     [userDefault synchronize];
 }
 @end

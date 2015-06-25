@@ -210,6 +210,10 @@
 		961108151B393BF10033E45F /* HUDErrormark.png in Resources */ = {isa = PBXBuildFile; fileRef = 961108101B393BF10033E45F /* HUDErrormark.png */; };
 		961108161B393BF10033E45F /* HUDErrormark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 961108111B393BF10033E45F /* HUDErrormark@2x.png */; };
 		961108181B393C0E0033E45F /* HUDErrormark@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 961108171B393C0E0033E45F /* HUDErrormark@3x.png */; };
+		9611081B1B3A9FD40033E45F /* SystemSettingVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 9611081A1B3A9FD40033E45F /* SystemSettingVC.m */; };
+		9611081F1B3B9FB90033E45F /* Settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 9611081C1B3B9FB90033E45F /* Settings.png */; };
+		961108201B3B9FB90033E45F /* Settings@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9611081D1B3B9FB90033E45F /* Settings@2x.png */; };
+		961108211B3B9FB90033E45F /* Settings@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9611081E1B3B9FB90033E45F /* Settings@3x.png */; };
 		9613EFDF1B27E7BC00632912 /* DeviceUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9613EFDE1B27E7BC00632912 /* DeviceUser.m */; };
 		9613EFE31B2A6C7400632912 /* RLAlertLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9613EFE21B2A6C7400632912 /* RLAlertLabel.m */; };
 		9613EFE71B2ABC1700632912 /* Voice.png in Resources */ = {isa = PBXBuildFile; fileRef = 9613EFE41B2ABC1700632912 /* Voice.png */; };
@@ -997,6 +1001,11 @@
 		961108101B393BF10033E45F /* HUDErrormark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HUDErrormark.png; sourceTree = "<group>"; };
 		961108111B393BF10033E45F /* HUDErrormark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "HUDErrormark@2x.png"; sourceTree = "<group>"; };
 		961108171B393C0E0033E45F /* HUDErrormark@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "HUDErrormark@3x.png"; sourceTree = "<group>"; };
+		961108191B3A9FD40033E45F /* SystemSettingVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemSettingVC.h; sourceTree = "<group>"; };
+		9611081A1B3A9FD40033E45F /* SystemSettingVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SystemSettingVC.m; sourceTree = "<group>"; };
+		9611081C1B3B9FB90033E45F /* Settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Settings.png; sourceTree = "<group>"; };
+		9611081D1B3B9FB90033E45F /* Settings@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings@2x.png"; sourceTree = "<group>"; };
+		9611081E1B3B9FB90033E45F /* Settings@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings@3x.png"; sourceTree = "<group>"; };
 		9613EFDD1B27E7BC00632912 /* DeviceUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceUser.h; sourceTree = "<group>"; };
 		9613EFDE1B27E7BC00632912 /* DeviceUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceUser.m; sourceTree = "<group>"; };
 		9613EFE11B2A6C7400632912 /* RLAlertLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLAlertLabel.h; sourceTree = "<group>"; };
@@ -3191,6 +3200,8 @@
 				960A23F21B01A3D8002111E3 /* MoreVC.m */,
 				960A24001B073CFD002111E3 /* MoreDetailVC.h */,
 				960A24011B073CFD002111E3 /* MoreDetailVC.m */,
+				961108191B3A9FD40033E45F /* SystemSettingVC.h */,
+				9611081A1B3A9FD40033E45F /* SystemSettingVC.m */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -4369,6 +4380,9 @@
 				96FC5AF51B16C7070076767B /* SetupNav.png */,
 				96FC5AF61B16C7070076767B /* SetupNav@2x.png */,
 				96FC5AF71B16C7070076767B /* SetupNav@3x.png */,
+				9611081C1B3B9FB90033E45F /* Settings.png */,
+				9611081D1B3B9FB90033E45F /* Settings@2x.png */,
+				9611081E1B3B9FB90033E45F /* Settings@3x.png */,
 			);
 			name = More;
 			path = Smartlock/Resources/More;
@@ -4517,6 +4531,8 @@
 				96002BE41B16FD660072CF05 /* MessageAvater.png in Resources */,
 				96AB245F1ADE45490021C19C /* btnCheck.png in Resources */,
 				96EED8621AC15E25000E53C0 /* SoundOperator.mp3 in Resources */,
+				961108201B3B9FB90033E45F /* Settings@2x.png in Resources */,
+				9611081F1B3B9FB90033E45F /* Settings.png in Resources */,
 				9613EFE71B2ABC1700632912 /* Voice.png in Resources */,
 				96FC5AFA1B16C7070076767B /* About@3x.png in Resources */,
 				960A23DA1B00A6B3002111E3 /* ReceiverBg@3x.png in Resources */,
@@ -4542,6 +4558,7 @@
 				96DA3EA51ACA8DCD00FAD340 /* LoginIcon.png in Resources */,
 				96002BE01B16FB4D0072CF05 /* KeyIcon@3x.png in Resources */,
 				96DA3EA61ACA8DCD00FAD340 /* LoginIcon@2x.png in Resources */,
+				961108211B3B9FB90033E45F /* Settings@3x.png in Resources */,
 				961108151B393BF10033E45F /* HUDErrormark.png in Resources */,
 				96DA3EDF1ACE218000FAD340 /* h3.jpg in Resources */,
 				9602375B1AF7745A005996E0 /* MainBackground@2x.jpeg in Resources */,
@@ -4863,6 +4880,7 @@
 				9613EFFD1B2C00ED00632912 /* RLSecurityPolicy.m in Sources */,
 				960236621AEE1627005996E0 /* XMPPDeprecatedDigestAuthentication.m in Sources */,
 				96DA44301AD670EC00FAD340 /* RLLocation.m in Sources */,
+				9611081B1B3A9FD40033E45F /* SystemSettingVC.m in Sources */,
 				960236831AEE1627005996E0 /* XMPPResourceMemoryStorageObject.m in Sources */,
 				96EED7AF1AC13742000E53C0 /* ZXGenericGF.m in Sources */,
 				96BD791A1AB66D4E00CAF7A4 /* CBUUID+StringExtraction.m in Sources */,
