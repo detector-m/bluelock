@@ -214,6 +214,7 @@
 		9611081F1B3B9FB90033E45F /* Settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 9611081C1B3B9FB90033E45F /* Settings.png */; };
 		961108201B3B9FB90033E45F /* Settings@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9611081D1B3B9FB90033E45F /* Settings@2x.png */; };
 		961108211B3B9FB90033E45F /* Settings@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9611081E1B3B9FB90033E45F /* Settings@3x.png */; };
+		961108571B3D07F50033E45F /* MSWeakTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 961108561B3D07F50033E45F /* MSWeakTimer.m */; };
 		9613EFDF1B27E7BC00632912 /* DeviceUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9613EFDE1B27E7BC00632912 /* DeviceUser.m */; };
 		9613EFE31B2A6C7400632912 /* RLAlertLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9613EFE21B2A6C7400632912 /* RLAlertLabel.m */; };
 		9613EFE71B2ABC1700632912 /* Voice.png in Resources */ = {isa = PBXBuildFile; fileRef = 9613EFE41B2ABC1700632912 /* Voice.png */; };
@@ -1006,6 +1007,8 @@
 		9611081C1B3B9FB90033E45F /* Settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Settings.png; sourceTree = "<group>"; };
 		9611081D1B3B9FB90033E45F /* Settings@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings@2x.png"; sourceTree = "<group>"; };
 		9611081E1B3B9FB90033E45F /* Settings@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings@3x.png"; sourceTree = "<group>"; };
+		961108551B3D07F50033E45F /* MSWeakTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSWeakTimer.h; sourceTree = "<group>"; };
+		961108561B3D07F50033E45F /* MSWeakTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MSWeakTimer.m; sourceTree = "<group>"; };
 		9613EFDD1B27E7BC00632912 /* DeviceUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceUser.h; sourceTree = "<group>"; };
 		9613EFDE1B27E7BC00632912 /* DeviceUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceUser.m; sourceTree = "<group>"; };
 		9613EFE11B2A6C7400632912 /* RLAlertLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLAlertLabel.h; sourceTree = "<group>"; };
@@ -2807,6 +2810,15 @@
 			path = Message;
 			sourceTree = "<group>";
 		};
+		961108541B3D07F50033E45F /* WeakTimer */ = {
+			isa = PBXGroup;
+			children = (
+				961108551B3D07F50033E45F /* MSWeakTimer.h */,
+				961108561B3D07F50033E45F /* MSWeakTimer.m */,
+			);
+			path = WeakTimer;
+			sourceTree = "<group>";
+		};
 		9613EFE01B2A6C5E00632912 /* AlertLabel */ = {
 			isa = PBXGroup;
 			children = (
@@ -3132,6 +3144,7 @@
 		96BD799F1ABFE8D500CAF7A4 /* RLTools */ = {
 			isa = PBXGroup;
 			children = (
+				961108541B3D07F50033E45F /* WeakTimer */,
 				969DFD631B32A2EF0057D0BE /* WebCache */,
 				9613EFEA1B2BCC7800632912 /* Security */,
 				96B43BE11B0D750400E33264 /* Json */,
@@ -4681,6 +4694,7 @@
 				96EED78A1AC13742000E53C0 /* ZXBookmarkDoCoMoResultParser.m in Sources */,
 				960236E61AEE1627005996E0 /* DDDispatchQueueLogFormatter.m in Sources */,
 				9602368D1AEE1627005996E0 /* XMPPPrivacy.m in Sources */,
+				961108571B3D07F50033E45F /* MSWeakTimer.m in Sources */,
 				96BD78B11AAFD0DC00CAF7A4 /* ViewController.m in Sources */,
 				96BD79251AB7BB9500CAF7A4 /* BaseVC.m in Sources */,
 				96EED7FB1AC13742000E53C0 /* ZXRSSExpandedGeneralAppIdDecoder.m in Sources */,

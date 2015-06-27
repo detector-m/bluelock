@@ -44,6 +44,7 @@ extern NSDictionary *messageDictionaryFromXMPPMessage(XMPPMessage *xmppMessage);
 + (NSInteger)messageType:(NSString *)jsonString;
 + (NSInteger)messageTypeWithXMPPMessage:(XMPPMessage *)xmppMessage;
 
++ (NSString *)messageDeviceTokenWithXMPPMessage:(XMPPMessage *)xmppMessage;
 //报文flag：flag=1 需要重新加载；flag=0 无需重新加载
 + (NSInteger)messageFlag:(NSString *)jsonString;
 + (NSInteger)messageFlagWithXMPPMessage:(XMPPMessage *)xmppMessage;

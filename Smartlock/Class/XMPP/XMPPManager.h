@@ -20,6 +20,8 @@
 extern const NSString *kDidConnected;
 extern const NSString *kDidDisconnected;
 extern const NSString *kReceiveMessage;
+extern const NSString *kReceiveLogoutMessage;
+
 
 @interface XMPPManager : NSObject <XMPPStreamDelegate, XMPPRosterDelegate> {
     XMPPStream *xmppStream;

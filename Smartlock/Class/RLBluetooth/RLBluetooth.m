@@ -50,12 +50,23 @@ static RLBluetooth *_sharedBluetooth = nil;
     return self.manager.centralReady;
 }
 
+- (BOOL)isSupportBluttoothLow {
+    return self.manager.manager.state != CBCentralManagerStateUnsupported;
+}
+
 #pragma mark -
 - (void)setupBLCentralManaer {
     self.manager = [RLCentralManager new];
 }
 
 - (void)scanBLPeripheralsWithCompletionBlock:(void (^)(NSArray *peripherals))completionCallback {
+    if(![self isSupportBluttoothLow]) {
+        if(completionCallback) {
+            completionCallback(nil);
+        }
+//        [RLHUD hudAlertWarningWithBody:NSLocalizedString(@"不支持低功耗蓝牙！", nil)];
+        return;
+    }
     if(![self bluetoothIsReady]) {
         if(completionCallback) {
             completionCallback(nil);

@@ -22,6 +22,7 @@
 
 #pragma mark -
 - (BOOL)bluetoothIsReady;
+- (BOOL)isSupportBluttoothLow;
 
 #pragma mark -
 - (void)scanBLPeripheralsWithCompletionBlock:(void (^)(NSArray *peripherals))completionCallback;

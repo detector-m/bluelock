@@ -123,7 +123,7 @@
                 [self startTimer:self.authcodeButton];
             }
             else {
-                [RLHUD hudAlertSuccessWithBody:NSLocalizedString(@"手机号码可用！", nil)];
+                [RLHUD hudAlertErrorWithBody:NSLocalizedString(@"手机号码未注册！", nil)];
             }
         }
     }];

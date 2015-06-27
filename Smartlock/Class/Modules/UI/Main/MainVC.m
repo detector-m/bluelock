@@ -1,3 +1,4 @@
+
 //
 //  MainVC.m
 //  Smartlock
@@ -34,6 +35,8 @@
 
 #pragma mark -
 #import "RLSecurityPolicy.h"
+
+#import "MSWeakTimer.h"
 
 @interface MainVC () <UIWebViewDelegate> //<RLCycleScrollViewDelegate>
 
@@ -73,7 +76,9 @@
 @property (nonatomic, strong) NSTimer *animationTimer;
 
 #pragma mark - 
-@property (nonatomic, strong) NSTimer *autoOpenlockTimer;
+//@property (nonatomic, strong) NSTimer *autoOpenlockTimer;
+@property (nonatomic, strong) MSWeakTimer *autoOpenlockTimer;
+
 @property (nonatomic, assign) BOOL isMainVC;
 @end
 
@@ -93,6 +98,9 @@
     self.navigationController.navigationBarHidden = YES;
 
     self.messageBadgeNumber = [[MyCoreDataManager sharedManager] objectsCountWithKey:@"isRead" contains:@NO withTablename:NSStringFromClass([Message class])];
+    
+    [self createAndScheduleAutoOpenlockTimer];
+    self.isMainVC = YES;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -100,8 +108,6 @@
     
     [self setBackButtonHide:YES];
     
-    [self createAndScheduleAutoOpenlockTimer];
-    self.isMainVC = YES;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -166,6 +172,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applictionWillResignActive) name:UIApplicationWillResignActiveNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage) name:(NSString *)kReceiveMessage object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveLogoutMessage) name:(NSString *)kReceiveLogoutMessage object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkReachable:) name:AFNetworkingReachabilityDidChangeNotification object:nil];
 }
 
@@ -367,6 +374,10 @@ static NSString *kBannersPage = @"/bleLock/advice.jhtml";
     __weak __typeof(self)weakSelf = self;
     [DeviceManager lockList:[User sharedUser].sessionToken withBlock:^(DeviceResponse *response, NSError *error) {
         self.isLockListLoading = NO;
+        if(response.status == -999) {
+            [weakSelf cancelAutoOpenlockTimer];
+            return ;
+        }
         if(error || !response.list.count) return;
 
         NSArray *list = [weakSelf sortLockForList:response.list];
@@ -392,6 +403,13 @@ static NSString *kBannersPage = @"/bleLock/advice.jhtml";
 
 static int retry = 0;
 - (void)clickOpenLockBtn:(UIButton *)button {
+    if(!self.isMainVC)
+        return;
+    if(![[RLBluetooth sharedBluetooth] isSupportBluttoothLow]) {
+        if([User getAutoOpenLockSwitch])
+            return;
+        [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"不支持低功耗蓝牙！", nil)];
+    }
     button = self.openLockBtn;
     if(!self.lockList.count) {
         if([User getAutoOpenLockSwitch])
@@ -719,6 +737,10 @@ static int retry = 0;
     [self loadLockListFromNet];
 }
 
+- (void)receiveLogoutMessage{
+    [self loadLockListFromNet];
+}
+
 #pragma mark - public methods
 #pragma mark -
 - (void)addKey:(KeyModel *)key {
@@ -770,19 +792,28 @@ static int retry = 0;
  *  自动开锁
  */
 - (void)createAndScheduleAutoOpenlockTimer {
-    if([User getAutoOpenLockSwitch]) return;
-    if(self.autoOpenlockTimer) {
-        return;
-    }
     
-    self.autoOpenlockTimer = [NSTimer scheduledTimerWithTimeInterval:7 target:self selector:@selector(clickOpenLockBtn:) userInfo:nil repeats:YES];
-    [self clickOpenLockBtn:self.openLockBtn];
+    if(![[RLBluetooth sharedBluetooth] isSupportBluttoothLow])
+        return;
+    if([User getAutoOpenLockSwitch]) return;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.autoOpenlockTimer invalidate];
+        self.autoOpenlockTimer = nil;
+//        self.autoOpenlockTimer = [NSTimer scheduledTimerWithTimeInterval:7 target:self selector:@selector(clickOpenLockBtn:) userInfo:nil repeats:YES];
+        self.autoOpenlockTimer = [MSWeakTimer scheduledTimerWithTimeInterval:7 target:self selector:@selector(clickOpenLockBtn:) userInfo:nil repeats:YES dispatchQueue:dispatch_get_main_queue()];
+        //        self.autoOpenlockTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:0] interval:7 target:self selector:@selector(clickOpenLockBtn:) userInfo:nil repeats:YES];
+        //        [[NSRunLoop currentRunLoop] addTimer:_autoOpenlockTimer forMode:NSDefaultRunLoopMode];
+        [self clickOpenLockBtn:self.openLockBtn];
+    });
+
 }
 
 - (void)cancelAutoOpenlockTimer {
-    if(self.autoOpenlockTimer) {
-        [self.autoOpenlockTimer invalidate], self.autoOpenlockTimer = nil;
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self stopTimer];
+        [self.autoOpenlockTimer invalidate];
+        self.autoOpenlockTimer = nil;
+    });
 }
 
 - (void)updateRecords {

@@ -8,6 +8,7 @@
 
 #import "RLCentralManager.h"
 #import "RLPeripheral.h"
+#import "RLHUD.h"
 
 @interface RLCentralManager () <CBCentralManagerDelegate>
 /*----------------------------------------------------*/
@@ -125,6 +126,7 @@
     NSString *message = nil;
     switch (self.manager.state) {
         case CBCentralManagerStateUnsupported:
+            [RLHUD hudAlertErrorWithBody:@"不支持低功耗蓝牙！"];
             message = @"The platform/hardware doesn't support Bluetooth Low Energy.";
             break;
         case CBCentralManagerStateUnauthorized:

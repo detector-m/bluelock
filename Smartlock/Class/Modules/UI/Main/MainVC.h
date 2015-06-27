@@ -21,4 +21,7 @@
 - (void)loadLockList;
 
 - (NSArray *)locks;
+
+#pragma mark -
+- (void)cancelAutoOpenlockTimer;
 @end

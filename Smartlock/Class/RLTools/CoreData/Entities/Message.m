@@ -71,6 +71,16 @@ NSDictionary *messageDictionaryFromXMPPMessage(XMPPMessage *xmppMessage) {
     
 }
 
++ (NSString *)messageDeviceTokenWithXMPPMessage:(XMPPMessage *)xmppMessage {
+    NSString *json = [[[xmppMessage elementForName:@"dqcc"] elementForName:@"backJson"] stringValue];
+    if(!json)
+        return nil;
+    
+    NSDictionary *backDic = [RLJSON JSONObjectWithString:json];
+
+    return [backDic objectForKey:@"data"];
+}
+
 + (NSInteger)messageFlag:(NSString *)jsonString {
     if(!jsonString)
         return -1;
