@@ -192,13 +192,12 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self deselectRow];
     KeyModel *key = [self.table.datas objectAtIndex:indexPath.row];
     if(!key.userType) {
         KeysOfLockVC *vc = [[KeysOfLockVC alloc] init];
         vc.lockId = key.lockID;
         [self.navigationController pushViewController:vc animated:YES];
-        
-        [self deselectRow];
     }
 }
 
