@@ -23,9 +23,12 @@
 
 #import "RLUtilitiesMethods.h"
 
+#import "MyCoreDataManager.h"
+
 #pragma mark -
 #import "CustomURLCache.h"
 
+#if 0
 /************** Test *****************/
 #import "ViewController.h"
 #import "TestViewController.h"
@@ -41,6 +44,7 @@
 #import "KeyEntity.h"
 #import "LockEntity.h"
 /*************************************/
+#endif
 
 @interface AppDelegate ()
 
@@ -69,14 +73,6 @@
     ////        DLog(@"%xc", x[i]);
     //        NSLog(@"%02x", x[i]);
     //    }
-#endif
-
-#if 0
-//    NSString *str = @"{\"backCode\":107,\"data\":{\"addTime\":\"2015-05-21 09:52:41\",\"bleLock\":{\"addTime\":\"2015-05-15 10:25:48\",\"bleAddress\":\"aaaaaaa\",\"id\":14,\"lockPwd\":\"123456789\",\"memberGid\":\"46804818-5dae-e440-6a60-db709c5b82d7\",\"status\":0},\"bleLockId\":14,\"id\":77,\"keyType\":2,\"lockName\":\"Renquant\",\"member\":{\"easemobUserId\":\"26\",\"easemobUserPwd\":\"1c072216AECDFBD3B6C1B87C7370DFCEE5\",\"gid\":\"46804818-5dae-e440-6a60-db709c5b82d7\",\"guestChikyugo\":\"00000016\",\"headPortrait\":\"4e27e819-5c2a-4e50-aeb9-0481f0151f17.jpg\",\"joinTime\":\"2014-12-19 18:14:33\",\"lastLoginIp\":\"106.226.59.52\",\"lastLoginTime\":\"2015-05-16 14:16:33\",\"latitude\":\"27.826707\",\"longitude\":\"114.406331\",\"memberName\":\"可力\",\"memberType\":1,\"mobile\":\"18970508666\",\"passward\":\"125BAFAE91627BB05DA33FF021CB189D39\",\"registeredCity\":\"宜春市\",\"sex\":\"1\",\"signature\":\"\",\"status\":1},\"memberGid\":\"55574b1f-e578-1b81-f4ff-0b9b9c55a933\",\"status\":0,\"userType\":1,\"validTime\":\"1432742400000\"}}";
-//    id ret = [RLJSON JSONObjectWithString:str];
-//    DLog(@"%@", ret);
-//    long long data = [[NSDate date] timeIntervalSince1970]*1000;
-//    DLog(@"%lli", data);
 #endif
     
 #if 0
