@@ -210,7 +210,6 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-#warning "background"
 #if 1
     UIApplication *app = [UIApplication sharedApplication];
     

@@ -137,13 +137,10 @@
 #pragma mark -
     self.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height + 64);
     self.backgroundImage.frame = self.view.frame;
+
     [self setupBanners];
     [self setupMainView];
-//    [self setupBanners];
-//    [self setupMainView];
-    
     [self setupLockList];
-    
     [self setupNotification];
 }
 
@@ -665,7 +662,6 @@ static int retry = 0;
 - (void)clickMyDeviceBtn:(UIButton *)button {
     LockDevicesVC *vc = [LockDevicesVC new];
     vc.mainVC = self;
-//    [vc.table addObjectFromArray:self.lockList];
     [self.navigationController pushViewController:vc animated:YES];
 }
 
@@ -799,10 +795,7 @@ static int retry = 0;
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.autoOpenlockTimer invalidate];
         self.autoOpenlockTimer = nil;
-//        self.autoOpenlockTimer = [NSTimer scheduledTimerWithTimeInterval:7 target:self selector:@selector(clickOpenLockBtn:) userInfo:nil repeats:YES];
-        self.autoOpenlockTimer = [MSWeakTimer scheduledTimerWithTimeInterval:7 target:self selector:@selector(clickOpenLockBtn:) userInfo:nil repeats:YES dispatchQueue:dispatch_get_main_queue()];
-        //        self.autoOpenlockTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:0] interval:7 target:self selector:@selector(clickOpenLockBtn:) userInfo:nil repeats:YES];
-        //        [[NSRunLoop currentRunLoop] addTimer:_autoOpenlockTimer forMode:NSDefaultRunLoopMode];
+        self.autoOpenlockTimer = [MSWeakTimer scheduledTimerWithTimeInterval:6 target:self selector:@selector(clickOpenLockBtn:) userInfo:nil repeats:YES dispatchQueue:dispatch_get_main_queue()];
         [self clickOpenLockBtn:self.openLockBtn];
     });
 
@@ -820,7 +813,7 @@ static int retry = 0;
     /*remove invalid records*/
     [RecordManager updateRecordsWithBlock:^(BOOL success) {
         [self loadLockListFromNet];
-        
+    
         for(KeyModel *key in self.lockList) {
             if(![key isValid]) {
                 [RecordManager removeRecordsWithKeyID:(long long)key.ID];

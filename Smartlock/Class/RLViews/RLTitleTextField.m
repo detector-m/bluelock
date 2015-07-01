@@ -29,11 +29,10 @@
         
         UITextField *tmp ;
         self.textField = [[UITextField alloc] initWithFrame:CGRectMake(widthOffset, 1, frame.size.width*0.7-2, frame.size.height-2)];
-        self.textField.clearButtonMode = UITextFieldViewModeWhileEditing;
         tmp = self.textField;
+        tmp.keyboardType = UIKeyboardTypeDefault;
         tmp.borderStyle = UITextBorderStyleRoundedRect;
         tmp.clearButtonMode = UITextFieldViewModeAlways;
-        tmp.keyboardType = UIKeyboardTypeDefault;
         
         tmp.font = [UIFont systemFontOfSize:16];
 

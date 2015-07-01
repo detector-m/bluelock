@@ -52,6 +52,7 @@
     
     heightOffset += self.phoneTextField.frame.size.height + 10;
     self.authcodeTextField = [UITextField new];
+    self.authcodeTextField.clearButtonMode = UITextFieldViewModeAlways;
     self.authcodeTextField.keyboardType = UIKeyboardTypeNumberPad;
     self.authcodeTextField.frame = CGRectMake(widthOffset, heightOffset, frame.size.width/2-widthOffset-2, 40.0f);
     self.authcodeTextField.layer.borderColor = [UIColor lightGrayColor].CGColor;
