@@ -71,7 +71,7 @@
         cell.detailTextLabel.text = [NSString stringWithFormat:@"还可使用%d次", (int)key.validCount];
     }
     else  {
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"钥匙有效期限%@", key.invalidDate];
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"有效期%@", key.invalidDate];
     }
     cell.imageView.image = [UIImage imageNamed:@"KeyIcon"];
 

@@ -90,7 +90,7 @@ NSString *dateStringFromTimestamp(long long timestamp) {
     
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp];
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init] ;
-    [formatter setDateFormat:@"yyyy-MM-dd"];
+    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     
     return [formatter stringFromDate:date];
 }
