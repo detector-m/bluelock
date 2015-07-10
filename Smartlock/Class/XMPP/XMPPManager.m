@@ -455,12 +455,12 @@ void postNotificationWithNone(const NSString *notificationName) {
     }
     
     if([Message messageTypeWithXMPPMessage:message] == 101) {
-        if(![[User sharedUser].deviceTokenString isEqualToString:[Message messageDeviceTokenWithXMPPMessage:message]]) {
-            postNotification(kReceiveLogoutMessage, @YES);
-            [Login hudAlertLogout];
-            
-            return;
-        }
+//        if(![[User sharedUser].deviceTokenString isEqualToString:[Message messageDeviceTokenWithXMPPMessage:message]]) {
+//            postNotification(kReceiveLogoutMessage, @YES);
+//            [Login hudAlertLogout];
+//            
+//            return;
+//        }
         
         postNotification(kReceiveLogoutMessage, @NO);
         return;

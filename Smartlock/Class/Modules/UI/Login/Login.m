@@ -82,7 +82,7 @@
 }
 
 + (void)hudAlertLogout {
-    [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"用户异地登录", nil) dimissBlock:^{
+    [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"请重新登录", nil) dimissBlock:^{
         [Login forcedLogout];
     }];
 }
