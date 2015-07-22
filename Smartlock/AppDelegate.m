@@ -278,6 +278,14 @@
     //向APNS注册成功，收到返回的deviceToken
     
     DLog(@"APNS OK device token = %@", deviceToken);
+    if((![User sharedUser].deviceToken || [User sharedUser].deviceToken.length == 0) && deviceToken.length != 0) {
+        [User sharedUser].deviceToken = deviceToken;
+        if(![User sharedUser].isLogined) {
+            return;
+        }
+        [Login hudAlertLogout];
+        return;
+    }
     [User sharedUser].deviceToken = deviceToken;
 }
 

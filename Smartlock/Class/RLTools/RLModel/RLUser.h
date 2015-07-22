@@ -28,6 +28,7 @@ typedef NS_ENUM(NSInteger, GenderType) {
 @property (nonatomic, copy) NSString *sessionToken;
 @property (nonatomic, strong) NSData *deviceToken;
 @property (nonatomic, weak) NSString *deviceTokenString;
+@property (nonatomic, assign) BOOL isLogined;
 
 + (instancetype)sharedUser;
 + (BOOL)saveArchiver;

@@ -37,6 +37,7 @@ NSString *kAutoOpenlockSwitchKey = @"autoOpenlockSwitchKey";
         self.age = [aDecoder decodeIntegerForKey:@"age"];
         self.location = [aDecoder decodeObjectForKey:@"location"];
         self.sessionToken = [aDecoder decodeObjectForKey:@"sessionToken"];
+        self.deviceToken = [aDecoder decodeObjectForKey:@"deviceToken"];
     }
     
     return self;
@@ -51,6 +52,7 @@ NSString *kAutoOpenlockSwitchKey = @"autoOpenlockSwitchKey";
     [aCoder encodeInteger:self.age forKey:@"age"];
     [aCoder encodeObject:self.location forKey:@"location"];
     [aCoder encodeObject:self.sessionToken forKey:@"sessionToken"];
+    [aCoder encodeObject:self.deviceToken forKey:@"deviceToken"];
 }
 
 #pragma mark - 
@@ -67,6 +69,7 @@ NSString *kAutoOpenlockSwitchKey = @"autoOpenlockSwitchKey";
     self.age = user.age;
     self.location = user.location;
     self.sessionToken = user.sessionToken;
+    self.deviceToken = user.deviceToken;
 }
 
 - (void)setWithParameters:(NSDictionary *)parameters {

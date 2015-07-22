@@ -52,6 +52,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [User sharedUser].isLogined = NO;
+    
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
     NSString *displayname = [infoDictionary objectForKey:@"CFBundleDisplayName"];
     self.title = displayname;//NSLocalizedString(@"永家科技", nil);

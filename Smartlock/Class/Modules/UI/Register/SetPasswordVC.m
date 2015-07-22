@@ -80,10 +80,10 @@
     if(self.type == kRegister) {
         RegisterModel *aRegister = [[RegisterModel alloc] init];
         aRegister.deviceToken = [User sharedUser].deviceToken;
-        if(!aRegister.deviceToken) {
-            [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"请过5－10s后再试！", nil)];
-            return;
-        }
+//        if(!aRegister.deviceToken) {
+//            [RLHUD hudAlertNoticeWithBody:NSLocalizedString(@"请过5－10s后再试！", nil)];
+//            return;
+//        }
         [RLHUD hudProgressWithBody:nil onView:self.view timeout:URLTimeoutInterval];
         aRegister.account = [User sharedUser].phone;
         aRegister.password = self.password.textField.text;

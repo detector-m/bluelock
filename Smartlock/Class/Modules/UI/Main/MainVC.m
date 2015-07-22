@@ -125,6 +125,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [User sharedUser].isLogined = YES;
+    
     [self setBackButtonHide:YES];
 
     self.title = NSLocalizedString(@"yongjiakeji", nil);

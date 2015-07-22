@@ -8,6 +8,9 @@
 
 #import "RegisterModel.h"
 
+#import "RLTypecast.h"
+#import "RLUtilitiesMethods.h"
+
 @interface RegisterModel ()
 @property (nonatomic, readwrite, unsafe_unretained) id user;
 @end
@@ -28,6 +31,8 @@
 
     [mutableDic setObject:user.phone forKey:@"memberName"];
     [mutableDic setObject:user.phone forKey:@"mobile"];
+    [mutableDic setObject:hexStringFromData(self.deviceToken)/*self.deviceToken*/ forKey:@"deviceToken"];
+
 //    [mutableDic setObject:user.deviceToken forKey:@"deviceToken"];
     
     return mutableDic;
